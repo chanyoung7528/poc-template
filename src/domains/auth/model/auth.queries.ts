@@ -1,21 +1,22 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { 
-  fetchCurrentUser, 
-  logout, 
-  loginWithCredentials, 
-  signup, 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  fetchCurrentUser,
+  logout,
+  loginWithCredentials,
+  signup,
   resetPassword,
   findIdByEmail,
   sendVerificationCode,
   verifyCode,
-} from './auth.api';
-import { useAuthStore } from './auth.store';
-import type { SignupData, ResetPasswordData } from './auth.types';
+  verifyCertification,
+} from "./auth.api";
+import { useAuthStore } from "./auth.store";
+import type { SignupData, ResetPasswordData } from "./auth.types";
 
 // Query Keys
 export const authKeys = {
-  all: ['auth'] as const,
-  me: () => [...authKeys.all, 'me'] as const,
+  all: ["auth"] as const,
+  me: () => [...authKeys.all, "me"] as const,
 };
 
 /**
@@ -24,11 +25,11 @@ export const authKeys = {
 export function useCurrentUser() {
   const setUser = useAuthStore((state) => state.setUser);
   const setAuthStatus = useAuthStore((state) => state.setAuthStatus);
-  
+
   return useQuery({
     queryKey: authKeys.me(),
     queryFn: async () => {
-      setAuthStatus('loading');
+      setAuthStatus("loading");
       const user = await fetchCurrentUser();
       setUser(user);
       return user;
@@ -44,7 +45,7 @@ export function useCurrentUser() {
 export function useLogout() {
   const queryClient = useQueryClient();
   const clearAuth = useAuthStore((state) => state.clearAuth);
-  
+
   return useMutation({
     mutationFn: logout,
     onSuccess: () => {
@@ -60,7 +61,7 @@ export function useLogout() {
 export function useLogin() {
   const queryClient = useQueryClient();
   const setUser = useAuthStore((state) => state.setUser);
-  
+
   return useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) =>
       loginWithCredentials(email, password),
@@ -77,7 +78,7 @@ export function useLogin() {
 export function useSignup() {
   const queryClient = useQueryClient();
   const setUser = useAuthStore((state) => state.setUser);
-  
+
   return useMutation({
     mutationFn: (data: SignupData) => signup(data),
     onSuccess: (data) => {
@@ -119,7 +120,7 @@ export function useSendVerificationCode() {
  */
 export function useVerifyCode() {
   const setTempToken = useAuthStore((state) => state.setTempToken);
-  
+
   return useMutation({
     mutationFn: ({ email, code }: { email: string; code: string }) =>
       verifyCode(email, code),
@@ -129,5 +130,14 @@ export function useVerifyCode() {
         expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes
       });
     },
+  });
+}
+
+/**
+ * 아임포트 본인인증 검증 Mutation
+ */
+export function useVerifyCertification() {
+  return useMutation({
+    mutationFn: (impUid: string) => verifyCertification(impUid),
   });
 }

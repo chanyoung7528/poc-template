@@ -1,17 +1,30 @@
 'use client';
 
+import { usePortOnePass } from '@/features/auth/hooks/usePortOnePass';
 import styles from './PassAuthButton.module.scss';
 
 interface PassAuthButtonProps {
-  onClick: () => void;
+  onClick?: () => void;
   isLoading?: boolean;
 }
 
-export function PassAuthButton({ onClick, isLoading }: PassAuthButtonProps) {
+export function PassAuthButton({ onClick, isLoading: externalLoading }: PassAuthButtonProps) {
+  const { handleAuth, isLoading: internalLoading } = usePortOnePass();
+  
+  const isLoading = externalLoading || internalLoading;
+  
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      handleAuth();
+    }
+  };
+
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={handleClick}
       className={styles.passAuthButton}
       disabled={isLoading}
     >

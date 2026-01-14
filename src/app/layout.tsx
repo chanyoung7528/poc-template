@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { QueryProvider } from '@/lib/query-provider';
 import './globals.scss';
 
@@ -16,6 +17,12 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <QueryProvider>{children}</QueryProvider>
+        
+        {/* 아임포트 SDK 스크립트 */}
+        <Script 
+          src="https://cdn.iamport.kr/v1/iamport.js" 
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

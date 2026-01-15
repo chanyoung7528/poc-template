@@ -1,0 +1,34 @@
+:root {
+  /* Safe Area Insets */
+  --sat: env(safe-area-inset-top, 0);
+  --sar: env(safe-area-inset-right, 0);
+  --sab: env(safe-area-inset-bottom, 0);
+  --sal: env(safe-area-inset-left, 0);
+
+  /* Layout Tokens */
+  --header-height: 4.8rem;
+  --gnb-height: 5.9rem;
+  --content-height: calc(100dvh - var(--header-height));
+
+  /* Border Radius */
+  --radius-xl: 1rem;
+  --radius-lg: 0.8rem;
+  --radius-md: 0.6rem;
+  --radius-sm: 0.4rem;
+
+  /* Z-Index Scale */
+  --z-base: 1;
+  --z-sticky: 10;
+  --z-header: 100;
+  --z-dropdown: 500;
+  --z-modal: 1000;
+  --z-toast: 2000;
+
+  /* Semantic Tokens - Layout & Spacing */
+  --spacing-xs: 0.4rem;
+  --spacing-sm: 0.8rem;
+  --spacing-md: 1.2rem;
+  --spacing-lg: 1.6rem;
+  --spacing-xl: 2.4rem;
+  --spacing-2xl: 3.2rem;
+}

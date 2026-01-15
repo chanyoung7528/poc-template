@@ -1,0 +1,35 @@
+:root {
+  --base-white: hsl(0, 0%, 100%);
+  --base-black: #000000;
+  --base-background: rgba(247, 245, 241, 1);
+
+  /* Brand Colors */
+  --brand100: #003b41;
+  --brand90: #005961;
+  --brand80: #007782;
+  --brand70: #0c9dab;
+  --brand60: #2bb3bf;
+  --brand50: #5bc9d4;
+  --brand40: #83d7df;
+  --brand30: #abe6eb;
+  --brand20: #ceeef1;
+  --brand10: #e7f8fa;
+
+  /* Grayscale */
+  --gray100: #222222;
+  --gray90: #454444;
+  --gray80: #626261;
+  --gray70: #7e7e7d;
+  --gray60: #999898;
+  --gray50: #b1b1b0;
+  --gray40: #d3d3d3;
+  --gray30: #e5e5e5;
+  --gray20: #eeeeee;
+  --gray10: #f8f8f8;
+
+  /* Semantic Colors */
+  --danger: #ff4d4f;
+  --success: #52c41a;
+  --warning: #faad14;
+  --info: var(--brand60);
+}

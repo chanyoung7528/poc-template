@@ -5,7 +5,6 @@
   padding: 1rem;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  background-color: #f9fafb;
 }
 
 .checkboxGroup {
@@ -34,7 +33,7 @@
   user-select: none;
 
   &.required::after {
-    content: ' *';
+    content: " *";
     color: #ef4444;
   }
 }
@@ -42,7 +41,7 @@
 .allAgree {
   padding-top: 0.75rem;
   border-top: 1px solid #e5e7eb;
-  
+
   .label {
     font-weight: 600;
     color: #1f2937;

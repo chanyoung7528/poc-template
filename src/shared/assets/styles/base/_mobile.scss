@@ -1,0 +1,63 @@
+html {
+  --design-width: 360;
+  --min-width-px: 280;
+  --max-width-px: 450;
+
+  --scale-factor: calc(10 / var(--design-width));
+
+  --min-font-size: calc(
+    (var(--min-width-px) * var(--scale-factor) / 16) * 100%
+  );
+  --max-font-size: calc(
+    (var(--max-width-px) * var(--scale-factor) / 16) * 100%
+  );
+  --dynamic-font-size: calc(var(--scale-factor) * 100vw);
+
+  font-size: clamp(
+    var(--min-font-size),
+    var(--dynamic-font-size),
+    var(--max-font-size)
+  );
+}
+
+body {
+  padding-inline: var(--sal) var(--sar);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  background-color: var(--base-background);
+}
+
+img {
+  -webkit-user-drag: none;
+  text-decoration-skip-ink: auto;
+}
+
+input,
+textarea,
+[contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+@media (max-width: 768px) {
+  input,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior-y: none;
+}
+
+#root {
+  height: 100dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  // isolation: isolate;
+}

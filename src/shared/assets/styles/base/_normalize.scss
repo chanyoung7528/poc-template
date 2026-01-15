@@ -1,0 +1,49 @@
+html {
+  overflow-wrap: break-word;
+  word-break: keep-all;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  // text-rendering: optimizeLegibility;
+}
+
+body {
+  font-size: 1.3rem;
+  font-family: var(--font-pretendard);
+  color: var(--gray100);
+  background-color: var(--base-white);
+}
+
+button,
+input,
+textarea,
+select {
+  // appearance: none;
+  // -webkit-appearance: none;
+  border-radius: 0;
+  // vertical-align: middle;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+sub {
+  bottom: -0.25em;
+
+  :lang(ko) & {
+    bottom: 0;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+:target {
+  scroll-margin-block: 5ex;
+}

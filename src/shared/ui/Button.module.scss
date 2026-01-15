@@ -39,10 +39,6 @@
     background-color: transparent;
     color: #1f2937;
     border: 1px solid #d1d5db;
-
-    &:hover:not(:disabled) {
-      background-color: #f9fafb;
-    }
   }
 
   &.danger {

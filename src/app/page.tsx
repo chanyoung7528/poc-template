@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useCurrentUser, useLogout } from '@/domains/auth/model/auth.queries';
-import styles from './page.module.scss';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useCurrentUser, useLogout } from "@/domains/auth/model/auth.queries";
+import styles from "./page.module.scss";
 
 export default function HomePage() {
   const router = useRouter();
@@ -12,16 +12,16 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!isLoading && (!user || error)) {
-      router.push('/login');
+      router.push("/auth");
     }
   }, [user, isLoading, error, router]);
 
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();
-      router.push('/login');
+      router.push("/login");
     } catch (error) {
-      console.error('로그아웃 실패:', error);
+      console.error("로그아웃 실패:", error);
     }
   };
 
@@ -63,13 +63,15 @@ export default function HomePage() {
                 {user.profileImage && (
                   <img
                     src={user.profileImage}
-                    alt={user.nickname || '프로필'}
+                    alt={user.nickname || "프로필"}
                     className={styles.profileImage}
                   />
                 )}
                 <div>
-                  <p className={styles.userName}>{user.nickname || '사용자'}</p>
-                  {user.email && <p className={styles.userEmail}>{user.email}</p>}
+                  <p className={styles.userName}>{user.nickname || "사용자"}</p>
+                  {user.email && (
+                    <p className={styles.userEmail}>{user.email}</p>
+                  )}
                 </div>
               </div>
 
@@ -86,7 +88,7 @@ export default function HomePage() {
                   <div className={styles.infoItem}>
                     <dt className={styles.infoLabel}>연결 시간</dt>
                     <dd className={styles.infoValue}>
-                      {new Date(user.connectedAt).toLocaleString('ko-KR')}
+                      {new Date(user.connectedAt).toLocaleString("ko-KR")}
                     </dd>
                   </div>
                 </dl>

@@ -13,7 +13,9 @@ if (!IMP_CODE) {
   console.error("❌ NEXT_PUBLIC_IMP_CODE 환경변수가 설정되지 않았습니다.");
 }
 if (!CHANNEL_KEY) {
-  console.error("❌ NEXT_PUBLIC_PORTONE_CHANNEL_KEY 환경변수가 설정되지 않았습니다.");
+  console.error(
+    "❌ NEXT_PUBLIC_PORTONE_CHANNEL_KEY 환경변수가 설정되지 않았습니다."
+  );
 }
 
 export function usePortOnePass() {
@@ -23,13 +25,17 @@ export function usePortOnePass() {
   const handleAuth = () => {
     // 환경변수 체크
     if (!IMP_CODE) {
-      alert("아임포트 설정 오류: NEXT_PUBLIC_IMP_CODE가 설정되지 않았습니다.\n.env.local 파일을 확인해주세요.");
+      alert(
+        "아임포트 설정 오류: NEXT_PUBLIC_IMP_CODE가 설정되지 않았습니다.\n.env.local 파일을 확인해주세요."
+      );
       console.error("환경변수 누락: NEXT_PUBLIC_IMP_CODE");
       return;
     }
 
     if (!CHANNEL_KEY) {
-      alert("아임포트 설정 오류: NEXT_PUBLIC_PORTONE_CHANNEL_KEY가 설정되지 않았습니다.\n.env.local 파일을 확인해주세요.");
+      alert(
+        "아임포트 설정 오류: NEXT_PUBLIC_PORTONE_CHANNEL_KEY가 설정되지 않았습니다.\n.env.local 파일을 확인해주세요."
+      );
       console.error("환경변수 누락: NEXT_PUBLIC_PORTONE_CHANNEL_KEY");
       return;
     }

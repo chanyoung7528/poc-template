@@ -1,14 +1,23 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import styles from './TermsAgreement.module.scss';
+import { useState } from "react";
+import styles from "./TermsAgreement.module.scss";
 
 interface TermsAgreementProps {
-  onAgree: (agreed: { terms: boolean; privacy: boolean; marketing: boolean }) => void;
+  onAgree: (agreed: {
+    terms: boolean;
+    privacy: boolean;
+    marketing: boolean;
+  }) => void;
   showError?: boolean;
+  onSubmit?: () => void;
 }
 
-export function TermsAgreement({ onAgree, showError }: TermsAgreementProps) {
+export function TermsAgreement({
+  onAgree,
+  showError,
+  onSubmit,
+}: TermsAgreementProps) {
   const [agreed, setAgreed] = useState({
     terms: false,
     privacy: false,
@@ -32,7 +41,14 @@ export function TermsAgreement({ onAgree, showError }: TermsAgreementProps) {
     onAgree(newAgreed);
   };
 
+  const handleSubmit = () => {
+    if (isRequiredAgreed) {
+      onSubmit?.();
+    }
+  };
+
   const isAllChecked = agreed.terms && agreed.privacy && agreed.marketing;
+  const isRequiredAgreed = agreed.terms && agreed.privacy;
 
   return (
     <div className={styles.termsAgreement}>
@@ -42,15 +58,18 @@ export function TermsAgreement({ onAgree, showError }: TermsAgreementProps) {
             type="checkbox"
             id="terms"
             checked={agreed.terms}
-            onChange={() => handleToggle('terms')}
+            onChange={() => handleToggle("terms")}
             className={styles.checkbox}
           />
-          <label htmlFor="terms" className={`${styles.label} ${styles.required}`}>
+          <label
+            htmlFor="terms"
+            className={`${styles.label} ${styles.required}`}
+          >
             서비스 이용약관 동의
           </label>
           <button
             type="button"
-            onClick={() => window.open('/terms', '_blank')}
+            onClick={() => window.open("/terms", "_blank")}
             className={styles.linkButton}
           >
             보기
@@ -62,15 +81,18 @@ export function TermsAgreement({ onAgree, showError }: TermsAgreementProps) {
             type="checkbox"
             id="privacy"
             checked={agreed.privacy}
-            onChange={() => handleToggle('privacy')}
+            onChange={() => handleToggle("privacy")}
             className={styles.checkbox}
           />
-          <label htmlFor="privacy" className={`${styles.label} ${styles.required}`}>
+          <label
+            htmlFor="privacy"
+            className={`${styles.label} ${styles.required}`}
+          >
             개인정보 처리방침 동의
           </label>
           <button
             type="button"
-            onClick={() => window.open('/privacy', '_blank')}
+            onClick={() => window.open("/privacy", "_blank")}
             className={styles.linkButton}
           >
             보기
@@ -82,7 +104,7 @@ export function TermsAgreement({ onAgree, showError }: TermsAgreementProps) {
             type="checkbox"
             id="marketing"
             checked={agreed.marketing}
-            onChange={() => handleToggle('marketing')}
+            onChange={() => handleToggle("marketing")}
             className={styles.checkbox}
           />
           <label htmlFor="marketing" className={styles.label}>
@@ -105,10 +127,17 @@ export function TermsAgreement({ onAgree, showError }: TermsAgreementProps) {
       </div>
 
       {showError && (!agreed.terms || !agreed.privacy) && (
-        <span className={styles.errorMessage}>
-          필수 약관에 동의해주세요
-        </span>
+        <span className={styles.errorMessage}>필수 약관에 동의해주세요</span>
       )}
+
+      <button
+        type="button"
+        onClick={handleSubmit}
+        disabled={!isRequiredAgreed}
+        className={styles.submitButton}
+      >
+        동의하기
+      </button>
     </div>
   );
 }

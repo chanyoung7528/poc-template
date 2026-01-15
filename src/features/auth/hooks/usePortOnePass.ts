@@ -65,14 +65,14 @@ export function usePortOnePass() {
     });
 
     // 본인인증 창 열기
-    IMP.certification(data, (rsp: IamportCertificationResponse) => {
+    IMP.certification(data, async (rsp: IamportCertificationResponse) => {
       console.log("아임포트 응답:", rsp);
 
       if (rsp.success && rsp.imp_uid) {
         // 인증 성공 - 서버에 imp_uid 전달하여 검증
         console.log("rsp.imp_uid", rsp.imp_uid);
         verifyCertificationMutation.mutate(rsp.imp_uid, {
-          onSuccess: (result) => {
+          onSuccess: async (result) => {
             console.log("서버 검증 결과:", result);
 
             // 서버 응답에 따른 분기 처리
@@ -90,15 +90,66 @@ export function usePortOnePass() {
                 break;
 
               case "NEW":
-                // 신규 회원 - 회원가입 폼으로 이동
-                // certificationData를 세션 스토리지에 임시 저장
-                if (result.certificationData) {
-                  sessionStorage.setItem(
-                    "certificationData",
-                    JSON.stringify(result.certificationData)
-                  );
+                // 신규 회원 - 본인인증 완료 API 호출
+                console.log("✅ 본인인증 성공, 세션 업데이트 중...");
+                
+                try {
+                  // 1. 본인인증 완료 상태를 세션에 저장
+                  const verifyResponse = await fetch("/api/auth/verify-complete", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      verificationData: result.certificationData,
+                    }),
+                  });
+
+                  const verifyData = await verifyResponse.json();
+
+                  if (!verifyResponse.ok) {
+                    console.error("본인인증 세션 업데이트 실패:", verifyData.error);
+                    
+                    if (verifyData.error === "unauthorized") {
+                      alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+                      router.push("/login?error=session_expired");
+                    } else if (verifyData.error === "terms_required") {
+                      alert("약관 동의가 필요합니다.");
+                      router.push("/terms-agreement");
+                    } else {
+                      alert("본인인증 처리 중 오류가 발생했습니다.");
+                    }
+                    return;
+                  }
+
+                  console.log("✅ 본인인증 세션 업데이트 완료");
+
+                  // 2. 회원가입 최종 완료 (DB 저장)
+                  const completeResponse = await fetch("/api/auth/complete-signup", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({}),
+                  });
+
+                  const completeData = await completeResponse.json();
+
+                  if (!completeResponse.ok) {
+                    console.error("회원가입 완료 실패:", completeData.error);
+                    alert("회원가입 처리 중 오류가 발생했습니다.");
+                    return;
+                  }
+
+                  console.log("✅ 회원가입 완료:", completeData.userId);
+                  
+                  // 3. 메인 페이지로 이동
+                  router.push(completeData.redirectUrl || "/main");
+                  
+                } catch (error) {
+                  console.error("본인인증 후 처리 중 오류:", error);
+                  alert("본인인증 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
                 }
-                router.push("/signup");
                 break;
 
               default:
@@ -107,6 +158,7 @@ export function usePortOnePass() {
           },
           onError: (error) => {
             console.error("본인인증 검증 실패:", error);
+            alert("본인인증 검증에 실패했습니다. 다시 시도해주세요.");
           },
         });
       } else {

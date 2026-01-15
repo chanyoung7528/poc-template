@@ -1,9 +1,9 @@
-import { SignJWT, jwtVerify } from 'jose';
-import { cookies } from 'next/headers';
-import { env } from '@/lib/config';
-import type { SessionUser } from './types';
+import { SignJWT, jwtVerify } from "jose";
+import { cookies } from "next/headers";
+import { env } from "@/lib/config";
+import type { SessionUser } from "./types";
 
-const SESSION_COOKIE_NAME = 'session';
+const SESSION_COOKIE_NAME = "session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7일
 
 /**
@@ -12,26 +12,44 @@ const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7일
 export async function createSessionToken(user: SessionUser): Promise<string> {
   const secret = new TextEncoder().encode(env.jwt.secret);
 
+  console.log("🔐 세션 토큰 생성:", {
+    id: user.id,
+    provider: user.provider,
+    isTemp: user.isTemp,
+  });
+
   return await new SignJWT({
     user,
   })
-    .setProtectedHeader({ alg: 'HS256' })
+    .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime('7d')
+    .setExpirationTime("7d")
     .sign(secret);
 }
 
 /**
  * JWT 토큰 검증 및 디코드
  */
-export async function verifySessionToken(token: string): Promise<SessionUser | null> {
+export async function verifySessionToken(
+  token: string
+): Promise<SessionUser | null> {
   try {
     const secret = new TextEncoder().encode(env.jwt.secret);
     const { payload } = await jwtVerify(token, secret);
 
-    return (payload.user as SessionUser) || null;
+    const user = (payload.user as SessionUser) || null;
+
+    if (user) {
+      console.log("🔓 세션 토큰 검증 성공:", {
+        id: user.id,
+        provider: user.provider,
+        isTemp: user.isTemp,
+      });
+    }
+
+    return user;
   } catch (error) {
-    console.error('토큰 검증 실패:', error);
+    console.error("토큰 검증 실패:", error);
     return null;
   }
 }
@@ -44,10 +62,10 @@ export async function setSessionCookie(token: string): Promise<void> {
 
   cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
     maxAge: SESSION_MAX_AGE,
-    path: '/',
+    path: "/",
   });
 }
 
@@ -78,4 +96,11 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   }
 
   return await verifySessionToken(token);
+}
+
+/**
+ * 세션 사용자 정보 가져오기 (별칭)
+ */
+export async function getSessionUser(): Promise<SessionUser | null> {
+  return await getCurrentUser();
 }

@@ -222,7 +222,7 @@ export async function POST(request: NextRequest) {
           },
         });
       } catch (error) {
-        console.error("❌ 아임포트 API 호출 실패:", error);
+        console.error("❌ 아임포트 API 호출 :", error);
         return NextResponse.json(
           {
             error: "본인인증 정보 조회 중 오류가 발생했습니다.",

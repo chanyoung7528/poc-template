@@ -1,5 +1,5 @@
-import { prisma } from './prisma';
-import type { User } from '@prisma/client';
+import { prisma } from "./prisma";
+import type { User } from "@prisma/client";
 
 /**
  * 카카오 ID로 사용자 조회
@@ -48,18 +48,25 @@ export async function findUserById(id: string): Promise<User | null> {
 /**
  * 신규 사용자 생성 (카카오 회원가입)
  */
-export async function createKakaoUser(data: { kakaoId: string; email: string | null; nickname: string | null; profileImage: string | null }): Promise<User> {
+export async function createKakaoUser(data: {
+  kakaoId: string;
+  email: string | null;
+  nickname: string | null;
+  profileImage: string | null;
+  marketingAgreed?: boolean;
+}): Promise<User> {
   const user = await prisma.user.create({
     data: {
       kakaoId: data.kakaoId,
       email: data.email,
       nickname: data.nickname,
       profileImage: data.profileImage,
-      provider: 'kakao',
+      provider: "kakao",
+      // marketingAgreed는 필요시 스키마에 추가
     },
   });
 
-  console.log('✅ [DB] 신규 카카오 사용자 생성:', user.id, user.nickname);
+  console.log("✅ [DB] 신규 카카오 사용자 생성:", user.id, user.nickname);
 
   return user;
 }
@@ -67,18 +74,25 @@ export async function createKakaoUser(data: { kakaoId: string; email: string | n
 /**
  * 신규 사용자 생성 (네이버 회원가입)
  */
-export async function createNaverUser(data: { naverId: string; email: string | null; nickname: string | null; profileImage: string | null }): Promise<User> {
+export async function createNaverUser(data: {
+  naverId: string;
+  email: string | null;
+  nickname: string | null;
+  profileImage: string | null;
+  marketingAgreed?: boolean;
+}): Promise<User> {
   const user = await prisma.user.create({
     data: {
       naverId: data.naverId,
       email: data.email,
       nickname: data.nickname,
       profileImage: data.profileImage,
-      provider: 'naver',
+      provider: "naver",
+      // marketingAgreed는 필요시 스키마에 추가
     },
   });
 
-  console.log('✅ [DB] 신규 네이버 사용자 생성:', user.id, user.nickname);
+  console.log("✅ [DB] 신규 네이버 사용자 생성:", user.id, user.nickname);
 
   return user;
 }
@@ -103,7 +117,7 @@ export async function updateUser(
     },
   });
 
-  console.log('✅ [DB] 사용자 정보 업데이트:', id);
+  console.log("✅ [DB] 사용자 정보 업데이트:", id);
 
   return user;
 }
@@ -117,5 +131,5 @@ export async function updateLastLogin(id: string): Promise<void> {
     data: { lastLoginAt: new Date() },
   });
 
-  console.log('✅ [DB] 마지막 로그인 시간 업데이트:', id);
+  console.log("✅ [DB] 마지막 로그인 시간 업데이트:", id);
 }

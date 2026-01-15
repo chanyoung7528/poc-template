@@ -60,4 +60,7 @@ export interface SessionUser {
   nickname?: string;
   profileImage?: string;
   provider: 'kakao' | 'naver';
+  isTemp?: boolean;              // 임시 사용자 여부 (DB 저장 전)
+  termsAgreed?: boolean;         // 약관 동의 완료 여부
+  verified?: boolean;            // 본인인증 완료 여부
 }

@@ -1,16 +1,17 @@
-'use client';
+"use client";
 
-import { LoginForm } from '@/domains/auth/ui/LoginForm';
-import { SocialLoginSection } from '../components/SocialLoginSection';
-import { useLoginFlow } from '../hooks/useLoginFlow';
-import styles from './LoginFlow.module.scss';
+import { LoginForm } from "@/domains/auth/ui/login/LoginForm";
+import { SocialLoginSection } from "../components/SocialLoginSection";
+import { useLoginFlow } from "../hooks/useLoginFlow";
+import styles from "./LoginFlow.module.scss";
 
 interface LoginFlowProps {
   onNavigateToSignup?: () => void;
 }
 
 export function LoginFlow({ onNavigateToSignup }: LoginFlowProps) {
-  const { handleLogin, handleSocialLogin, isLoading, error, setStep } = useLoginFlow();
+  const { handleLogin, handleSocialLogin, isLoading, error, setStep } =
+    useLoginFlow();
 
   return (
     <div className={styles.loginFlow}>
@@ -25,12 +26,12 @@ export function LoginFlow({ onNavigateToSignup }: LoginFlowProps) {
         <LoginForm
           onSubmit={handleLogin}
           isLoading={isLoading}
-          onForgotPassword={() => setStep('reset-password')}
+          onForgotPassword={() => setStep("reset-password")}
         />
 
         <SocialLoginSection
-          onKakaoLogin={() => handleSocialLogin('kakao')}
-          onNaverLogin={() => handleSocialLogin('naver')}
+          onKakaoLogin={() => handleSocialLogin("kakao")}
+          onNaverLogin={() => handleSocialLogin("naver")}
           isLoading={isLoading}
           showDivider
         />
@@ -39,7 +40,7 @@ export function LoginFlow({ onNavigateToSignup }: LoginFlowProps) {
       {onNavigateToSignup && (
         <div className={styles.footer}>
           <p className={styles.footerText}>
-            아직 계정이 없으신가요?{' '}
+            아직 계정이 없으신가요?{" "}
             <button onClick={onNavigateToSignup} className={styles.footerLink}>
               회원가입
             </button>

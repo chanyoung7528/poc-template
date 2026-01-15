@@ -1,11 +1,14 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { TermsAgreement } from '@/domains/auth/ui/TermsAgreement';
-import { SignupStepper } from '../components/SignupStepper';
-import { useSignupFlow } from '../hooks/useSignupFlow';
-import { validatePassword, validateNickname } from '@/domains/auth/model/auth.utils';
-import styles from './SignupFlow.module.scss';
+import { useState } from "react";
+import { TermsAgreement } from "@/domains/auth/ui/terms-agreement/TermsAgreement";
+import { SignupStepper } from "../components/SignupStepper";
+import { useSignupFlow } from "../hooks/useSignupFlow";
+import {
+  validatePassword,
+  validateNickname,
+} from "@/domains/auth/model/auth.utils";
+import styles from "./SignupFlow.module.scss";
 
 interface SignupFlowProps {
   onNavigateToLogin?: () => void;
@@ -24,20 +27,20 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
     handleSignup,
   } = useSignupFlow();
 
-  const [localEmail, setLocalEmail] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
+  const [localEmail, setLocalEmail] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
   const [formData, setFormData] = useState({
-    password: '',
-    confirmPassword: '',
-    nickname: '',
+    password: "",
+    confirmPassword: "",
+    nickname: "",
   });
   const [showTermsError, setShowTermsError] = useState(false);
 
   const steps = [
-    { label: '약관 동의', key: 'terms' },
-    { label: 'PASS 인증', key: 'verify' },
-    { label: '정보 입력', key: 'form' },
-    { label: '완료', key: 'complete' },
+    { label: "약관 동의", key: "terms" },
+    { label: "PASS 인증", key: "verify" },
+    { label: "정보 입력", key: "form" },
+    { label: "완료", key: "complete" },
   ];
 
   const currentStepIndex = steps.findIndex((step) => step.key === currentStep);
@@ -85,7 +88,7 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
 
   const renderStepContent = () => {
     switch (currentStep) {
-      case 'terms':
+      case "terms":
         return (
           <TermsAgreement
             onAgree={(agreed) => {
@@ -100,7 +103,7 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
           />
         );
 
-      case 'verify':
+      case "verify":
         return (
           <div className={styles.verifySection}>
             <div className={styles.formGroup}>
@@ -113,8 +116,12 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
                 placeholder="example@email.com"
               />
             </div>
-            <button onClick={handleSendCodeClick} className={styles.button} disabled={isLoading}>
-              {isLoading ? '발송 중...' : '인증 코드 발송'}
+            <button
+              onClick={handleSendCodeClick}
+              className={styles.button}
+              disabled={isLoading}
+            >
+              {isLoading ? "발송 중..." : "인증 코드 발송"}
             </button>
 
             {email && (
@@ -130,15 +137,19 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
                     maxLength={6}
                   />
                 </div>
-                <button onClick={handleVerifyCodeClick} className={styles.button} disabled={isLoading}>
-                  {isLoading ? '인증 중...' : '인증 확인'}
+                <button
+                  onClick={handleVerifyCodeClick}
+                  className={styles.button}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "인증 중..." : "인증 확인"}
                 </button>
               </>
             )}
           </div>
         );
 
-      case 'form':
+      case "form":
         return (
           <div className={styles.formSection}>
             <div className={styles.formGroup}>
@@ -146,7 +157,9 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
               <input
                 type="text"
                 value={formData.nickname}
-                onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, nickname: e.target.value })
+                }
                 className={styles.input}
                 placeholder="닉네임 (2-20자)"
               />
@@ -157,7 +170,9 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
               <input
                 type="password"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
                 className={styles.input}
                 placeholder="비밀번호 (8자 이상, 영문/숫자/특수문자 포함)"
               />
@@ -168,27 +183,45 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
               <input
                 type="password"
                 value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, confirmPassword: e.target.value })
+                }
                 className={styles.input}
                 placeholder="비밀번호 확인"
               />
             </div>
 
-            <button onClick={handleSignupSubmit} className={styles.button} disabled={isLoading}>
-              {isLoading ? '가입 중...' : '회원가입 완료'}
+            <button
+              onClick={handleSignupSubmit}
+              className={styles.button}
+              disabled={isLoading}
+            >
+              {isLoading ? "가입 중..." : "회원가입 완료"}
             </button>
           </div>
         );
 
-      case 'complete':
+      case "complete":
         return (
           <div className={styles.completeSection}>
-            <svg className={styles.successIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <svg
+              className={styles.successIcon}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
               <circle cx="12" cy="12" r="10" strokeWidth="2" />
-              <path d="M8 12l3 3 5-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M8 12l3 3 5-5"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
             <h2 className={styles.completeTitle}>회원가입 완료!</h2>
-            <p className={styles.completeMessage}>환영합니다. 곧 메인 페이지로 이동합니다.</p>
+            <p className={styles.completeMessage}>
+              환영합니다. 곧 메인 페이지로 이동합니다.
+            </p>
           </div>
         );
 
@@ -201,7 +234,9 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
     <div className={styles.signupFlow}>
       <div className={styles.header}>
         <h1 className={styles.title}>회원가입</h1>
-        <p className={styles.subtitle}>서비스 이용을 위해 회원가입을 진행해주세요</p>
+        <p className={styles.subtitle}>
+          서비스 이용을 위해 회원가입을 진행해주세요
+        </p>
       </div>
 
       <div className={styles.content}>
@@ -212,10 +247,10 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
         </SignupStepper>
       </div>
 
-      {onNavigateToLogin && currentStep !== 'complete' && (
+      {onNavigateToLogin && currentStep !== "complete" && (
         <div className={styles.footer}>
           <p className={styles.footerText}>
-            이미 계정이 있으신가요?{' '}
+            이미 계정이 있으신가요?{" "}
             <button onClick={onNavigateToLogin} className={styles.footerLink}>
               로그인
             </button>

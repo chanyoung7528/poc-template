@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// 환경변수에서 아임포트 인증 정보 가져오기 (필수)
+type TestScenario = "NEW" | "EXISTING" | "UNDER_14";
+
+// 환경변수에서 아임포트 인증 정보 가져오기
 // KG이니시스 설정:
 // - REST API Key: 1022516262368276
 // - REST API Secret: ac2VXFVNRLMci0SkVFf7oZY2kDo1AS7aWXX4Y4QoOZnL18H0qUrn60lzS6qRmlPei1nbobYxCQXt7AnF
@@ -9,11 +11,8 @@ import { NextRequest, NextResponse } from "next/server";
 const IAMPORT_API_KEY = process.env.IAMPORT_API_KEY;
 const IAMPORT_API_SECRET = process.env.IAMPORT_API_SECRET;
 
-// 환경변수 검증
-if (!IAMPORT_API_KEY || !IAMPORT_API_SECRET) {
-  console.error("❌ 아임포트 API 인증 정보가 설정되지 않았습니다.");
-  console.error("필수 환경변수: IAMPORT_API_KEY, IAMPORT_API_SECRET");
-}
+// 실제 운영 환경인지 확인 (환경변수가 설정되어 있으면 실제 API 사용)
+const USE_REAL_API = IAMPORT_API_KEY && IAMPORT_API_SECRET;
 
 interface IamportCertificationData {
   name: string;
@@ -142,24 +141,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 환경변수 필수 체크
-    if (!IAMPORT_API_KEY || !IAMPORT_API_SECRET) {
-      console.error("❌ 아임포트 API 인증 정보가 설정되지 않았습니다.");
-      return NextResponse.json(
-        {
-          error: "서버 설정 오류",
-          message: "IAMPORT_API_KEY 또는 IAMPORT_API_SECRET 환경변수가 설정되지 않았습니다. .env.local 파일을 확인해주세요.",
-        },
-        { status: 500 }
-      );
-    }
-
     // ============================================
-    // 실제 아임포트 API 호출 (환경변수 필수)
+    // 실제 아임포트 API 호출 (환경변수 설정 시)
     // ============================================
-    console.log("🔄 실제 아임포트 API 호출");
+    if (USE_REAL_API) {
+      console.log("🔄 실제 아임포트 API 호출");
 
-    try {
+      try {
         // 1. Access Token 발급
         const accessToken = await getIamportAccessToken();
         console.log("✅ 아임포트 토큰 발급 성공");
@@ -242,7 +230,54 @@ export async function POST(request: NextRequest) {
           },
           { status: 500 }
         );
+      }
     }
+
+    // ============================================
+    // 테스트용 Mock 응답 (환경변수 미설정 시)
+    // ============================================
+    console.log("🧪 테스트 모드 - Mock 응답 반환");
+
+    const getTestScenario = (): TestScenario => {
+      return "NEW"; // 'NEW' | 'EXISTING' | 'UNDER_14' 중 선택
+    };
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const scenario = getTestScenario();
+
+    if (scenario === "EXISTING") {
+      return NextResponse.json({
+        status: "EXISTING" as const,
+        user: {
+          id: "user123",
+          maskedId: "te**@example.com",
+          provider: "kakao",
+        },
+      });
+    }
+
+    if (scenario === "UNDER_14") {
+      return NextResponse.json({
+        status: "UNDER_14" as const,
+        certificationData: {
+          name: "홍길동",
+          phone: "010-1234-5678",
+          birth: "20150101",
+          gender: "M" as const,
+        },
+      });
+    }
+
+    return NextResponse.json({
+      status: "NEW" as const,
+      certificationData: {
+        name: "홍길동",
+        phone: "010-1234-5678",
+        birth: "19900101",
+        gender: "M" as const,
+      },
+    });
   } catch (error) {
     console.error("본인인증 검증 중 오류:", error);
     return NextResponse.json(

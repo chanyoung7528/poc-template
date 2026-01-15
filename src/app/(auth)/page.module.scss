@@ -1,0 +1,47 @@
+.characterImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+// Wellness 타이틀 영역
+.titleFrame {
+  margin-top: 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.wellnessTitle {
+  font-weight: 800;
+  font-size: 4rem;
+  line-height: 1.2;
+  letter-spacing: -1px;
+  color: #ff6433;
+  text-align: center;
+}
+
+.wellnessSubtitle {
+  font-weight: 500;
+  font-size: 1.8rem;
+  line-height: 1.2;
+  letter-spacing: -0.1px;
+  color: #003223;
+  text-align: center;
+}
+
+// 버튼 영역
+.buttonFrame {
+  margin-top: 3.6rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
+  padding: 0 2rem;
+}
+.button {
+  height: 8rem;
+  border-radius: 16px;
+}

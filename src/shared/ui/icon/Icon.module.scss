@@ -1,0 +1,43 @@
+.icon {
+  --size-sm: 1.6rem;
+  --size-md: 2.4rem;
+  --size-lg: 3.2rem;
+
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  &.size-sm {
+    width: var(--size-sm);
+    height: var(--size-sm);
+  }
+  &.size-md {
+    width: var(--size-md);
+    height: var(--size-md);
+  }
+  &.size-lg {
+    width: var(--size-lg);
+    height: var(--size-lg);
+  }
+
+  &.outlined {
+    fill: none;
+    stroke: currentColor;
+  }
+  &.filled {
+    fill: currentColor;
+    stroke: none;
+  }
+  &.duotone {
+    fill: currentColor;
+    stroke: currentColor;
+    opacity: 0.9;
+
+    path:first-child {
+      opacity: 0.3;
+    }
+  }
+}

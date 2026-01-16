@@ -12,7 +12,7 @@ export function extractAuthMode(searchParams: URLSearchParams): AuthMode {
   if (!state) return "login";
 
   try {
-    const stateData = JSON.parse(decodeURIComponent(state));
+    const stateData = JSON?.parse?.(decodeURIComponent(state));
     return stateData.mode || "login";
   } catch (e) {
     console.error("state 파싱 실패:", e);

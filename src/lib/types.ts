@@ -53,14 +53,23 @@ export interface NaverUserInfo {
 
 // 세션 사용자 타입 (JWT에 저장될 정보)
 export interface SessionUser {
-  id: string;                    // 우리 서비스의 사용자 ID
-  kakaoId?: string;              // 카카오 ID (optional)
-  naverId?: string;              // 네이버 ID (optional)
+  id: string; // 우리 서비스의 사용자 ID
+  kakaoId?: string; // 카카오 ID (optional)
+  naverId?: string; // 네이버 ID (optional)
+  wellnessId?: string; // Wellness ID (optional)
   email?: string;
   nickname?: string;
   profileImage?: string;
-  provider: 'kakao' | 'naver';
-  isTemp?: boolean;              // 임시 사용자 여부 (DB 저장 전)
-  termsAgreed?: boolean;         // 약관 동의 완료 여부
-  verified?: boolean;            // 본인인증 완료 여부
+  provider: "kakao" | "naver" | "wellness";
+  isTemp?: boolean; // 임시 사용자 여부 (DB 저장 전)
+  termsAgreed?: boolean; // 약관 동의 완료 여부
+  verified?: boolean; // 본인인증 완료 여부
+  signupType?: "social" | "wellness"; // 회원가입 유형 (소셜/일반)
+  // 본인인증 데이터 (일반 회원가입용)
+  verificationData?: {
+    name: string;
+    phone: string;
+    birth: string;
+    gender: "M" | "F";
+  };
 }

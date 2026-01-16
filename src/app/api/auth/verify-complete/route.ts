@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
       provider: sessionUser?.provider,
       isTemp: sessionUser?.isTemp,
       termsAgreed: sessionUser?.termsAgreed,
+      signupType: sessionUser?.signupType,
     });
 
     if (!sessionUser) {
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 요청 바디에서 본인인증 데이터 추출 (필요 시)
+    // 요청 바디에서 본인인증 데이터 추출
     const body = await request.json();
     const { verificationData } = body;
 
@@ -65,6 +66,7 @@ export async function POST(request: NextRequest) {
     const updatedUser: SessionUser = {
       ...sessionUser,
       verified: true,
+      verificationData: verificationData || sessionUser.verificationData,
     };
 
     // 업데이트된 세션 토큰 생성
@@ -78,6 +80,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: "본인인증이 완료되었습니다.",
       nextStep: "complete-signup", // DB 저장을 위한 최종 단계
+      signupType: sessionUser.signupType, // 회원가입 유형 반환
     });
   } catch (error) {
     console.error("본인인증 업데이트 중 오류:", error);

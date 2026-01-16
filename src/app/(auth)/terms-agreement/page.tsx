@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TermsAgreement } from "@/domains/auth/ui/terms-agreement/TermsAgreement";
 import { TermsAgreementTitle } from "@/domains/auth/ui/terms-agreement/TermsAgreementTitle";
+import { useAuthStore } from "@/store/authStore";
 
 export default function TermsAgreementPage() {
   const router = useRouter();
@@ -11,6 +12,9 @@ export default function TermsAgreementPage() {
     privacy: false,
     marketing: false,
   });
+
+  // Zustand Store 사용
+  const agreeToTerms = useAuthStore((state) => state.agreeToTerms);
 
   const handleAgree = (agreed: {
     terms: boolean;
@@ -60,6 +64,9 @@ export default function TermsAgreementPage() {
       }
 
       console.log("✅ 약관 동의 완료, 본인인증 페이지로 이동");
+
+      // Zustand Store 업데이트
+      agreeToTerms();
 
       // 본인인증 페이지로 이동
       router.push("/verify");

@@ -35,6 +35,17 @@ export async function findUserByEmail(email: string): Promise<User | null> {
 }
 
 /**
+ * 전화번호로 사용자 조회 (중복 가입 방지)
+ */
+export async function findUserByPhone(phone: string): Promise<User | null> {
+  const user = await prisma.user.findFirst({
+    where: { phone },
+  });
+
+  return user;
+}
+
+/**
  * 우리 서비스의 사용자 ID로 조회
  */
 export async function findUserById(id: string): Promise<User | null> {
@@ -118,6 +129,51 @@ export async function updateUser(
   });
 
   console.log("✅ [DB] 사용자 정보 업데이트:", id);
+
+  return user;
+}
+
+/**
+ * 신규 사용자 생성 (일반 회원가입 - Wellness ID)
+ */
+export async function createWellnessUser(data: {
+  wellnessId: string;
+  passwordHash: string;
+  email?: string | null;
+  nickname?: string | null;
+  name: string;
+  phone: string;
+  birth: string;
+  gender: "M" | "F";
+}): Promise<User> {
+  const user = await prisma.user.create({
+    data: {
+      wellnessId: data.wellnessId,
+      passwordHash: data.passwordHash,
+      email: data.email,
+      nickname: data.nickname || data.name,
+      name: data.name,
+      phone: data.phone,
+      birth: data.birth,
+      gender: data.gender,
+      provider: "wellness",
+    },
+  });
+
+  console.log("✅ [DB] 신규 일반 사용자 생성:", user.id, user.wellnessId);
+
+  return user;
+}
+
+/**
+ * Wellness ID로 사용자 조회
+ */
+export async function findUserByWellnessId(
+  wellnessId: string
+): Promise<User | null> {
+  const user = await prisma.user.findUnique({
+    where: { wellnessId },
+  });
 
   return user;
 }

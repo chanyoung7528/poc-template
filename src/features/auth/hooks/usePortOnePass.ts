@@ -92,24 +92,30 @@ export function usePortOnePass() {
               case "NEW":
                 // 신규 회원 - 본인인증 완료 API 호출
                 console.log("✅ 본인인증 성공, 세션 업데이트 중...");
-                
+
                 try {
                   // 1. 본인인증 완료 상태를 세션에 저장
-                  const verifyResponse = await fetch("/api/auth/verify-complete", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      verificationData: result.certificationData,
-                    }),
-                  });
+                  const verifyResponse = await fetch(
+                    "/api/auth/verify-complete",
+                    {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        verificationData: result.certificationData,
+                      }),
+                    }
+                  );
 
                   const verifyData = await verifyResponse.json();
 
                   if (!verifyResponse.ok) {
-                    console.error("본인인증 세션 업데이트 실패:", verifyData.error);
-                    
+                    console.error(
+                      "본인인증 세션 업데이트 실패:",
+                      verifyData.error
+                    );
+
                     if (verifyData.error === "unauthorized") {
                       alert("세션이 만료되었습니다. 다시 로그인해주세요.");
                       router.push("/login?error=session_expired");
@@ -124,31 +130,49 @@ export function usePortOnePass() {
 
                   console.log("✅ 본인인증 세션 업데이트 완료");
 
-                  // 2. 회원가입 최종 완료 (DB 저장)
-                  const completeResponse = await fetch("/api/auth/complete-signup", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({}),
-                  });
+                  // 2. 회원가입 유형 확인
+                  if (verifyData.signupType === "wellness") {
+                    // 일반 회원가입: ID/Password 입력 페이지로 이동
+                    console.log(
+                      "→ 일반 회원가입: credentials 페이지로 이동"
+                    );
+                    router.push("/signup/credentials");
+                  } else {
+                    // 소셜 회원가입: 바로 DB 저장
+                    console.log("→ 소셜 회원가입: 최종 완료 처리");
 
-                  const completeData = await completeResponse.json();
+                    const completeResponse = await fetch(
+                      "/api/auth/complete-signup",
+                      {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({}),
+                      }
+                    );
 
-                  if (!completeResponse.ok) {
-                    console.error("회원가입 완료 실패:", completeData.error);
-                    alert("회원가입 처리 중 오류가 발생했습니다.");
-                    return;
+                    const completeData = await completeResponse.json();
+
+                    if (!completeResponse.ok) {
+                      console.error(
+                        "회원가입 완료 실패:",
+                        completeData.error
+                      );
+                      alert("회원가입 처리 중 오류가 발생했습니다.");
+                      return;
+                    }
+
+                    console.log("✅ 회원가입 완료:", completeData.userId);
+
+                    // 3. 메인 페이지로 이동
+                    router.push(completeData.redirectUrl || "/main");
                   }
-
-                  console.log("✅ 회원가입 완료:", completeData.userId);
-                  
-                  // 3. 메인 페이지로 이동
-                  router.push(completeData.redirectUrl || "/main");
-                  
                 } catch (error) {
                   console.error("본인인증 후 처리 중 오류:", error);
-                  alert("본인인증 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
+                  alert(
+                    "본인인증 처리 중 오류가 발생했습니다. 다시 시도해주세요."
+                  );
                 }
                 break;
 

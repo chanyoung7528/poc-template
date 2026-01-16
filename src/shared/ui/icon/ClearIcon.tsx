@@ -32,7 +32,7 @@ export function ClearIcon({ size = 20, className, onClick }: ClearIconProps) {
         <path
           d="M7.5 7.50293L12.5 12.5044"
           stroke="white"
-          stroke-linecap="round"
+          strokeLinecap="round"
         />
         <path
           d="M12.5 7.50293L7.5 12.5044"

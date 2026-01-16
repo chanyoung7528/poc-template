@@ -3,6 +3,9 @@ import type { OAuthProvider, AuthMode } from "./types";
 import { handleSignupFlow } from "./signup-handler";
 import { handleLoginFlow } from "./login-handler";
 import { getSessionUser } from "@/lib/session";
+import { createKakaoUser, createNaverUser } from "@/lib/database";
+import type { SessionUser } from "@/lib/types";
+import { createSessionToken, setSessionCookie } from "@/lib/session";
 
 /**
  * OAuth 콜백 요청에서 모드 추출
@@ -88,12 +91,56 @@ export async function handleOAuthCallback(
     if (existingSession && existingSession.isTemp) {
       console.log("⚠️ 회원가입 진행 중인 세션 발견");
 
-      // 본인인증까지 완료했으면 최종 회원가입 처리
+      // 본인인증까지 완료했으면 최종 회원가입 처리 (내부에서 직접 처리)
       if (existingSession.termsAgreed && existingSession.verified) {
-        console.log("→ 본인인증 완료, 회원가입 최종 처리로 이동");
-        return NextResponse.redirect(
-          new URL("/api/auth/complete-signup-redirect", request.url)
-        );
+        console.log("→ 본인인증 완료, 회원가입 최종 처리");
+
+        // DB에 사용자 저장
+        let newUser;
+        if (existingSession.provider === "kakao" && existingSession.kakaoId) {
+          newUser = await createKakaoUser({
+            kakaoId: existingSession.kakaoId,
+            email: existingSession.email || null,
+            nickname: existingSession.nickname || null,
+            profileImage: existingSession.profileImage || null,
+            marketingAgreed: false,
+          });
+        } else if (
+          existingSession.provider === "naver" &&
+          existingSession.naverId
+        ) {
+          newUser = await createNaverUser({
+            naverId: existingSession.naverId,
+            email: existingSession.email || null,
+            nickname: existingSession.nickname || null,
+            profileImage: existingSession.profileImage || null,
+            marketingAgreed: false,
+          });
+        } else {
+          console.error("유효하지 않은 Provider:", existingSession.provider);
+          return NextResponse.redirect(
+            new URL("/signup?error=invalid_provider", request.url)
+          );
+        }
+
+        // 정식 세션 생성
+        const finalSessionUser: SessionUser = {
+          id: newUser.id,
+          kakaoId: newUser.kakaoId || undefined,
+          naverId: newUser.naverId || undefined,
+          email: newUser.email || undefined,
+          nickname: newUser.nickname || undefined,
+          profileImage: newUser.profileImage || undefined,
+          provider: existingSession.provider,
+        };
+
+        const finalSessionToken = await createSessionToken(finalSessionUser);
+        await setSessionCookie(finalSessionToken);
+
+        console.log("✅ 회원가입 완료:", newUser.id);
+
+        // 메인 페이지로 직접 리다이렉트 (중간 API 거치지 않음)
+        return NextResponse.redirect(new URL("/main", request.url));
       }
       // 약관 동의만 했으면 본인인증으로
       else if (existingSession.termsAgreed && !existingSession.verified) {

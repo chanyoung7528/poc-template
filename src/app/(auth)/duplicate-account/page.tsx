@@ -1,47 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/shared/ui/Button";
 import styles from "./page.module.scss";
 
-interface DuplicateInfo {
-  provider: string;
-  maskedId: string;
-}
-
 export default function DuplicateAccountPage() {
   const router = useRouter();
-  const [duplicateInfo, setDuplicateInfo] = useState<DuplicateInfo | null>(
-    null
-  );
-
-  useEffect(() => {
-    // 중복 검증 API 호출하여 정보 가져오기
-    const fetchDuplicateInfo = async () => {
-      try {
-        const response = await fetch("/api/auth/wellness/check-duplicate", {
-          method: "POST",
-        });
-
-        const data = await response.json();
-
-        if (data.isDuplicate) {
-          setDuplicateInfo({
-            provider: data.provider,
-            maskedId: data.maskedId,
-          });
-        } else {
-          // 중복이 아니면 회원가입 페이지로
-          router.push("/signup/credentials");
-        }
-      } catch (error) {
-        console.error("중복 정보 조회 중 오류:", error);
-      }
-    };
-
-    fetchDuplicateInfo();
-  }, [router]);
+  const searchParams = useSearchParams();
+  
+  // URL 파라미터에서 정보 가져오기 (서버에서 리다이렉트할 때 전달됨)
+  const provider = searchParams.get("provider") || "";
+  const phone = searchParams.get("phone") || "";
 
   const getProviderName = (provider: string) => {
     switch (provider) {
@@ -64,10 +33,16 @@ export default function DuplicateAccountPage() {
     router.push("/signup");
   };
 
-  if (!duplicateInfo) {
+  // URL 파라미터가 없으면 에러 (서버에서 리다이렉트되지 않은 경우)
+  if (!provider || !phone) {
     return (
       <div className={styles.container}>
-        <p>확인 중...</p>
+        <div className={styles.content}>
+          <p>잘못된 접근입니다.</p>
+          <Button onClick={handleGoToSignup} className={styles.button}>
+            회원가입으로 돌아가기
+          </Button>
+        </div>
       </div>
     );
   }
@@ -87,11 +62,11 @@ export default function DuplicateAccountPage() {
           </p>
           <div className={styles.accountInfo}>
             <p className={styles.provider}>
-              가입 경로: <strong>{getProviderName(duplicateInfo.provider)}</strong>
+              가입 경로: <strong>{getProviderName(provider)}</strong>
             </p>
-            {duplicateInfo.maskedId && (
+            {phone && (
               <p className={styles.maskedId}>
-                아이디: <strong>{duplicateInfo.maskedId}</strong>
+                전화번호: <strong>{phone}</strong>
               </p>
             )}
           </div>

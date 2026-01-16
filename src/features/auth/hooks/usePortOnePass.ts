@@ -105,12 +105,21 @@ export function usePortOnePass() {
                       body: JSON.stringify({
                         verificationData: result.certificationData,
                       }),
+                      redirect: "follow", // 리다이렉트 자동 따라가기
                     }
                   );
 
-                  const verifyData = await verifyResponse.json();
+                  // 서버 리다이렉트 응답인 경우 (status 307, 308 등)
+                  if (verifyResponse.redirected) {
+                    console.log("✅ 서버 리다이렉트 감지:", verifyResponse.url);
+                    // 서버에서 리다이렉트한 URL로 이동 (브라우저가 자동 처리)
+                    window.location.href = verifyResponse.url;
+                    return;
+                  }
 
+                  // JSON 응답인 경우 (소셜 회원가입)
                   if (!verifyResponse.ok) {
+                    const verifyData = await verifyResponse.json();
                     console.error(
                       "본인인증 세션 업데이트 실패:",
                       verifyData.error
@@ -128,17 +137,11 @@ export function usePortOnePass() {
                     return;
                   }
 
+                  const verifyData = await verifyResponse.json();
                   console.log("✅ 본인인증 세션 업데이트 완료");
 
-                  // 2. 회원가입 유형 확인
-                  if (verifyData.signupType === "wellness") {
-                    // 일반 회원가입: ID/Password 입력 페이지로 이동
-                    console.log(
-                      "→ 일반 회원가입: credentials 페이지로 이동"
-                    );
-                    router.push("/signup/credentials");
-                  } else {
-                    // 소셜 회원가입: 바로 DB 저장
+                  // 소셜 회원가입인 경우만 여기서 처리 (일반 회원가입은 서버 리다이렉트로 처리됨)
+                  if (verifyData.signupType !== "wellness") {
                     console.log("→ 소셜 회원가입: 최종 완료 처리");
 
                     const completeResponse = await fetch(
@@ -155,17 +158,14 @@ export function usePortOnePass() {
                     const completeData = await completeResponse.json();
 
                     if (!completeResponse.ok) {
-                      console.error(
-                        "회원가입 완료 실패:",
-                        completeData.error
-                      );
+                      console.error("회원가입 완료 실패:", completeData.error);
                       alert("회원가입 처리 중 오류가 발생했습니다.");
                       return;
                     }
 
                     console.log("✅ 회원가입 완료:", completeData.userId);
 
-                    // 3. 메인 페이지로 이동
+                    // 메인 페이지로 이동
                     router.push(completeData.redirectUrl || "/main");
                   }
                 } catch (error) {

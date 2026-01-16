@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/session";
 import type { SessionUser } from "@/lib/types";
 import { createSessionToken, setSessionCookie } from "@/lib/session";
+import { findUserByPhone } from "@/lib/database";
 
 /**
  * 본인인증 완료 API
@@ -75,7 +76,30 @@ export async function POST(request: NextRequest) {
 
     console.log("✅ 본인인증 상태 세션에 저장 완료");
 
-    // 성공 응답
+    // 일반 회원가입(wellness)인 경우 중복 확인 후 리다이렉트
+    if (sessionUser.signupType === "wellness") {
+      const { phone } = updatedUser.verificationData || {};
+      
+      if (phone) {
+        // 전화번호로 기존 회원 조회
+        const existingUser = await findUserByPhone(phone);
+        
+        if (existingUser) {
+          console.log("⚠️ 이미 가입된 전화번호:", phone);
+          // 중복 계정 페이지로 서버 사이드 리다이렉트
+          const redirectUrl = new URL("/duplicate-account", request.url);
+          redirectUrl.searchParams.set("provider", existingUser.provider);
+          redirectUrl.searchParams.set("phone", phone);
+          return NextResponse.redirect(redirectUrl);
+        }
+      }
+      
+      // 중복이 아니면 ID/PW 입력 페이지로 서버 사이드 리다이렉트
+      console.log("✅ 신규 회원 확인 완료, ID/PW 입력 페이지로 이동");
+      return NextResponse.redirect(new URL("/signup/credentials", request.url));
+    }
+
+    // 소셜 회원가입인 경우 JSON 응답 (클라이언트에서 처리)
     return NextResponse.json({
       success: true,
       message: "본인인증이 완료되었습니다.",

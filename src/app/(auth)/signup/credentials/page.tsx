@@ -31,40 +31,30 @@ export default function CredentialsPage() {
     },
   });
 
-  // 본인인증 완료 및 중복 검증
+  // 세션 확인 (서버에서 이미 중복 확인 완료 후 리다이렉트됨)
   useEffect(() => {
-    const checkDuplicate = async () => {
+    const checkSession = async () => {
       try {
-        const response = await fetch("/api/auth/wellness/check-duplicate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
+        const response = await fetch("/api/auth/session");
         const data = await response.json();
 
-        if (!response.ok) {
-          if (data.error === "unauthorized") {
-            router.push("/signup?error=session_expired");
-          } else if (data.error === "verification_required") {
-            router.push("/verify");
-          }
+        if (!response.ok || !data.user) {
+          router.push("/signup?error=session_expired");
           return;
         }
 
-        // 중복 회원 체크
-        if (data.isDuplicate) {
-          console.log("⚠️ 이미 가입된 회원");
-          router.push("/duplicate-account");
+        // 일반 회원가입이 아니거나 본인인증이 완료되지 않은 경우
+        if (data.user.signupType !== "wellness" || !data.user.verified) {
+          router.push("/verify");
+          return;
         }
       } catch (error) {
-        console.error("중복 검증 중 오류:", error);
-        alert("오류가 발생했습니다. 다시 시도해주세요.");
+        console.error("세션 확인 중 오류:", error);
+        router.push("/signup?error=session_expired");
       }
     };
 
-    checkDuplicate();
+    checkSession();
   }, [router]);
 
   const password = watch("password");

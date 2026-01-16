@@ -6,23 +6,38 @@ import { useForm } from "react-hook-form";
 import { FormInput } from "@/domains/auth/ui/common/FormInput";
 import { Button } from "@/shared/ui/Button";
 import styles from "./page.module.scss";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-interface CredentialsForm {
+interface AccountForm {
   wellnessId: string;
   password: string;
   passwordConfirm: string;
 }
 
+const accountSchema = z
+  .object({
+    wellnessId: z
+      .string()
+      .min(4, "아이디는 4자 이상이어야 합니다")
+      .regex(/^[a-z0-9_]+$/, "영문 소문자, 숫자, _만 입력 가능합니다"),
+    password: z
+      .string()
+      .min(8, "비밀번호는 8자 이상이어야 합니다")
+      .regex(/^(?=.*[a-zA-Z])(?=.*[0-9])/, "영문과 숫자를 포함해야 합니다"),
+    passwordConfirm: z.string().min(1, "비밀번호 확인을 입력해주세요"),
+  })
+  .refine((data) => data.password === data.passwordConfirm, {
+    message: "비밀번호가 일치하지 않습니다",
+    path: ["passwordConfirm"],
+  });
+
 export default function CredentialsPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {
-    control,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<CredentialsForm>({
+  const { control, handleSubmit, watch } = useForm<AccountForm>({
+    resolver: zodResolver(accountSchema),
     mode: "onChange",
     defaultValues: {
       wellnessId: "",
@@ -57,9 +72,7 @@ export default function CredentialsPage() {
     checkSession();
   }, [router]);
 
-  const password = watch("password");
-
-  const onSubmit = async (data: CredentialsForm) => {
+  const onSubmit = async (data: AccountForm) => {
     setIsSubmitting(true);
 
     try {
@@ -106,67 +119,55 @@ export default function CredentialsPage() {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <h1 className={styles.title}>아이디·비밀번호 설정</h1>
-        <p className={styles.subtitle}>
-          로그인에 사용할 아이디와 비밀번호를 입력해주세요
-        </p>
+        <h1 className={styles.title}>
+          사용하실 아이디와 패스워드를 입력해 주세요
+        </h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-          <FormInput
-            name="wellnessId"
-            control={control}
-            label="아이디"
-            placeholder="영문, 숫자 조합 6-20자"
-            rules={{
-              required: "아이디를 입력해주세요",
-              pattern: {
-                value: /^[a-zA-Z0-9]{6,20}$/,
-                message: "영문, 숫자 조합 6-20자로 입력해주세요",
-              },
-            }}
-            error={errors.wellnessId?.message}
-          />
+          <div className={styles.section}>
+            <FormInput
+              name="wellnessId"
+              control={control}
+              label="아이디"
+              type="text"
+              placeholder="4자 이상 (영문, 숫자, _)"
+              onChange={(value) => {
+                const sanitized = value
+                  .toLowerCase()
+                  .replace(/[^a-z0-9_]/g, "");
+                if (value !== sanitized) {
+                  return;
+                }
+              }}
+              autoFocus
+            />
 
-          <FormInput
-            name="password"
-            control={control}
-            label="비밀번호"
-            type="password"
-            placeholder="영문, 숫자, 특수문자 조합 8-20자"
-            rules={{
-              required: "비밀번호를 입력해주세요",
-              pattern: {
-                value:
-                  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,20}$/,
-                message: "영문, 숫자, 특수문자 조합 8-20자로 입력해주세요",
-              },
-            }}
-            error={errors.password?.message}
-          />
+            <FormInput
+              name="password"
+              control={control}
+              label="비밀번호"
+              type="password"
+              placeholder="영문, 숫자, 특수문자 조합 8-20자"
+            />
 
-          <FormInput
-            name="passwordConfirm"
-            control={control}
-            label="비밀번호 확인"
-            type="password"
-            placeholder="비밀번호를 다시 입력해주세요"
-            rules={{
-              required: "비밀번호 확인을 입력해주세요",
-              validate: (value) =>
-                value === password || "비밀번호가 일치하지 않습니다",
-            }}
-            error={errors.passwordConfirm?.message}
-          />
+            <FormInput
+              name="passwordConfirm"
+              control={control}
+              label="비밀번호 확인"
+              type="password"
+              placeholder="비밀번호를 다시 입력해주세요"
+            />
 
-          <Button
-            type="submit"
-            variant="primary"
-            size="large"
-            disabled={isSubmitting}
-            className={styles.submitButton}
-          >
-            {isSubmitting ? "처리 중..." : "회원가입 완료"}
-          </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="large"
+              disabled={isSubmitting}
+              className={styles.submitButton}
+            >
+              {isSubmitting ? "처리 중..." : "회원가입 완료"}
+            </Button>
+          </div>
         </form>
       </div>
     </div>

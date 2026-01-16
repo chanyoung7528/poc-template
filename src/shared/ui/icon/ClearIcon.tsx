@@ -37,7 +37,7 @@ export function ClearIcon({ size = 20, className, onClick }: ClearIconProps) {
         <path
           d="M12.5 7.50293L7.5 12.5044"
           stroke="white"
-          stroke-linecap="round"
+          strokeLinecap="round"
         />
       </g>
     </svg>

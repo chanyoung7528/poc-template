@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { WellnessIdInput } from "@/domains/auth/ui/input/WellnessIdInput";
 import { FormInput } from "@/domains/auth/ui/common/FormInput";
-import { Button } from "@/shared/ui/Button";
 import styles from "./page.module.scss";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,8 +19,11 @@ const accountSchema = z
   .object({
     wellnessId: z
       .string()
-      .min(4, "아이디는 4자 이상이어야 합니다")
-      .regex(/^[a-z0-9_]+$/, "영문 소문자, 숫자, _만 입력 가능합니다"),
+      .min(10, "아이디는 10자 이상이어야 합니다")
+      .max(15, "아이디는 15자 이하여야 합니다")
+      .regex(/^[a-z0-9]+$/, "영문 소문자와 숫자만 입력 가능합니다")
+      .regex(/[a-z]/, "영문 소문자를 포함해야 합니다")
+      .regex(/\d/, "숫자를 포함해야 합니다"),
     password: z
       .string()
       .min(8, "비밀번호는 8자 이상이어야 합니다")
@@ -36,7 +39,7 @@ export default function CredentialsPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { control, handleSubmit, watch } = useForm<AccountForm>({
+  const { control, handleSubmit } = useForm<AccountForm>({
     resolver: zodResolver(accountSchema),
     mode: "onChange",
     defaultValues: {
@@ -71,6 +74,20 @@ export default function CredentialsPage() {
 
     checkSession();
   }, [router]);
+
+  // 중복 확인 함수
+  const handleDuplicateCheck = async (wellnessId: string): Promise<boolean> => {
+    try {
+      const response = await fetch(
+        `/api/auth/wellness/check-id?wellnessId=${encodeURIComponent(wellnessId)}`
+      );
+      const data = await response.json();
+      return data.isDuplicate;
+    } catch (error) {
+      console.error("중복 확인 중 오류:", error);
+      return false;
+    }
+  };
 
   const onSubmit = async (data: AccountForm) => {
     setIsSubmitting(true);
@@ -120,26 +137,17 @@ export default function CredentialsPage() {
     <div className={styles.container}>
       <div className={styles.content}>
         <h1 className={styles.title}>
-          사용하실 아이디와 패스워드를 입력해 주세요
+          사용하실 아이디와{"\n"}패스워드를 입력해 주세요
         </h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <div className={styles.section}>
-            <FormInput
+            <WellnessIdInput
               name="wellnessId"
               control={control}
               label="아이디"
-              type="text"
-              placeholder="4자 이상 (영문, 숫자, _)"
-              onChange={(value) => {
-                const sanitized = value
-                  .toLowerCase()
-                  .replace(/[^a-z0-9_]/g, "");
-                if (value !== sanitized) {
-                  return;
-                }
-              }}
-              autoFocus
+              placeholder="아이디를 입력해주세요"
+              onDuplicateCheck={handleDuplicateCheck}
             />
 
             <FormInput
@@ -157,17 +165,15 @@ export default function CredentialsPage() {
               type="password"
               placeholder="비밀번호를 다시 입력해주세요"
             />
-
-            <Button
-              type="submit"
-              variant="primary"
-              size="large"
-              disabled={isSubmitting}
-              className={styles.submitButton}
-            >
-              {isSubmitting ? "처리 중..." : "회원가입 완료"}
-            </Button>
           </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={styles.submitButton}
+          >
+            {isSubmitting ? "처리 중..." : "회원가입 완료"}
+          </button>
         </form>
       </div>
     </div>

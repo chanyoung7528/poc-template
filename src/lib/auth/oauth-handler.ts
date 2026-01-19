@@ -82,14 +82,20 @@ export async function handleOAuthCallback(
     const existingSession = await getSessionUser();
     console.log("기존 세션 확인:", {
       exists: !!existingSession,
+      provider: existingSession?.provider,
+      currentProvider: provider.name,
       isTemp: existingSession?.isTemp,
       termsAgreed: existingSession?.termsAgreed,
       verified: existingSession?.verified,
     });
 
-    // 임시 사용자 세션이 있으면 진행 상황에 따라 리다이렉트
-    if (existingSession && existingSession.isTemp) {
-      console.log("⚠️ 회원가입 진행 중인 세션 발견");
+    // 임시 사용자 세션이 있고, 같은 provider인 경우에만 기존 세션 사용
+    if (
+      existingSession &&
+      existingSession.isTemp &&
+      existingSession.provider === provider.name
+    ) {
+      console.log("⚠️ 회원가입 진행 중인 세션 발견 (같은 Provider)");
 
       // 본인인증까지 완료했으면 최종 회원가입 처리 (내부에서 직접 처리)
       if (existingSession.termsAgreed && existingSession.verified) {
@@ -152,6 +158,18 @@ export async function handleOAuthCallback(
         console.log("→ 약관 동의 페이지로 이동");
         return NextResponse.redirect(new URL("/terms-agreement", request.url));
       }
+    }
+
+    // 기존 세션이 있지만 다른 provider인 경우, 기존 세션 무시하고 새로 시작
+    if (
+      existingSession &&
+      existingSession.isTemp &&
+      existingSession.provider !== provider.name
+    ) {
+      console.log(
+        `⚠️ Provider 변경 감지: ${existingSession.provider} → ${provider.name}, 기존 세션 무시하고 새로 시작`
+      );
+      // 기존 세션은 무시하고 아래 로직으로 새 provider로 진행
     }
 
     // Step 1: 액세스 토큰 획득

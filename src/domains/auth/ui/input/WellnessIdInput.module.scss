@@ -24,7 +24,10 @@
   transition: color 0.2s;
 
   &.focused {
-    color: var(--brand60);
+    color: var(--success);
+  }
+  &.error {
+    color: var(--danger);
   }
 }
 
@@ -43,10 +46,6 @@
   box-shadow: 0px 16px 20px 0px rgba(0, 0, 0, 0.08);
   transition: all 0.2s ease-in-out;
 
-  &.hasActionButton {
-    padding-right: 8rem;
-  }
-
   &::placeholder {
     color: #c5c8ce;
     font-size: 1.7rem;
@@ -55,24 +54,12 @@
 
   &:focus {
     outline: none;
-    border: 1px solid var(--brand60);
+    border: 1px solid var(--success);
     background-color: var(--base-white);
-  }
-
-  &:active {
-    background-color: var(--base-white);
-  }
-
-  &:-webkit-autofill,
-  &:-webkit-autofill:focus {
-    box-shadow: 0 0 0px 1000px var(--base-white) inset;
-    -webkit-box-shadow: 0 0 0px 1000px var(--base-white) inset;
-    caret-color: var(--gray100);
-    border: 1px solid var(--brand60);
   }
 
   &.focused {
-    border-color: var(--brand60);
+    border-color: var(--success);
     background-color: var(--base-white);
   }
 
@@ -80,18 +67,6 @@
     background-color: var(--gray10);
     color: var(--gray50);
     cursor: not-allowed;
-  }
-
-  &[readonly] {
-    cursor: pointer;
-
-    &:focus {
-      border-color: var(--brand60);
-    }
-  }
-
-  &.error {
-    border-color: var(--danger);
   }
 }
 
@@ -120,19 +95,38 @@
   }
 }
 
-.errorMessage {
-  font-family: var(--font-pretendard);
-  font-size: 1.3rem;
-  font-weight: 500;
-  line-height: 1.8rem;
-  color: var(--danger);
+.helperContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-left: 0.4rem;
+  min-height: 2rem; // 헬퍼 텍스트 영역 고정
 }
 
-.helperText {
+.helperTextNeutral {
   font-family: var(--font-pretendard);
   font-size: 1.3rem;
   font-weight: 400;
   line-height: 1.8rem;
   color: var(--gray60);
+  margin: 0;
+}
+
+.helperTextSuccess {
+  font-family: var(--font-pretendard);
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1.8rem;
+  color: var(--success);
+  margin: 0;
+}
+
+.helperTextError {
+  font-family: var(--font-pretendard);
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1.8rem;
+  color: var(--danger);
+  margin: 0;
 }
 

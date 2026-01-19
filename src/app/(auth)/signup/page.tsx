@@ -69,7 +69,7 @@ export default function SignupPage() {
           onNaver={handleNaver}
           onApple={handleApple}
         />
-      </div>
+    </div>
     </>
   );
 }

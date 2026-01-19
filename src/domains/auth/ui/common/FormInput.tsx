@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { forwardRef, useState, useImperativeHandle, useRef } from 'react';
-import type { Control, FieldValues, Path } from 'react-hook-form';
-import { useController } from 'react-hook-form';
-import { ClearIcon } from '@/shared/ui/icon/ClearIcon';
-import styles from './FormInput.module.scss';
+import { forwardRef, useState, useImperativeHandle, useRef } from "react";
+import type { Control, FieldValues, Path } from "react-hook-form";
+import { useController } from "react-hook-form";
+import { ClearIcon } from "@/shared/ui/icon/ClearIcon";
+import styles from "./FormInput.module.scss";
 
 interface FormInputProps<T extends FieldValues = FieldValues> extends Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  'name' | 'onChange' | 'onBlur' | 'onFocus'
+  "name" | "onChange" | "onBlur" | "onFocus"
 > {
   name: Path<T>;
   control: Control<T>;
@@ -44,6 +44,7 @@ const FormInputComponent = <T extends FieldValues = FieldValues>(
   ref: React.Ref<HTMLInputElement>
 ) => {
   const [isFocused, setIsFocused] = useState(false);
+
   const [isTouched, setIsTouched] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -57,18 +58,18 @@ const FormInputComponent = <T extends FieldValues = FieldValues>(
 
   // 1. 에러 로직 우선순위 정리
   const errorMessage =
-    typeof errorProp === 'string' ? errorProp : fieldError?.message;
+    typeof errorProp === "string" ? errorProp : fieldError?.message;
   const hasError = !!errorProp || !!fieldError;
 
   // 2. 값 로직 정리 (Controlled/Uncontrolled 대응)
-  const value = valueProp ?? field.value ?? '';
+  const value = valueProp ?? field.value ?? "";
   const hasValue = String(value).length > 0;
 
   // 3. 입력 상태 결정 (에러/성공/기본)
   const getInputState = () => {
     if (!isTouched) return undefined;
-    if (hasError) return 'error';
-    if (hasValue && !hasError) return 'success';
+    if (hasError) return "error";
+    if (hasValue && !hasError) return "success";
     return undefined;
   };
 
@@ -96,8 +97,8 @@ const FormInputComponent = <T extends FieldValues = FieldValues>(
     if (onClearProp) {
       onClearProp();
     } else {
-      field.onChange(''); // RHF 값 초기화
-      onChangeProp?.('');
+      field.onChange(""); // RHF 값 초기화
+      onChangeProp?.("");
     }
     setIsTouched(false); // Clear 시 상태 초기화
   };
@@ -113,11 +114,11 @@ const FormInputComponent = <T extends FieldValues = FieldValues>(
   return (
     <div className={styles.container}>
       <div
-        className={`${styles.inputWrapper} ${children ? styles.hasAction : ''}`}
+        className={`${styles.inputWrapper} ${children ? styles.hasAction : ""}`}
       >
         {label && (
           <label
-            className={`${styles.label} ${inputState === 'success' ? styles.focused : inputState === 'error' ? styles.error : isFocused ? styles.focused : ''}`}
+            className={`${styles.label} ${inputState === "success" ? styles.focused : inputState === "error" ? styles.error : isFocused ? styles.focused : ""}`}
           >
             {label}
           </label>
@@ -132,15 +133,15 @@ const FormInputComponent = <T extends FieldValues = FieldValues>(
           onFocus={handleFocus}
           onBlur={handleBlur}
           className={`${styles.input} 
-            ${isFocused ? styles.focused : ''} 
-            ${children ? styles.hasActionButton : ''} 
-            ${className || ''}`}
+            ${isFocused ? styles.focused : ""} 
+            ${children ? styles.hasActionButton : ""} 
+            ${className || ""}`}
           style={{
             borderColor:
-              inputState === 'success'
-                ? 'var(--success)'
-                : inputState === 'error'
-                  ? 'var(--danger)'
+              inputState === "success"
+                ? "var(--success)"
+                : inputState === "error"
+                  ? "var(--danger)"
                   : undefined,
           }}
         />

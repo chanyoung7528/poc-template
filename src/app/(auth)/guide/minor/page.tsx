@@ -17,6 +17,8 @@ export default function MinorGuidePage() {
             fill="none"
             stroke="currentColor"
           >
+
+            
             <circle cx="12" cy="12" r="10" strokeWidth="2" />
             <line
               x1="12"

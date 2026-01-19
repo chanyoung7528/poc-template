@@ -126,11 +126,15 @@ export async function POST() {
 
     console.log('✅ 회원가입 완료 및 로그인:', newUser.id);
 
-    // 성공 응답
+    // 성공 응답 - 회원가입 완료 페이지로 리다이렉트
+    // 소셜 회원가입의 경우 nickname을 전달 (wellnessId 대신)
+    const displayName = newUser.nickname || newUser.email || '회원';
+    const redirectUrl = `/signup/complete?wellnessId=${encodeURIComponent(displayName)}`;
+
     return NextResponse.json({
       success: true,
       userId: newUser.id,
-      redirectUrl: '/main',
+      redirectUrl,
     });
   } catch (error) {
     console.error('회원가입 완료 처리 중 오류:', error);

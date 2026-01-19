@@ -165,8 +165,8 @@ export function usePortOnePass() {
 
                     console.log('✅ 회원가입 완료:', completeData.userId);
 
-                    // 메인 페이지로 이동
-                    router.push(completeData.redirectUrl || '/main');
+                    // 회원가입 완료 페이지로 이동
+                    router.push(completeData.redirectUrl || '/signup/complete');
                   }
                 } catch (error) {
                   console.error('본인인증 후 처리 중 오류:', error);

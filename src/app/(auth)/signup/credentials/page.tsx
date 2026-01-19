@@ -122,9 +122,8 @@ export default function CredentialsPage() {
 
       console.log("✅ 회원가입 성공");
 
-      // 성공 메시지 표시 후 메인 페이지로 이동
-      alert("회원가입이 완료되었습니다!");
-      router.push("/main");
+      // 회원가입 완료 페이지로 이동 (wellnessId 전달)
+      router.push(`/signup/complete?wellnessId=${encodeURIComponent(data.wellnessId)}`);
     } catch (error) {
       console.error("회원가입 요청 중 오류:", error);
       alert("네트워크 오류가 발생했습니다. 다시 시도해주세요.");

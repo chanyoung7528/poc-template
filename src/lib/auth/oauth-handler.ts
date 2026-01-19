@@ -145,8 +145,11 @@ export async function handleOAuthCallback(
 
         console.log('✅ 회원가입 완료:', newUser.id);
 
-        // 메인 페이지로 직접 리다이렉트 (중간 API 거치지 않음)
-        return NextResponse.redirect(new URL('/main', request.url));
+        // 회원가입 완료 페이지로 리다이렉트 (nickname 전달)
+        const displayName = newUser.nickname || newUser.email || '회원';
+        const redirectUrl = new URL('/signup/complete', request.url);
+        redirectUrl.searchParams.set('wellnessId', displayName);
+        return NextResponse.redirect(redirectUrl);
       }
       // 약관 동의만 했으면 본인인증으로
       else if (existingSession.termsAgreed && !existingSession.verified) {

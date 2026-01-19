@@ -142,12 +142,14 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ 일반 회원가입 완료 및 로그인:', newUser.id);
 
-    // 성공 응답
+    // 성공 응답 - 회원가입 완료 페이지로 리다이렉트 (wellnessId 전달)
+    const redirectUrl = `/signup/complete?wellnessId=${encodeURIComponent(wellnessId)}`;
+
     return NextResponse.json({
       success: true,
       userId: newUser.id,
       message: '회원가입이 완료되었습니다.',
-      redirectUrl: '/main',
+      redirectUrl,
     });
   } catch (error) {
     console.error('일반 회원가입 완료 처리 중 오류:', error);

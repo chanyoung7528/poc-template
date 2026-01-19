@@ -1,11 +1,11 @@
-import { NextRequest } from "next/server";
-import type { User } from "@prisma/client";
+import { NextRequest } from 'next/server';
+import type { User } from '@prisma/client';
 
 /**
  * OAuth Provider 공통 인터페이스
  */
 export interface OAuthProvider {
-  name: "kakao" | "naver";
+  name: 'kakao' | 'naver';
 
   /**
    * 인가 코드로 액세스 토큰 획득
@@ -31,7 +31,7 @@ export interface OAuthUserInfo {
   email?: string;
   nickname?: string;
   profileImage?: string;
-  provider: "kakao" | "naver";
+  provider: 'kakao' | 'naver';
 }
 
 /**
@@ -46,7 +46,7 @@ export interface OAuthCallbackResult {
 /**
  * 회원가입/로그인 모드
  */
-export type AuthMode = "signup" | "login";
+export type AuthMode = 'signup' | 'login';
 
 /**
  * OAuth 콜백 컨텍스트

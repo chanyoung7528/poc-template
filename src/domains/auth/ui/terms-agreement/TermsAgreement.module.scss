@@ -32,7 +32,7 @@
   accent-color: #003223;
   flex-shrink: 0;
   touch-action: manipulation;
-  
+
   // 모바일에서 터치 영역 확대
   @media (max-width: 768px) {
     width: 2.4rem;
@@ -51,7 +51,7 @@
   user-select: none;
   flex: 1;
   touch-action: manipulation;
-  
+
   // 모바일에서 텍스트 크기 조정
   @media (max-width: 768px) {
     font-size: 1.5rem;
@@ -59,7 +59,7 @@
   }
 
   &.required::after {
-    content: " *";
+    content: ' *';
     color: #ff6433;
     font-weight: 600;
   }
@@ -76,19 +76,19 @@
     font-size: 1.5rem;
     line-height: 2.2rem;
     color: #222;
-    
+
     @media (max-width: 768px) {
       font-size: 1.6rem;
       line-height: 2.4rem;
     }
   }
-  
+
   .checkbox {
     width: 2.2rem;
     height: 2.2rem;
     min-width: 2.2rem;
     min-height: 2.2rem;
-    
+
     @media (max-width: 768px) {
       width: 2.6rem;
       height: 2.6rem;
@@ -114,7 +114,7 @@
   min-height: 4.4rem;
   display: flex;
   align-items: center;
-  
+
   @media (max-width: 768px) {
     font-size: 1.4rem;
     padding: var(--spacing-sm);
@@ -134,7 +134,7 @@
   color: #ff6433;
   margin-top: var(--spacing-xs);
   padding-left: var(--spacing-sm);
-  
+
   @media (max-width: 768px) {
     font-size: 1.3rem;
     line-height: 1.8rem;
@@ -156,7 +156,9 @@
   border-radius: var(--radius-md);
   cursor: pointer;
   touch-action: manipulation;
-  transition: background-color 0.2s, opacity 0.2s;
+  transition:
+    background-color 0.2s,
+    opacity 0.2s;
 
   @media (max-width: 768px) {
     min-height: 6rem;

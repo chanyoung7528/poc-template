@@ -1,10 +1,9 @@
-"use client";
+'use client';
 
-import { ButtonHTMLAttributes, ReactNode } from "react";
-import styles from "./AuthActionButton.module.scss";
+import { ButtonHTMLAttributes, ReactNode } from 'react';
+import styles from './AuthActionButton.module.scss';
 
-interface AuthActionButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface AuthActionButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon: ReactNode;
   label: string;
   title: string;
@@ -14,7 +13,7 @@ export function AuthActionButton({
   icon,
   label,
   title,
-  className = "",
+  className = '',
   ...props
 }: AuthActionButtonProps) {
   return (

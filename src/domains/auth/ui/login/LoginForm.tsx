@@ -9,32 +9,38 @@ interface LoginFormProps {
   onForgotPassword?: () => void;
 }
 
-export function LoginForm({ onSubmit, isLoading, onForgotPassword }: LoginFormProps) {
+export function LoginForm({
+  onSubmit,
+  isLoading,
+  onForgotPassword,
+}: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+    {}
+  );
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     // Validation
     const newErrors: { email?: string; password?: string } = {};
-    
+
     if (!email) {
       newErrors.email = '이메일을 입력해주세요';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = '올바른 이메일 형식이 아닙니다';
     }
-    
+
     if (!password) {
       newErrors.password = '비밀번호를 입력해주세요';
     }
-    
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    
+
     setErrors({});
     await onSubmit(email, password);
   };
@@ -54,7 +60,9 @@ export function LoginForm({ onSubmit, isLoading, onForgotPassword }: LoginFormPr
           placeholder="example@email.com"
           disabled={isLoading}
         />
-        {errors.email && <span className={styles.errorMessage}>{errors.email}</span>}
+        {errors.email && (
+          <span className={styles.errorMessage}>{errors.email}</span>
+        )}
       </div>
 
       <div className={styles.formGroup}>
@@ -70,10 +78,16 @@ export function LoginForm({ onSubmit, isLoading, onForgotPassword }: LoginFormPr
           placeholder="비밀번호를 입력하세요"
           disabled={isLoading}
         />
-        {errors.password && <span className={styles.errorMessage}>{errors.password}</span>}
+        {errors.password && (
+          <span className={styles.errorMessage}>{errors.password}</span>
+        )}
       </div>
 
-      <button type="submit" className={styles.submitButton} disabled={isLoading}>
+      <button
+        type="submit"
+        className={styles.submitButton}
+        disabled={isLoading}
+      >
         {isLoading ? '로그인 중...' : '로그인'}
       </button>
 

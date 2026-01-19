@@ -1,5 +1,5 @@
-import { prisma } from "./prisma";
-import type { User } from "@prisma/client";
+import { prisma } from './prisma';
+import type { User } from '@prisma/client';
 
 /**
  * 카카오 ID로 사용자 조회
@@ -72,12 +72,12 @@ export async function createKakaoUser(data: {
       email: data.email,
       nickname: data.nickname,
       profileImage: data.profileImage,
-      provider: "kakao",
+      provider: 'kakao',
       // marketingAgreed는 필요시 스키마에 추가
     },
   });
 
-  console.log("✅ [DB] 신규 카카오 사용자 생성:", user.id, user.nickname);
+  console.log('✅ [DB] 신규 카카오 사용자 생성:', user.id, user.nickname);
 
   return user;
 }
@@ -98,12 +98,12 @@ export async function createNaverUser(data: {
       email: data.email,
       nickname: data.nickname,
       profileImage: data.profileImage,
-      provider: "naver",
+      provider: 'naver',
       // marketingAgreed는 필요시 스키마에 추가
     },
   });
 
-  console.log("✅ [DB] 신규 네이버 사용자 생성:", user.id, user.nickname);
+  console.log('✅ [DB] 신규 네이버 사용자 생성:', user.id, user.nickname);
 
   return user;
 }
@@ -128,7 +128,7 @@ export async function updateUser(
     },
   });
 
-  console.log("✅ [DB] 사용자 정보 업데이트:", id);
+  console.log('✅ [DB] 사용자 정보 업데이트:', id);
 
   return user;
 }
@@ -144,7 +144,7 @@ export async function createWellnessUser(data: {
   name: string;
   phone: string;
   birth: string;
-  gender: "M" | "F";
+  gender: 'M' | 'F';
 }): Promise<User> {
   const user = await prisma.user.create({
     data: {
@@ -156,11 +156,11 @@ export async function createWellnessUser(data: {
       phone: data.phone,
       birth: data.birth,
       gender: data.gender,
-      provider: "wellness",
+      provider: 'wellness',
     },
   });
 
-  console.log("✅ [DB] 신규 일반 사용자 생성:", user.id, user.wellnessId);
+  console.log('✅ [DB] 신규 일반 사용자 생성:', user.id, user.wellnessId);
 
   return user;
 }
@@ -187,5 +187,5 @@ export async function updateLastLogin(id: string): Promise<void> {
     data: { lastLoginAt: new Date() },
   });
 
-  console.log("✅ [DB] 마지막 로그인 시간 업데이트:", id);
+  console.log('✅ [DB] 마지막 로그인 시간 업데이트:', id);
 }

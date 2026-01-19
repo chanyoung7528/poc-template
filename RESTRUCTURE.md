@@ -55,11 +55,13 @@ src/
 모든 컴포넌트의 스타일이 Tailwind CSS `className`에서 SCSS Module 방식으로 변경되었습니다.
 
 **Before:**
+
 ```tsx
 <div className="flex min-h-screen items-center justify-center bg-gray-50">
 ```
 
 **After:**
+
 ```tsx
 import styles from './LoginFlow.module.scss';
 
@@ -67,6 +69,7 @@ import styles from './LoginFlow.module.scss';
 ```
 
 **장점:**
+
 - 더 명확한 스타일 범위 (스타일 충돌 방지)
 - 재사용 가능한 스타일 변수 및 믹스인
 - 더 나은 IDE 지원 및 자동완성
@@ -96,21 +99,25 @@ import styles from './LoginFlow.module.scss';
 ## 🚀 시작하기
 
 ### 1. 의존성 설치
+
 ```bash
 pnpm install
 ```
 
 ### 2. Prisma 클라이언트 생성
+
 ```bash
 pnpm db:generate
 ```
 
 ### 3. 개발 서버 실행
+
 ```bash
 pnpm dev
 ```
 
 ### 4. 프로덕션 빌드
+
 ```bash
 pnpm build
 pnpm start
@@ -190,7 +197,7 @@ DATABASE_URL=
 // Component.module.scss
 .container {
   display: flex;
-  
+
   .title {
     font-size: 1.5rem;
     color: #333;

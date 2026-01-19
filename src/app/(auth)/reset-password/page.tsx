@@ -43,7 +43,7 @@ export default function ResetPasswordPage() {
 
   const handleResetClick = async () => {
     const passwordValidation = validatePassword(password);
-    
+
     if (!passwordValidation.isValid) {
       return;
     }
@@ -78,7 +78,11 @@ export default function ResetPasswordPage() {
               required
             />
 
-            <Button onClick={handleSendCodeClick} disabled={isLoading} fullWidth>
+            <Button
+              onClick={handleSendCodeClick}
+              disabled={isLoading}
+              fullWidth
+            >
               {isLoading ? '발송 중...' : '인증 코드 발송'}
             </Button>
 
@@ -94,7 +98,11 @@ export default function ResetPasswordPage() {
                   required
                 />
 
-                <Button onClick={handleVerifyCodeClick} disabled={isLoading} fullWidth>
+                <Button
+                  onClick={handleVerifyCodeClick}
+                  disabled={isLoading}
+                  fullWidth
+                >
                   {isLoading ? '인증 중...' : '인증 확인'}
                 </Button>
               </>
@@ -106,9 +114,7 @@ export default function ResetPasswordPage() {
         return (
           <div className={styles.content}>
             <h1 className={styles.title}>새 비밀번호 설정</h1>
-            <p className={styles.subtitle}>
-              새로운 비밀번호를 입력해주세요
-            </p>
+            <p className={styles.subtitle}>새로운 비밀번호를 입력해주세요</p>
 
             <Input
               label="새 비밀번호"
@@ -137,14 +143,22 @@ export default function ResetPasswordPage() {
       case 'complete':
         return (
           <div className={styles.completeContent}>
-            <svg className={styles.successIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <svg
+              className={styles.successIcon}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
               <circle cx="12" cy="12" r="10" strokeWidth="2" />
-              <path d="M8 12l3 3 5-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M8 12l3 3 5-5"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
             <h1 className={styles.title}>비밀번호 재설정 완료</h1>
-            <p className={styles.subtitle}>
-              곧 로그인 페이지로 이동합니다
-            </p>
+            <p className={styles.subtitle}>곧 로그인 페이지로 이동합니다</p>
           </div>
         );
 

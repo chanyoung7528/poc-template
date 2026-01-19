@@ -1,6 +1,11 @@
 export type AuthProvider = 'kakao' | 'naver' | 'apple';
 
-export type AuthStatus = 'idle' | 'loading' | 'authenticated' | 'unauthenticated' | 'error';
+export type AuthStatus =
+  | 'idle'
+  | 'loading'
+  | 'authenticated'
+  | 'unauthenticated'
+  | 'error';
 
 export interface User {
   id: string;

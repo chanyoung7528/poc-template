@@ -13,14 +13,13 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     // Add auth token if available
-    const token = typeof window !== 'undefined' 
-      ? localStorage.getItem('auth-token') 
-      : null;
-    
+    const token =
+      typeof window !== 'undefined' ? localStorage.getItem('auth-token') : null;
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
+
     return config;
   },
   (error) => {
@@ -41,7 +40,7 @@ apiClient.interceptors.response.use(
         window.location.href = '/login';
       }
     }
-    
+
     return Promise.reject(error);
   }
 );

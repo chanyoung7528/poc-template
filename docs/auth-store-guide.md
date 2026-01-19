@@ -7,16 +7,19 @@ Zustand를 이용한 중앙화된 인증 상태 관리 시스템입니다. 사�
 ## 주요 기능
 
 ### 1. 인증 상태 관리
+
 - 로그인/로그아웃 상태
 - 사용자 정보 (ID, 이메일, 닉네임, 프로필 이미지)
 - Provider 타입 (kakao, naver, apple, wellness)
 
 ### 2. 회원가입 진행 상태
+
 - 단계별 상태 관리 (약관 동의, 본인인증, ID/PW 입력)
 - 임시 세션 관리
 - 본인인증 데이터 임시 저장
 
 ### 3. 세션 동기화
+
 - 서버 세션과 클라이언트 Store 자동 동기화
 - 새로고침 시에도 상태 유지 (localStorage persist)
 
@@ -25,7 +28,7 @@ Zustand를 이용한 중앙화된 인증 상태 관리 시스템입니다. 사�
 ### 기본 사용
 
 ```typescript
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from '@/store/authStore';
 
 function MyComponent() {
   // 전체 상태 가져오기
@@ -47,21 +50,21 @@ import { useAuthUser, useAuthStatus, useSignupProgress } from "@/store/authStore
 function ProfileComponent() {
   // 사용자 정보만 구독 (다른 상태 변경 시 리렌더링 안 됨)
   const { userId, email, nickname, profileImage } = useAuthUser();
-  
+
   return <div>{nickname}</div>;
 }
 
 function StatusComponent() {
   // 인증 상태만 구독
   const { isAuthenticated, isTemp, provider } = useAuthStatus();
-  
+
   return <div>{provider}로 로그인됨</div>;
 }
 
 function SignupProgressComponent() {
   // 회원가입 진행 상태만 구독
   const { signupStep, termsAgreed, verified } = useSignupProgress();
-  
+
   return <div>현재 단계: {signupStep}</div>;
 }
 ```
@@ -74,10 +77,10 @@ function SignupProgressComponent() {
 const startSignup = useAuthStore((state) => state.startSignup);
 
 // 소셜 로그인 회원가입
-startSignup("kakao"); // 또는 "naver", "apple"
+startSignup('kakao'); // 또는 "naver", "apple"
 
 // 일반 회원가입
-startSignup("wellness");
+startSignup('wellness');
 ```
 
 ### 2. 약관 동의
@@ -93,14 +96,16 @@ agreeToTerms();
 ### 3. 본인인증 완료
 
 ```typescript
-const completeVerification = useAuthStore((state) => state.completeVerification);
+const completeVerification = useAuthStore(
+  (state) => state.completeVerification
+);
 
 // 본인인증 완료
 completeVerification({
-  name: "홍길동",
-  phone: "01012345678",
-  birth: "19900101",
-  gender: "M",
+  name: '홍길동',
+  phone: '01012345678',
+  birth: '19900101',
+  gender: 'M',
 });
 // 자동으로 verified = true, signupStep이 변경됨
 ```
@@ -111,7 +116,7 @@ completeVerification({
 const completeSignup = useAuthStore((state) => state.completeSignup);
 
 // 회원가입 완료 (DB 저장 후)
-completeSignup("user-id-from-db");
+completeSignup('user-id-from-db');
 // 자동으로 isTemp = false, isAuthenticated = true로 변경됨
 ```
 
@@ -122,11 +127,11 @@ const login = useAuthStore((state) => state.login);
 
 // 로그인
 login({
-  userId: "user-id",
-  provider: "kakao",
-  email: "user@example.com",
-  nickname: "홍길동",
-  profileImage: "https://example.com/image.jpg",
+  userId: 'user-id',
+  provider: 'kakao',
+  email: 'user@example.com',
+  nickname: '홍길동',
+  profileImage: 'https://example.com/image.jpg',
 });
 ```
 
@@ -146,14 +151,16 @@ logout();
 ```typescript
 // 1. 회원가입 페이지
 const startSignup = useAuthStore((state) => state.startSignup);
-startSignup("kakao");
+startSignup('kakao');
 
 // 2. 약관 동의 페이지
 const agreeToTerms = useAuthStore((state) => state.agreeToTerms);
 agreeToTerms();
 
 // 3. 본인인증 페이지
-const completeVerification = useAuthStore((state) => state.completeVerification);
+const completeVerification = useAuthStore(
+  (state) => state.completeVerification
+);
 completeVerification(certificationData);
 
 // 4. API 호출 후 회원가입 완료
@@ -166,7 +173,7 @@ completeSignup(userId);
 ```typescript
 // 1. 회원가입 페이지
 const startSignup = useAuthStore((state) => state.startSignup);
-startSignup("wellness");
+startSignup('wellness');
 
 // 2. 약관 동의
 agreeToTerms();

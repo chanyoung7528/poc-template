@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { TermsAgreement } from "@/domains/auth/ui/terms-agreement/TermsAgreement";
-import { SignupStepper } from "../components/SignupStepper";
-import { useSignupFlow } from "../hooks/useSignupFlow";
+import { useState } from 'react';
+import { TermsAgreement } from '@/domains/auth/ui/terms-agreement/TermsAgreement';
+import { SignupStepper } from '../components/SignupStepper';
+import { useSignupFlow } from '../hooks/useSignupFlow';
 import {
   validatePassword,
   validateNickname,
-} from "@/domains/auth/model/auth.utils";
-import styles from "./SignupFlow.module.scss";
+} from '@/domains/auth/model/auth.utils';
+import styles from './SignupFlow.module.scss';
 
 interface SignupFlowProps {
   onNavigateToLogin?: () => void;
@@ -27,20 +27,20 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
     handleSignup,
   } = useSignupFlow();
 
-  const [localEmail, setLocalEmail] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
+  const [localEmail, setLocalEmail] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
   const [formData, setFormData] = useState({
-    password: "",
-    confirmPassword: "",
-    nickname: "",
+    password: '',
+    confirmPassword: '',
+    nickname: '',
   });
   const [showTermsError, setShowTermsError] = useState(false);
 
   const steps = [
-    { label: "약관 동의", key: "terms" },
-    { label: "PASS 인증", key: "verify" },
-    { label: "정보 입력", key: "form" },
-    { label: "완료", key: "complete" },
+    { label: '약관 동의', key: 'terms' },
+    { label: 'PASS 인증', key: 'verify' },
+    { label: '정보 입력', key: 'form' },
+    { label: '완료', key: 'complete' },
   ];
 
   const currentStepIndex = steps.findIndex((step) => step.key === currentStep);
@@ -88,7 +88,7 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
 
   const renderStepContent = () => {
     switch (currentStep) {
-      case "terms":
+      case 'terms':
         return (
           <TermsAgreement
             onAgree={(agreed) => {
@@ -103,7 +103,7 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
           />
         );
 
-      case "verify":
+      case 'verify':
         return (
           <div className={styles.verifySection}>
             <div className={styles.formGroup}>
@@ -121,7 +121,7 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
               className={styles.button}
               disabled={isLoading}
             >
-              {isLoading ? "발송 중..." : "인증 코드 발송"}
+              {isLoading ? '발송 중...' : '인증 코드 발송'}
             </button>
 
             {email && (
@@ -142,14 +142,14 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
                   className={styles.button}
                   disabled={isLoading}
                 >
-                  {isLoading ? "인증 중..." : "인증 확인"}
+                  {isLoading ? '인증 중...' : '인증 확인'}
                 </button>
               </>
             )}
           </div>
         );
 
-      case "form":
+      case 'form':
         return (
           <div className={styles.formSection}>
             <div className={styles.formGroup}>
@@ -196,12 +196,12 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
               className={styles.button}
               disabled={isLoading}
             >
-              {isLoading ? "가입 중..." : "회원가입 완료"}
+              {isLoading ? '가입 중...' : '회원가입 완료'}
             </button>
           </div>
         );
 
-      case "complete":
+      case 'complete':
         return (
           <div className={styles.completeSection}>
             <svg
@@ -247,10 +247,10 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
         </SignupStepper>
       </div>
 
-      {onNavigateToLogin && currentStep !== "complete" && (
+      {onNavigateToLogin && currentStep !== 'complete' && (
         <div className={styles.footer}>
           <p className={styles.footerText}>
-            이미 계정이 있으신가요?{" "}
+            이미 계정이 있으신가요?{' '}
             <button onClick={onNavigateToLogin} className={styles.footerLink}>
               로그인
             </button>

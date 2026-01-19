@@ -1,21 +1,21 @@
-import { apiClient } from "@/shared/api/axios.instance";
+import { apiClient } from '@/shared/api/axios.instance';
 import type {
   User,
   LoginResponse,
   SignupData,
   ResetPasswordData,
   CertificationResult,
-} from "./auth.types";
+} from './auth.types';
 
 /**
  * 현재 로그인한 사용자 정보를 조회합니다
  */
 export async function fetchCurrentUser(): Promise<User | null> {
   try {
-    const response = await apiClient.get<{ user: User }>("/api/auth/me");
+    const response = await apiClient.get<{ user: User }>('/api/auth/me');
     return response.data.user;
   } catch (error) {
-    console.error("사용자 정보 조회 실패:", error);
+    console.error('사용자 정보 조회 실패:', error);
     return null;
   }
 }
@@ -24,7 +24,7 @@ export async function fetchCurrentUser(): Promise<User | null> {
  * 로그아웃을 수행합니다
  */
 export async function logout(): Promise<void> {
-  await apiClient.post("/api/auth/logout");
+  await apiClient.post('/api/auth/logout');
 }
 
 /**
@@ -34,7 +34,7 @@ export async function loginWithCredentials(
   email: string,
   password: string
 ): Promise<LoginResponse> {
-  const response = await apiClient.post<LoginResponse>("/api/auth/login", {
+  const response = await apiClient.post<LoginResponse>('/api/auth/login', {
     email,
     password,
   });
@@ -46,7 +46,7 @@ export async function loginWithCredentials(
  */
 export async function signup(data: SignupData): Promise<LoginResponse> {
   const response = await apiClient.post<LoginResponse>(
-    "/api/auth/signup",
+    '/api/auth/signup',
     data
   );
   return response.data;
@@ -56,7 +56,7 @@ export async function signup(data: SignupData): Promise<LoginResponse> {
  * 비밀번호 재설정을 수행합니다
  */
 export async function resetPassword(data: ResetPasswordData): Promise<void> {
-  await apiClient.post("/api/auth/reset-password", data);
+  await apiClient.post('/api/auth/reset-password', data);
 }
 
 /**
@@ -66,7 +66,7 @@ export async function findIdByEmail(
   email: string
 ): Promise<{ maskedId: string }> {
   const response = await apiClient.post<{ maskedId: string }>(
-    "/api/auth/find-id",
+    '/api/auth/find-id',
     { email }
   );
   return response.data;
@@ -76,7 +76,7 @@ export async function findIdByEmail(
  * 인증 코드를 발송합니다
  */
 export async function sendVerificationCode(email: string): Promise<void> {
-  await apiClient.post("/api/auth/send-code", { email });
+  await apiClient.post('/api/auth/send-code', { email });
 }
 
 /**
@@ -87,7 +87,7 @@ export async function verifyCode(
   code: string
 ): Promise<{ token: string }> {
   const response = await apiClient.post<{ token: string }>(
-    "/api/auth/verify-code",
+    '/api/auth/verify-code',
     {
       email,
       code,
@@ -103,7 +103,7 @@ export async function verifyCertification(
   impUid: string
 ): Promise<CertificationResult> {
   const response = await apiClient.post<CertificationResult>(
-    "/api/auth/verify-certification",
+    '/api/auth/verify-certification',
     {
       imp_uid: impUid,
     }

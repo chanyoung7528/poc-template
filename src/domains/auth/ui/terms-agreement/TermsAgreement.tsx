@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import styles from "./TermsAgreement.module.scss";
+import { useState } from 'react';
+import styles from './TermsAgreement.module.scss';
 
 interface TermsAgreementProps {
   onAgree: (agreed: {
@@ -58,7 +58,7 @@ export function TermsAgreement({
             type="checkbox"
             id="terms"
             checked={agreed.terms}
-            onChange={() => handleToggle("terms")}
+            onChange={() => handleToggle('terms')}
             className={styles.checkbox}
           />
           <label
@@ -69,7 +69,7 @@ export function TermsAgreement({
           </label>
           <button
             type="button"
-            onClick={() => window.open("/terms", "_blank")}
+            onClick={() => window.open('/terms', '_blank')}
             className={styles.linkButton}
           >
             보기
@@ -81,7 +81,7 @@ export function TermsAgreement({
             type="checkbox"
             id="privacy"
             checked={agreed.privacy}
-            onChange={() => handleToggle("privacy")}
+            onChange={() => handleToggle('privacy')}
             className={styles.checkbox}
           />
           <label
@@ -92,7 +92,7 @@ export function TermsAgreement({
           </label>
           <button
             type="button"
-            onClick={() => window.open("/privacy", "_blank")}
+            onClick={() => window.open('/privacy', '_blank')}
             className={styles.linkButton}
           >
             보기
@@ -104,7 +104,7 @@ export function TermsAgreement({
             type="checkbox"
             id="marketing"
             checked={agreed.marketing}
-            onChange={() => handleToggle("marketing")}
+            onChange={() => handleToggle('marketing')}
             className={styles.checkbox}
           />
           <label htmlFor="marketing" className={styles.label}>

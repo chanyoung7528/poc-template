@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchCurrentUser,
   logout,
@@ -9,14 +9,14 @@ import {
   sendVerificationCode,
   verifyCode,
   verifyCertification,
-} from "./auth.api";
-import { useAuthStore } from "./auth.store";
-import type { SignupData, ResetPasswordData } from "./auth.types";
+} from './auth.api';
+import { useAuthStore } from './auth.store';
+import type { SignupData, ResetPasswordData } from './auth.types';
 
 // Query Keys
 export const authKeys = {
-  all: ["auth"] as const,
-  me: () => [...authKeys.all, "me"] as const,
+  all: ['auth'] as const,
+  me: () => [...authKeys.all, 'me'] as const,
 };
 
 /**
@@ -29,7 +29,7 @@ export function useCurrentUser() {
   return useQuery({
     queryKey: authKeys.me(),
     queryFn: async () => {
-      setAuthStatus("loading");
+      setAuthStatus('loading');
       const user = await fetchCurrentUser();
       setUser(user);
       return user;

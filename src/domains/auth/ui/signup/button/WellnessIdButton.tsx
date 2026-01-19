@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import styles from "./WellnessIdButton.module.scss";
+import styles from './WellnessIdButton.module.scss';
 
 interface WellnessIdButtonProps {
   onClick: () => void;
@@ -12,8 +12,8 @@ interface WellnessIdButtonProps {
 export function WellnessIdButton({
   onClick,
   disabled = false,
-  className = "",
-  children = "Wellness ID로 시작하기",
+  className = '',
+  children = 'Wellness ID로 시작하기',
 }: WellnessIdButtonProps) {
   return (
     <button

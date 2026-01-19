@@ -1,4 +1,4 @@
-declare module "bcryptjs" {
+declare module 'bcryptjs' {
   export function hash(
     data: string | Buffer,
     saltOrRounds: string | number
@@ -11,7 +11,10 @@ declare module "bcryptjs" {
     data: string | Buffer,
     encrypted: string
   ): Promise<boolean>;
-  export function compareSync(data: string | Buffer, encrypted: string): boolean;
+  export function compareSync(
+    data: string | Buffer,
+    encrypted: string
+  ): boolean;
   export function genSaltSync(rounds?: number): string;
   export function genSalt(rounds?: number): Promise<string>;
 }

@@ -8,11 +8,14 @@ interface PassAuthButtonProps {
   isLoading?: boolean;
 }
 
-export function PassAuthButton({ onClick, isLoading: externalLoading }: PassAuthButtonProps) {
+export function PassAuthButton({
+  onClick,
+  isLoading: externalLoading,
+}: PassAuthButtonProps) {
   const { handleAuth, isLoading: internalLoading } = usePortOnePass();
-  
+
   const isLoading = externalLoading || internalLoading;
-  
+
   const handleClick = () => {
     if (onClick) {
       onClick();

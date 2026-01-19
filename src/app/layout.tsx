@@ -1,21 +1,21 @@
-import "@/shared/assets/styles/index.scss";
-import type { Metadata, Viewport } from "next";
-import Script from "next/script";
-import { QueryProvider } from "@/lib/query-provider";
-import { AuthProvider } from "@/components/AuthProvider";
-import { pretendard, suite } from "@/shared/assets/fonts";
+import '@/shared/assets/styles/index.scss';
+import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
+import { QueryProvider } from '@/lib/query-provider';
+import { AuthProvider } from '@/components/AuthProvider';
+import { pretendard, suite } from '@/shared/assets/fonts';
 
 export const metadata: Metadata = {
-  title: "소셜 로그인 - Next.js 15",
-  description: "Next.js 15와 소셜 OAuth를 이용한 간편 로그인",
+  title: '소셜 로그인 - Next.js 15',
+  description: 'Next.js 15와 소셜 OAuth를 이용한 간편 로그인',
 };
 
 export const viewport: Viewport = {
-  width: "device-width",
+  width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  viewportFit: "cover",
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({

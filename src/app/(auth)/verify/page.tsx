@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { PassAuthButton } from "@/domains/auth/ui/signup/PassAuthButton";
-import styles from "./page.module.scss";
-import { usePortOnePass } from "@/features/auth/hooks/usePortOnePass";
+import { useState } from 'react';
+import { PassAuthButton } from '@/domains/auth/ui/signup/PassAuthButton';
+import styles from './page.module.scss';
+import { usePortOnePass } from '@/features/auth/hooks/usePortOnePass';
 
 export default function VerifyPage() {
   const { handleAuth, isLoading } = usePortOnePass();
@@ -14,14 +14,14 @@ export default function VerifyPage() {
 
     try {
       // PASS 인증 SDK 호출 - 콜백에서 자동으로 처리됨
-      console.log("PASS 인증 시작");
+      console.log('PASS 인증 시작');
       handleAuth();
 
       // handleAuth는 아임포트 SDK를 호출하고 콜백에서 결과를 처리합니다
       // 여기서는 로딩 상태만 관리하고, 실제 결과 처리는 usePortOnePass 훅 내부에서 수행됩니다
     } catch (error) {
-      console.error("본인인증 중 오류:", error);
-      alert("본인인증 중 오류가 발생했습니다. 다시 시도해주세요.");
+      console.error('본인인증 중 오류:', error);
+      alert('본인인증 중 오류가 발생했습니다. 다시 시도해주세요.');
       setIsVerifying(false);
     }
   };

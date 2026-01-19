@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { AuthActionButton } from "@/domains/auth/ui/AuthActionButton";
-import styles from "./page.module.scss";
+import { useRouter } from 'next/navigation';
+import { AuthActionButton } from '@/domains/auth/ui/AuthActionButton';
+import styles from './page.module.scss';
 
 export default function AuthPage() {
   const router = useRouter();
 
   const handleSignup = () => {
-    router.push("/signup");
+    router.push('/signup');
   };
 
   const handleLogin = () => {
-    router.push("/login");
+    router.push('/login');
   };
 
   return (

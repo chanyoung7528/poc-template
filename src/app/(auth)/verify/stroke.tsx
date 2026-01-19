@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 export default function VerifyPage({
   percentage = 60,
@@ -61,7 +61,7 @@ export default function VerifyPage({
           style={{
             strokeDasharray: totalLength,
             strokeDashoffset: dashOffset,
-            transition: "stroke-dashoffset 0.5s ease-in-out",
+            transition: 'stroke-dashoffset 0.5s ease-in-out',
           }}
         />
 

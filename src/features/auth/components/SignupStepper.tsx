@@ -14,20 +14,22 @@ interface SignupStepperProps {
   children: ReactNode;
 }
 
-export function SignupStepper({ steps, currentStep, children }: SignupStepperProps) {
+export function SignupStepper({
+  steps,
+  currentStep,
+  children,
+}: SignupStepperProps) {
   return (
     <div className={styles.signupStepper}>
       <div className={styles.steps}>
         {steps.map((step, index) => {
           const isActive = index === currentStep;
           const isCompleted = index < currentStep;
-          
+
           return (
             <div key={step.key} className={styles.step}>
               <div
-                className={`${styles.stepCircle} ${
-                  isActive ? styles.active : isCompleted ? styles.completed : ''
-                }`}
+                className={`${styles.stepCircle} ${isActive ? styles.active : isCompleted ? styles.completed : ''}`}
               >
                 {isCompleted ? (
                   <svg
@@ -45,9 +47,7 @@ export function SignupStepper({ steps, currentStep, children }: SignupStepperPro
                 )}
               </div>
               <span
-                className={`${styles.stepLabel} ${
-                  isActive ? styles.active : isCompleted ? styles.completed : ''
-                }`}
+                className={`${styles.stepLabel} ${isActive ? styles.active : isCompleted ? styles.completed : ''}`}
               >
                 {step.label}
               </span>

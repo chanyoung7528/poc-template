@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import styles from "./TermsAgreementTitle.module.scss";
+import styles from './TermsAgreementTitle.module.scss';
 
 export function TermsAgreementTitle() {
   return (

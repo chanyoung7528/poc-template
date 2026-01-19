@@ -1,9 +1,9 @@
-import type { SessionUser } from "@/lib/types";
-import { createSessionToken, setSessionCookie } from "@/lib/session";
-import { updateUser, updateLastLogin } from "@/lib/database";
-import type { OAuthUserInfo } from "./types";
-import { handleSignupFlow } from "./signup-handler";
-import type { User } from "@prisma/client";
+import type { SessionUser } from '@/lib/types';
+import { createSessionToken, setSessionCookie } from '@/lib/session';
+import { updateUser, updateLastLogin } from '@/lib/database';
+import type { OAuthUserInfo } from './types';
+import { handleSignupFlow } from './signup-handler';
+import type { User } from '@prisma/client';
 
 /**
  * 로그인 처리 결과
@@ -28,13 +28,13 @@ export async function handleLoginFlow(
   // 인증 데이터를 임시 세션에 저장하고 약관 동의 페이지로 이동
   if (!existingUser) {
     console.log(
-      "🆕 미가입 사용자 - 회원가입 플로우로 전환:",
+      '🆕 미가입 사용자 - 회원가입 플로우로 전환:',
       userInfo.providerId
     );
     return await handleSignupFlow(userInfo, existingUser);
   }
 
-  console.log("🔄 기존 회원 로그인:", existingUser.id);
+  console.log('🔄 기존 회원 로그인:', existingUser.id);
 
   // 프로필 정보 업데이트 (변경되었을 수 있음)
   try {
@@ -47,15 +47,15 @@ export async function handleLoginFlow(
     // 마지막 로그인 시간 업데이트
     await updateLastLogin(existingUser.id);
   } catch (error) {
-    console.error("사용자 업데이트 오류:", error);
+    console.error('사용자 업데이트 오류:', error);
     // 업데이트 실패해도 로그인은 진행
   }
 
   // 세션 사용자 생성
   const sessionUser: SessionUser = {
     id: existingUser.id,
-    [userInfo.provider === "kakao" ? "kakaoId" : "naverId"]:
-      existingUser[userInfo.provider === "kakao" ? "kakaoId" : "naverId"],
+    [userInfo.provider === 'kakao' ? 'kakaoId' : 'naverId']:
+      existingUser[userInfo.provider === 'kakao' ? 'kakaoId' : 'naverId'],
     email: existingUser.email || undefined,
     nickname: existingUser.nickname || undefined,
     profileImage: existingUser.profileImage || undefined,
@@ -67,18 +67,18 @@ export async function handleLoginFlow(
     const sessionToken = await createSessionToken(sessionUser);
     await setSessionCookie(sessionToken);
 
-    console.log("✅ 로그인 성공:", existingUser.id);
+    console.log('✅ 로그인 성공:', existingUser.id);
 
     return {
       success: true,
-      redirectUrl: "/main",
+      redirectUrl: '/main',
     };
   } catch (error) {
-    console.error("세션 토큰 생성 오류:", error);
+    console.error('세션 토큰 생성 오류:', error);
     return {
       success: false,
-      redirectUrl: "/login?error=session_error",
-      error: "session_error",
+      redirectUrl: '/login?error=session_error',
+      error: 'session_error',
     };
   }
 }

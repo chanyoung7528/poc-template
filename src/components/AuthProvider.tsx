@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useAuthSync } from "@/hooks/useAuthSync";
+import { useAuthSync } from '@/hooks/useAuthSync';
 
 /**
  * Auth Provider Component

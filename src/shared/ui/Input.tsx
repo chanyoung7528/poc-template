@@ -15,7 +15,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={styles.inputWrapper}>
         {label && (
-          <label className={`${styles.label} ${required ? styles.required : ''}`}>
+          <label
+            className={`${styles.label} ${required ? styles.required : ''}`}
+          >
             {label}
           </label>
         )}
@@ -25,7 +27,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {error && <span className={styles.errorMessage}>{error}</span>}
-        {!error && helperText && <span className={styles.helperText}>{helperText}</span>}
+        {!error && helperText && (
+          <span className={styles.helperText}>{helperText}</span>
+        )}
       </div>
     );
   }

@@ -10,7 +10,15 @@ export const pretendard = localFont({
   weight: '100 900',
   display: 'swap',
   preload: true,
-  fallback: ['-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'sans-serif'],
+  fallback: [
+    '-apple-system',
+    'BlinkMacSystemFont',
+    'system-ui',
+    'Apple SD Gothic Neo',
+    'Noto Sans KR',
+    'Malgun Gothic',
+    'sans-serif',
+  ],
 });
 
 /**
@@ -24,5 +32,13 @@ export const suite = localFont({
   weight: '300 900',
   display: 'swap',
   preload: false,
-  fallback: ['-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'sans-serif'],
+  fallback: [
+    '-apple-system',
+    'BlinkMacSystemFont',
+    'system-ui',
+    'Apple SD Gothic Neo',
+    'Noto Sans KR',
+    'Malgun Gothic',
+    'sans-serif',
+  ],
 });

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-type TestScenario = "NEW" | "EXISTING" | "UNDER_14";
+type TestScenario = 'NEW' | 'EXISTING' | 'UNDER_14';
 
 // 환경변수에서 아임포트 인증 정보 가져오기
 // KG이니시스 설정:
@@ -29,9 +29,9 @@ interface IamportCertificationData {
  * 아임포트 Access Token 발급
  */
 async function getIamportAccessToken(): Promise<string> {
-  const response = await fetch("https://api.iamport.kr/users/getToken", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+  const response = await fetch('https://api.iamport.kr/users/getToken', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       imp_key: IAMPORT_API_KEY,
       imp_secret: IAMPORT_API_SECRET,
@@ -84,7 +84,7 @@ async function deleteCertificationData(
   const response = await fetch(
     `https://api.iamport.kr/certifications/${imp_uid}`,
     {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -132,11 +132,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { imp_uid } = body;
 
-    console.log("아임포트 imp_uid:", imp_uid);
+    console.log('아임포트 imp_uid:', imp_uid);
 
     if (!imp_uid) {
       return NextResponse.json(
-        { error: "imp_uid is required" },
+        { error: 'imp_uid is required' },
         { status: 400 }
       );
     }
@@ -145,16 +145,16 @@ export async function POST(request: NextRequest) {
     // 실제 아임포트 API 호출 (환경변수 설정 시)
     // ============================================
     if (USE_REAL_API) {
-      console.log("🔄 실제 아임포트 API 호출");
+      console.log('🔄 실제 아임포트 API 호출');
 
       try {
         // 1. Access Token 발급
         const accessToken = await getIamportAccessToken();
-        console.log("✅ 아임포트 토큰 발급 성공");
+        console.log('✅ 아임포트 토큰 발급 성공');
 
         // 2. 본인인증 정보 조회
         const certData = await getCertificationData(imp_uid, accessToken);
-        console.log("✅ 본인인증 정보 조회 성공:", {
+        console.log('✅ 본인인증 정보 조회 성공:', {
           name: certData.name,
           phone: certData.phone,
           birthday: certData.birthday,
@@ -167,18 +167,18 @@ export async function POST(request: NextRequest) {
         // 5. 개인정보 보호를 위해 아임포트 서버에서 인증 정보 삭제
         // (본인인증 정보를 로컬에 저장했으므로 아임포트 서버에서는 삭제)
         await deleteCertificationData(imp_uid, accessToken);
-        console.log("🗑️  아임포트 서버에서 본인인증 정보 삭제 완료");
+        console.log('🗑️  아임포트 서버에서 본인인증 정보 삭제 완료');
 
         // 6. 만 14세 미만 체크
         if (age < 14) {
           return NextResponse.json({
-            status: "UNDER_14" as const,
+            status: 'UNDER_14' as const,
             certificationData: {
               name: certData.name,
               phone: certData.phone,
               birth: certData.birthday,
               gender:
-                certData.gender === "male" ? ("M" as const) : ("F" as const),
+                certData.gender === 'male' ? ('M' as const) : ('F' as const),
             },
           });
         }
@@ -212,21 +212,21 @@ export async function POST(request: NextRequest) {
 
         // 8. 신규 회원 (기존 회원이 없으면)
         return NextResponse.json({
-          status: "NEW" as const,
+          status: 'NEW' as const,
           certificationData: {
             name: certData.name,
             phone: certData.phone,
             birth: certData.birthday,
             gender:
-              certData.gender === "male" ? ("M" as const) : ("F" as const),
+              certData.gender === 'male' ? ('M' as const) : ('F' as const),
           },
         });
       } catch (error) {
-        console.error("❌ 아임포트 API 호출 :", error);
+        console.error('❌ 아임포트 API 호출 :', error);
         return NextResponse.json(
           {
-            error: "본인인증 정보 조회 중 오류가 발생했습니다.",
-            details: error instanceof Error ? error.message : "Unknown error",
+            error: '본인인증 정보 조회 중 오류가 발생했습니다.',
+            details: error instanceof Error ? error.message : 'Unknown error',
           },
           { status: 500 }
         );
@@ -236,52 +236,52 @@ export async function POST(request: NextRequest) {
     // ============================================
     // 테스트용 Mock 응답 (환경변수 미설정 시)
     // ============================================
-    console.log("🧪 테스트 모드 - Mock 응답 반환");
+    console.log('🧪 테스트 모드 - Mock 응답 반환');
 
     const getTestScenario = (): TestScenario => {
-      return "NEW"; // 'NEW' | 'EXISTING' | 'UNDER_14' 중 선택
+      return 'NEW'; // 'NEW' | 'EXISTING' | 'UNDER_14' 중 선택
     };
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const scenario = getTestScenario();
 
-    if (scenario === "EXISTING") {
+    if (scenario === 'EXISTING') {
       return NextResponse.json({
-        status: "EXISTING" as const,
+        status: 'EXISTING' as const,
         user: {
-          id: "user123",
-          maskedId: "te**@example.com",
-          provider: "kakao",
+          id: 'user123',
+          maskedId: 'te**@example.com',
+          provider: 'kakao',
         },
       });
     }
 
-    if (scenario === "UNDER_14") {
+    if (scenario === 'UNDER_14') {
       return NextResponse.json({
-        status: "UNDER_14" as const,
+        status: 'UNDER_14' as const,
         certificationData: {
-          name: "홍길동",
-          phone: "010-1234-5678",
-          birth: "20150101",
-          gender: "M" as const,
+          name: '홍길동',
+          phone: '010-1234-5678',
+          birth: '20150101',
+          gender: 'M' as const,
         },
       });
     }
 
     return NextResponse.json({
-      status: "NEW" as const,
+      status: 'NEW' as const,
       certificationData: {
-        name: "홍길동",
-        phone: "010-1234-5678",
-        birth: "19900101",
-        gender: "M" as const,
+        name: '홍길동',
+        phone: '010-1234-5678',
+        birth: '19900101',
+        gender: 'M' as const,
       },
     });
   } catch (error) {
-    console.error("본인인증 검증 중 오류:", error);
+    console.error('본인인증 검증 중 오류:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

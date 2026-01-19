@@ -47,12 +47,14 @@ CPPWD: bbbbb
 ## 📝 구현 플로우
 
 ### 1. 사용자 인증 요청
+
 ```typescript
 // /verify 페이지에서 PassAuthButton 클릭
 <PassAuthButton />
 ```
 
 ### 2. 포트원 SDK 초기화 및 인증창 열기
+
 ```typescript
 // usePortOnePass.ts
 const { IMP } = window;
@@ -61,6 +63,7 @@ IMP.certification(data, callback);
 ```
 
 ### 3. 인증 성공 시 서버 검증
+
 ```typescript
 // imp_uid를 서버로 전송
 verifyCertificationMutation.mutate(rsp.imp_uid);
@@ -69,6 +72,7 @@ verifyCertificationMutation.mutate(rsp.imp_uid);
 ### 4. 서버 응답에 따른 분기 처리
 
 #### Case 1: 신규 회원 (NEW)
+
 ```typescript
 {
   status: 'NEW',
@@ -80,10 +84,13 @@ verifyCertificationMutation.mutate(rsp.imp_uid);
   }
 }
 ```
+
 → **회원가입 폼으로 이동** (`/signup`)
+
 - certificationData를 sessionStorage에 저장하여 회원가입 폼에서 사용
 
 #### Case 2: 기존 회원 (EXISTING)
+
 ```typescript
 {
   status: 'EXISTING',
@@ -94,18 +101,23 @@ verifyCertificationMutation.mutate(rsp.imp_uid);
   }
 }
 ```
+
 → **기존 계정 안내 페이지로 이동** (`/auth/result`)
+
 - 마스킹된 이메일과 가입 플랫폼 표시
 - 로그인 페이지로 이동 유도
 
 #### Case 3: 만 14세 미만 (UNDER_14)
+
 ```typescript
 {
   status: 'UNDER_14',
   certificationData: { ... }
 }
 ```
+
 → **가입 제한 안내 페이지로 이동** (`/auth/guide/minor`)
+
 - 법적 제한 사항 안내
 - 홈으로 이동
 
@@ -122,27 +134,33 @@ const testScenario = 'NEW'; // 'NEW' | 'EXISTING' | 'UNDER_14'
 ### 각 시나리오별 테스트 순서
 
 1. **신규 회원 테스트 (NEW)**
+
    ```typescript
    const testScenario = 'NEW';
    ```
+
    1. `/verify` 페이지 접속
    2. "PASS 인증으로 시작하기" 버튼 클릭
    3. 포트원 인증창에서 테스트 진행
    4. 인증 성공 후 `/signup` 페이지로 자동 이동 확인
 
 2. **기존 회원 테스트 (EXISTING)**
+
    ```typescript
    const testScenario = 'EXISTING';
    ```
+
    1. `/verify` 페이지 접속
    2. PASS 인증 진행
    3. `/auth/result` 페이지로 이동
    4. 마스킹된 이메일 표시 확인
 
 3. **만 14세 미만 테스트 (UNDER_14)**
+
    ```typescript
    const testScenario = 'UNDER_14';
    ```
+
    1. `/verify` 페이지 접속
    2. PASS 인증 진행
    3. `/auth/guide/minor` 페이지로 이동
@@ -171,11 +189,14 @@ const getAccessToken = async () => {
 
 // 2. 본인인증 정보 조회
 const getCertificationData = async (imp_uid: string, accessToken: string) => {
-  const response = await fetch(`https://api.iamport.kr/certifications/${imp_uid}`, {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-    },
-  });
+  const response = await fetch(
+    `https://api.iamport.kr/certifications/${imp_uid}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
   const data = await response.json();
   return data.response;
 };
@@ -189,17 +210,20 @@ function calculateAge(birth: string): number {
   const birthYear = parseInt(birth.substring(0, 4));
   const birthMonth = parseInt(birth.substring(4, 6));
   const birthDay = parseInt(birth.substring(6, 8));
-  
+
   const today = new Date();
   const birthDate = new Date(birthYear, birthMonth - 1, birthDay);
-  
+
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
-  
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
     age--;
   }
-  
+
   return age;
 }
 ```
@@ -211,20 +235,20 @@ function calculateAge(birth: string): number {
 const existingUser = await prisma.user.findFirst({
   where: {
     OR: [
-      { 
+      {
         name: certData.name,
-        birth: certData.birth 
+        birth: certData.birth,
       },
-      { 
-        phone: certData.phone 
-      }
-    ]
+      {
+        phone: certData.phone,
+      },
+    ],
   },
   select: {
     id: true,
     email: true,
     provider: true,
-  }
+  },
 });
 
 if (existingUser) {
@@ -233,8 +257,8 @@ if (existingUser) {
     user: {
       id: existingUser.id,
       maskedId: maskEmail(existingUser.email),
-      provider: existingUser.provider
-    }
+      provider: existingUser.provider,
+    },
   });
 }
 ```
@@ -245,7 +269,9 @@ if (existingUser) {
 function maskEmail(email: string): string {
   const [localPart, domain] = email.split('@');
   const visibleLength = Math.max(1, Math.floor(localPart.length / 3));
-  const masked = localPart.slice(0, visibleLength) + '*'.repeat(localPart.length - visibleLength);
+  const masked =
+    localPart.slice(0, visibleLength) +
+    '*'.repeat(localPart.length - visibleLength);
   return `${masked}@${domain}`;
 }
 ```
@@ -262,23 +288,28 @@ function maskEmail(email: string): string {
 if (!user) {
   // 신규 회원인 경우
   const email = kakaoUser.kakao_account?.email;
-  
+
   if (email) {
     const existingUser = await findUserByEmail(email);
     if (existingUser) {
-      return NextResponse.redirect(new URL(`/login?error=already_registered`, request.url));
+      return NextResponse.redirect(
+        new URL(`/login?error=already_registered`, request.url)
+      );
     }
   }
-  
+
   // ✅ PASS 인증으로 리다이렉트 (소셜 정보는 세션에 임시 저장)
-  sessionStorage.setItem('pendingSocialAuth', JSON.stringify({
-    provider: 'kakao',
-    kakaoId,
-    email,
-    nickname: kakaoUser.kakao_account?.profile?.nickname,
-    profileImage: kakaoUser.kakao_account?.profile?.profile_image_url,
-  }));
-  
+  sessionStorage.setItem(
+    'pendingSocialAuth',
+    JSON.stringify({
+      provider: 'kakao',
+      kakaoId,
+      email,
+      nickname: kakaoUser.kakao_account?.profile?.nickname,
+      profileImage: kakaoUser.kakao_account?.profile?.profile_image_url,
+    })
+  );
+
   return NextResponse.redirect(new URL('/verify', request.url));
 }
 ```
@@ -291,17 +322,17 @@ if (!user) {
 const handleSignup = async (data: SignupData) => {
   // 세션에 저장된 소셜 정보 확인
   const pendingSocialAuth = sessionStorage.getItem('pendingSocialAuth');
-  
+
   if (pendingSocialAuth) {
     const socialData = JSON.parse(pendingSocialAuth);
-    
+
     // 소셜 정보 + 본인인증 정보 병합하여 회원가입
     await signupWithSocial({
       ...socialData,
       ...data,
-      certificationVerified: true
+      certificationVerified: true,
     });
-    
+
     sessionStorage.removeItem('pendingSocialAuth');
   } else {
     await signup(data);

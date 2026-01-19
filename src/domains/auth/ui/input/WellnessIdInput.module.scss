@@ -112,6 +112,10 @@
   margin: 0;
 }
 
+.helperTextContainer {
+  display: flex;
+  gap: 0.4rem;
+}
 .helperTextSuccess {
   font-family: var(--font-pretendard);
   font-size: 1.3rem;
@@ -129,4 +133,3 @@
   color: var(--danger);
   margin: 0;
 }
-

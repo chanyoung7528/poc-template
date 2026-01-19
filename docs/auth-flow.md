@@ -405,8 +405,8 @@ sequenceDiagram
 ```typescript
 // Frontend (웹뷰)
 interface WebViewMessage {
-  type: "SOCIAL_LOGIN" | "PASS_AUTH" | "GET_DEVICE_INFO";
-  provider?: "kakao" | "naver";
+  type: 'SOCIAL_LOGIN' | 'PASS_AUTH' | 'GET_DEVICE_INFO';
+  provider?: 'kakao' | 'naver';
   data?: any;
 }
 
@@ -425,14 +425,14 @@ function sendToApp(message: WebViewMessage) {
 }
 
 // 앱으로부터 메시지 수신
-window.addEventListener("message", (event) => {
+window.addEventListener('message', (event) => {
   const message = JSON.parse(event.data);
 
   switch (message.type) {
-    case "PASS_RESULT":
+    case 'PASS_RESULT':
       handlePassResult(message.data);
       break;
-    case "OAUTH_RESULT":
+    case 'OAUTH_RESULT':
       handleOAuthResult(message.data);
       break;
   }
@@ -442,13 +442,11 @@ window.addEventListener("message", (event) => {
 ### 주요 통신 시나리오
 
 1. **소셜 로그인**
-
    - 웹뷰 → 앱: `{ type: 'SOCIAL_LOGIN', provider: 'kakao' }`
    - 앱: OAuth 처리 및 콜백 URL 반환
    - 앱 → 웹뷰: 페이지 이동 (`window.location.href`)
 
 2. **본인인증**
-
    - 웹뷰 → 앱: `{ type: 'PASS_AUTH' }`
    - 앱: PASS 인증 처리
    - 앱 → 웹뷰: `{ type: 'PASS_RESULT', success: true }`
@@ -467,7 +465,7 @@ window.addEventListener("message", (event) => {
 
 ```typescript
 interface OAuthProvider {
-  name: "kakao" | "naver";
+  name: 'kakao' | 'naver';
   getAccessToken(code: string, state?: string): Promise<string>;
   getUserInfo(accessToken: string): Promise<OAuthUserInfo>;
   findUser(providerId: string): Promise<User | null>;
@@ -510,7 +508,7 @@ interface OAuthProvider {
 
 5. **모드별 처리**
    ```typescript
-   if (mode === "signup") {
+   if (mode === 'signup') {
      await handleSignupFlow(userInfo, existingUser);
    } else {
      await handleLoginFlow(userInfo, existingUser);
@@ -531,7 +529,7 @@ interface OAuthProvider {
 ```typescript
 const tempUser: SessionUser = {
   id: `temp-${provider}-${providerId}`,
-  [provider === "kakao" ? "kakaoId" : "naverId"]: providerId,
+  [provider === 'kakao' ? 'kakaoId' : 'naverId']: providerId,
   email,
   nickname,
   profileImage,
@@ -661,7 +659,7 @@ interface SessionUser {
   email?: string;
   nickname?: string;
   profileImage?: string;
-  provider: "kakao" | "naver";
+  provider: 'kakao' | 'naver';
 
   // 회원가입 진행 상태 플래그
   isTemp?: boolean; // true: 임시 사용자, undefined: 정식 사용자

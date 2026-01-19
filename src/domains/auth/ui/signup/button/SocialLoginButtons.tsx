@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { WellnessIdButton } from "./WellnessIdButton";
-import { SocialLoginButton } from "./SocialLoginButton";
-import styles from "./SocialLoginButtons.module.scss";
+import { WellnessIdButton } from './WellnessIdButton';
+import { SocialLoginButton } from './SocialLoginButton';
+import styles from './SocialLoginButtons.module.scss';
 
 interface SocialLoginButtonsProps {
   onWellnessId: () => void;

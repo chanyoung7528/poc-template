@@ -24,7 +24,11 @@
   transition: color 0.2s;
 
   &.focused {
-    color: var(--brand60);
+    color: var(--success);
+  }
+
+  &.error {
+    color: var(--danger);
   }
 }
 
@@ -55,11 +59,7 @@
 
   &:focus {
     outline: none;
-    border: 1px solid var(--brand60);
-    background-color: var(--base-white);
-  }
-
-  &:active {
+    border: 1px solid var(--success);
     background-color: var(--base-white);
   }
 
@@ -68,11 +68,11 @@
     box-shadow: 0 0 0px 1000px var(--base-white) inset;
     -webkit-box-shadow: 0 0 0px 1000px var(--base-white) inset;
     caret-color: var(--gray100);
-    border: 1px solid var(--brand60);
+    border: 1px solid var(--success);
   }
 
   &.focused {
-    border-color: var(--brand60);
+    border-color: var(--success);
     background-color: var(--base-white);
   }
 
@@ -86,7 +86,7 @@
     cursor: pointer;
 
     &:focus {
-      border-color: var(--brand60);
+      border-color: var(--success);
     }
   }
 
@@ -135,4 +135,3 @@
   line-height: 1.8rem;
   color: var(--gray60);
 }
-

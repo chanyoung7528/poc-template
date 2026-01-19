@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import type { Control, FieldValues, Path } from "react-hook-form";
-import { useController } from "react-hook-form";
-import { ClearIcon } from "@/shared/ui/icon/ClearIcon";
-import styles from "./WellnessIdInput.module.scss";
+import { ClearIcon } from '@/shared/ui/icon/ClearIcon';
+import { useEffect, useState } from 'react';
+import type { Control, FieldValues, Path } from 'react-hook-form';
+import { useController } from 'react-hook-form';
+import styles from './WellnessIdInput.module.scss';
 
 interface ValidationRule {
   label: string;
@@ -21,15 +21,15 @@ interface WellnessIdInputProps<T extends FieldValues = FieldValues> {
 
 const VALIDATION_RULES: ValidationRule[] = [
   {
-    label: "영문 소문자 포함",
+    label: '영문 소문자 포함',
     check: (value: string) => /[a-z]/.test(value) && /^[a-z0-9]*$/.test(value),
   },
   {
-    label: "숫자 포함",
+    label: '숫자 포함',
     check: (value: string) => /\d/.test(value),
   },
   {
-    label: "10-15자",
+    label: '10-15자',
     check: (value: string) => value.length >= 10 && value.length <= 15,
   },
 ];
@@ -37,8 +37,8 @@ const VALIDATION_RULES: ValidationRule[] = [
 export function WellnessIdInput<T extends FieldValues = FieldValues>({
   name,
   control,
-  label = "아이디",
-  placeholder = "아이디를 입력해주세요",
+  label = '아이디',
+  placeholder = '아이디를 입력해주세요',
   onDuplicateCheck,
 }: WellnessIdInputProps<T>) {
   const {
@@ -51,7 +51,7 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
   const [isDuplicateChecking, setIsDuplicateChecking] = useState(false);
   const [isDuplicate, setIsDuplicate] = useState<boolean | null>(null);
 
-  const value = field.value ?? "";
+  const value = field.value ?? '';
   const hasValue = String(value).length > 0;
 
   // 각 규칙의 통과 여부 계산
@@ -76,7 +76,7 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
         const result = await onDuplicateCheck(value);
         setIsDuplicate(result);
       } catch (error) {
-        console.error("중복 확인 중 오류:", error);
+        console.error('중복 확인 중 오류:', error);
         setIsDuplicate(null);
       } finally {
         setIsDuplicateChecking(false);
@@ -103,13 +103,13 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    
+
     // 영문 대소문자와 숫자만 허용하고, 나머지 문자 제거
-    const sanitized = inputValue.replace(/[^a-zA-Z0-9]/g, "");
-    
+    const sanitized = inputValue.replace(/[^a-zA-Z0-9]/g, '');
+
     // 소문자로 변환
     const lowercased = sanitized.toLowerCase();
-    
+
     // 값이 변경된 경우에만 업데이트 (불필요한 리렌더링 방지)
     if (lowercased !== value) {
       field.onChange(lowercased);
@@ -117,7 +117,7 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
   };
 
   const handleClear = () => {
-    field.onChange("");
+    field.onChange('');
     setIsTouched(false);
     setIsDuplicate(null);
   };
@@ -125,9 +125,9 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
   // 입력 필드 border와 라벨 색상 결정 (동일한 시점)
   const getInputState = () => {
     if (!isTouched) return undefined;
-    if (error) return "error";
-    if (isDuplicate === true) return "error";
-    if (isDuplicate === false && allRulesPassed) return "success";
+    if (error) return 'error';
+    if (isDuplicate === true) return 'error';
+    if (isDuplicate === false && allRulesPassed) return 'success';
     return undefined;
   };
 
@@ -139,13 +139,7 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
       <div className={styles.inputWrapper}>
         {label && (
           <label
-            className={`${styles.label} ${
-              inputState === "success"
-                ? styles.focused
-                : inputState === "error"
-                ? styles.error
-                : ""
-            }`}
+            className={`${styles.label} ${inputState === 'success' ? styles.focused : inputState === 'error' ? styles.error : ''}`}
           >
             {label}
           </label>
@@ -161,14 +155,14 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
           onBlur={handleBlur}
           placeholder={placeholder}
           autoComplete="username"
-          className={`${styles.input} ${isFocused ? styles.focused : ""}`}
+          className={`${styles.input} ${isFocused ? styles.focused : ''}`}
           style={{
             borderColor:
-              inputState === "success"
-                ? "var(--success)"
-                : inputState === "error"
-                ? "var(--danger)"
-                : undefined,
+              inputState === 'success'
+                ? 'var(--success)'
+                : inputState === 'error'
+                  ? 'var(--danger)'
+                  : undefined,
           }}
         />
 
@@ -181,14 +175,12 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
       <div className={styles.helperContainer}>
         {/* 포커스 In: 기본 안내 문구 (중립 색상) */}
         {isFocused && !isTouched && (
-          <p className={styles.helperTextNeutral}>
-            영문 소문자, 숫자, 10-15자
-          </p>
+          <p className={styles.helperTextNeutral}>영문 소문자, 숫자, 10-15자</p>
         )}
 
         {/* 포커스 Out: 검증 결과 표시 */}
         {isTouched && !isFocused && (
-          <>
+          <div className={styles.helperTextContainer}>
             {ruleResults.map((rule, index) => (
               <p
                 key={index}
@@ -199,9 +191,10 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
                 }
               >
                 {rule.label}
+                {/* 마지막 요소가 아닐 때만 콤마 추가 */}
+                {index < ruleResults.length - 1 && ', '}
               </p>
             ))}
-
             {/* 중복 확인 결과 */}
             {isDuplicateChecking && allRulesPassed && (
               <p className={styles.helperTextNeutral}>중복 확인 중...</p>
@@ -216,7 +209,7 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
                 사용 가능한 아이디입니다.
               </p>
             )}
-          </>
+          </div>
         )}
 
         {/* react-hook-form 에러 메시지 */}

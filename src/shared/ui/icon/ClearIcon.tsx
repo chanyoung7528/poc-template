@@ -14,11 +14,11 @@ export function ClearIcon({ size = 20, className, onClick }: ClearIconProps) {
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       onClick={onClick}
-      style={{ cursor: onClick ? "pointer" : "default" }}
+      style={{ cursor: onClick ? 'pointer' : 'default' }}
     >
       <mask
         id="mask0_1852_46437"
-        style={{ maskType: "alpha" }}
+        style={{ maskType: 'alpha' }}
         maskUnits="userSpaceOnUse"
         x="0"
         y="0"

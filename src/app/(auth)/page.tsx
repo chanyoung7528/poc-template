@@ -95,7 +95,7 @@ export default function AuthPage() {
         .to({}, { duration: 1.0 })
         .call(() => setCurrentCharacter(4));
 
-      // [ Scene 4 ] 마무리 이동 - 배경이 최종 위치로 확장, 버튼 등장
+      // [ Scene 4 ] 마무리 이동 - 배경 확장 → 타이틀 이동 → 버튼 등장 (순차적)
       tl.to(
         bottomSectionRef.current,
         {
@@ -112,20 +112,21 @@ export default function AuthPage() {
             y: 120,
             duration: 0.8,
           },
-          "finalMove+=0.3"
+          "finalMove+=0.2" // 배경 확장 시작 후 0.2초 뒤 타이틀 이동
         )
         .fromTo(
           buttonFrameRef.current,
           {
-            y: 0,
+            y: 200, // 더 아래에서 시작
             opacity: 0,
           },
           {
-            y: 120,
+            y: 120, // 타이틀과 동일한 최종 위치
             opacity: 1,
             duration: 0.8,
+            ease: "power3.out",
           },
-          "finalMove+=0.3"
+          "finalMove+=0.8" // 타이틀 시작 후 0.6초 뒤 버튼 등장
         );
     });
 

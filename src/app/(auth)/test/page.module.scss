@@ -40,7 +40,7 @@
 
 .characterImage {
   position: absolute;
-  top: 9.875rem; // 270px → rem
+  top: 29.875rem; // Scene 3 초기 위치 (위쪽)
   left: 50%;
   transform: translateX(-50%);
   width: 24rem;
@@ -49,7 +49,7 @@
 
 .section {
   position: relative;
-  top: 25rem; // 400px → rem
+  top: 45rem; // Scene 3에서 캐릭터보다 아래에 위치
 }
 
 .curveMask {

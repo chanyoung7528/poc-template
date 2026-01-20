@@ -12,6 +12,8 @@ export default function AuthPage() {
   // Scene refs
   const splashTitleRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
+  const characterImageRef = useRef<HTMLDivElement>(null);
+
   const titleFrameRef = useRef<HTMLDivElement>(null);
   const buttonFrameRef = useRef<HTMLDivElement>(null);
 
@@ -69,7 +71,7 @@ export default function AuthPage() {
 
       // [ Scene 2 ] 교차 모션 (Cross Motion)
       // 타이틀이 크게 밑으로 내려가면서 페이드아웃
-      // 동시에 하단 섹션(캐릭터 + 타이틀 포함)이 위로 올라옴
+      // 동시에 하단 섹션이 위로 올라옴 (titleFrame과 button은 아직 보이지 않음)
       tl.to(
         splashTitleRef.current,
         {
@@ -79,29 +81,20 @@ export default function AuthPage() {
           ease: "power3.inOut",
         },
         "crossMotion"
-      )
-        .fromTo(
-          sectionRef.current,
-          {
-            y: "100vh",
-            opacity: 0,
-          },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 1.4,
-            ease: "power3.out",
-          },
-          "crossMotion" // splashTitle 퇴장과 동시에 시작
-        )
-        .to(
-          titleFrameRef.current,
-          {
-            opacity: 1,
-            duration: 0.6,
-          },
-          "crossMotion+=0.4" // section이 조금 올라온 후 fade-in
-        );
+      ).fromTo(
+        sectionRef.current,
+        {
+          y: "100vh",
+          opacity: 0,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.4,
+          ease: "power3.out",
+        },
+        "crossMotion" // splashTitle 퇴장과 동시에 시작
+      );
 
       // [ Scene 3 ] 캐릭터 Frame Animation (1→2→3→4) - 부드러운 크로스 페이드
 
@@ -144,28 +137,48 @@ export default function AuthPage() {
         )
         .to({}, { duration: 0.6 });
 
-      // [ Scene 4 ] 마무리 이동 - 타이틀 이동 → 버튼 등장 (순차적)
+      // [ Scene 4 ] 마무리 이동 - 캐릭터를 아래로 내리면서 타이틀과 버튼 등장
       tl.to(
-        titleFrameRef.current,
+        characterImageRef.current,
         {
-          y: 0,
-          duration: 0.8,
+          top: "9.875rem", // 29.875rem → 9.875rem (아래로 내림)
+          duration: 1.2,
+          ease: "power3.inOut",
         },
         "finalMove"
-      ).fromTo(
-        buttonFrameRef.current,
-        {
-          y: 200, // 더 아래에서 시작
-          opacity: 0,
-        },
-        {
-          y: 0, // 타이틀과 동일한 최종 위치
-          opacity: 1,
-          duration: 0.8,
-          ease: "power3.out",
-        },
-        "finalMove+=0.6" // 타이틀 시작 후 0.6초 뒤 버튼 등장
-      );
+      )
+        .to(
+          sectionRef.current,
+          {
+            top: "25rem", // 45rem → 25rem (함께 올라감)
+            duration: 1.2,
+            ease: "power3.inOut",
+          },
+          "finalMove" // 캐릭터와 동시에 시작
+        )
+        .to(
+          titleFrameRef.current,
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+          },
+          "finalMove+=0.2" // 이동 시작 후 0.2초 뒤 타이틀 등장
+        )
+        .fromTo(
+          buttonFrameRef.current,
+          {
+            y: 200, // 더 아래에서 시작
+            opacity: 0,
+          },
+          {
+            y: 0, // 타이틀과 동일한 최종 위치
+            opacity: 1,
+            duration: 0.8,
+            ease: "power3.out",
+          },
+          "finalMove+=0.8" // 타이틀 시작 후 0.6초 뒤 버튼 등장
+        );
     });
 
     return () => ctx.revert();
@@ -192,7 +205,7 @@ export default function AuthPage() {
       </div>
 
       {/* 캐릭터 이미지 - 곡선 위에 위치 (4개 모두 렌더, opacity로 크로스 페이드) */}
-      <div className={styles.characterImage}>
+      <div ref={characterImageRef} className={styles.characterImage}>
         <img
           ref={char1Ref}
           src="/img/auth/ch-1.png"

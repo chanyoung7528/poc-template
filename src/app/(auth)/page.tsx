@@ -16,7 +16,7 @@ export default function AuthPage() {
   const titleFrameRef = useRef<HTMLDivElement>(null);
   const buttonFrameRef = useRef<HTMLDivElement>(null);
 
-  // 캐릭터 이미지 refs (4개 모두 - 크로스 페이드용)
+  // 캐릭터 이미지 refs (4개 모두 - 크로스 페이드용)ㅈ
   const char1Ref = useRef<HTMLImageElement>(null);
   const char2Ref = useRef<HTMLImageElement>(null);
   const char3Ref = useRef<HTMLImageElement>(null);

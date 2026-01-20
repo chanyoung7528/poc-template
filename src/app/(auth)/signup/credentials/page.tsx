@@ -2,6 +2,7 @@
 
 import { FormInput } from "@/domains/auth/ui/common/FormInput";
 import { WellnessIdInput } from "@/domains/auth/ui/input/WellnessIdInput";
+import { checkWellnessIdDuplicate } from "@/domains/auth/model/auth.api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -78,14 +79,11 @@ export default function CredentialsPage() {
   // 중복 확인 함수
   const handleDuplicateCheck = async (wellnessId: string): Promise<boolean> => {
     try {
-      const response = await fetch(
-        `/api/auth/wellness/check-id?wellnessId=${encodeURIComponent(wellnessId)}`
-      );
-      const data = await response.json();
-      return data.isDuplicate;
+      return await checkWellnessIdDuplicate(wellnessId);
     } catch (error) {
       console.error("중복 확인 중 오류:", error);
-      return false;
+      // 에러 발생 시 중복으로 처리하여 사용 불가능하게 함
+      return true;
     }
   };
 
@@ -123,7 +121,9 @@ export default function CredentialsPage() {
       console.log("✅ 회원가입 성공");
 
       // 회원가입 완료 페이지로 이동 (wellnessId 전달)
-      router.push(`/signup/complete?wellnessId=${encodeURIComponent(data.wellnessId)}`);
+      router.push(
+        `/signup/complete?wellnessId=${encodeURIComponent(data.wellnessId)}`
+      );
     } catch (error) {
       console.error("회원가입 요청 중 오류:", error);
       alert("네트워크 오류가 발생했습니다. 다시 시도해주세요.");

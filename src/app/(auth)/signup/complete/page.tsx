@@ -23,7 +23,7 @@ function SignupCompleteContent() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Timeline for sequential animations
+      // Timeline for simultaneous animations
       const tl = gsap.timeline({
         defaults: { ease: "power3.out" },
       });
@@ -35,7 +35,13 @@ function SignupCompleteContent() {
         { opacity: 1, duration: 0.2 }
       );
 
-      // 2. Character bounces in with scale - 한 번만 실행
+      // 전체 애니메이션 시작 타이밍을 약간 늦춤
+      tl.to({}, { duration: 0.2 });
+
+      // 모든 애니메이션을 동시에 시작 (첫 번째 애니메이션과 동시에)
+      const simultaneousStart = "<";
+
+      // 2. Character bounces in with scale
       tl.fromTo(
         characterRef.current,
         {
@@ -50,7 +56,7 @@ function SignupCompleteContent() {
           duration: 0.4,
           ease: "back.out(1.7)",
         },
-        "+=0.05"
+        simultaneousStart
       );
 
       // 3. Confetti 빵빠레 효과 - 캐릭터 주변에서 돌며 퍼짐
@@ -83,7 +89,7 @@ function SignupCompleteContent() {
             duration: 0.5,
             ease: "power2.out",
           },
-          "-=0.3"
+          simultaneousStart
         );
 
         // 주변에서 떠다니는 효과
@@ -99,7 +105,7 @@ function SignupCompleteContent() {
         });
       });
 
-      // 4. Title slides in from bottom - 컨페티와 동시에
+      // 4. Title slides in from bottom
       tl.fromTo(
         titleRef.current,
         {
@@ -111,10 +117,10 @@ function SignupCompleteContent() {
           opacity: 1,
           duration: 0.3,
         },
-        "<" // 이전 애니메이션과 동시에 시작
+        simultaneousStart
       );
 
-      // 5. Subtitle fades in - 더 빨리
+      // 5. Subtitle fades in
       tl.fromTo(
         subtitleRef.current,
         {
@@ -126,10 +132,10 @@ function SignupCompleteContent() {
           opacity: 1,
           duration: 0.3,
         },
-        "-=0.15"
+        simultaneousStart
       );
 
-      // 6. Benefits message - 더 빨리
+      // 6. Benefits message
       tl.fromTo(
         benefitsRef.current,
         {
@@ -141,10 +147,10 @@ function SignupCompleteContent() {
           opacity: 1,
           duration: 0.3,
         },
-        "-=0.05"
+        simultaneousStart
       );
 
-      // 7. Action buttons slide up - 더 빨리
+      // 7. Action buttons slide up
       tl.fromTo(
         actionsRef.current,
         {
@@ -157,10 +163,8 @@ function SignupCompleteContent() {
           duration: 0.3,
           ease: "back.out(1.2)",
         },
-        "-=0.05"
+        simultaneousStart
       );
-
-      // 캐릭터는 초기 애니메이션 후 정적으로 유지 (반복 애니메이션 제거)
     }, containerRef);
 
     return () => ctx.revert();

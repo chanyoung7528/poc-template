@@ -1,10 +1,11 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/shared/ui/Button';
 import styles from './page.module.scss';
 
-export default function DuplicateAccountPage() {
+function DuplicateAccountContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -96,5 +97,13 @@ export default function DuplicateAccountPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DuplicateAccountPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DuplicateAccountContent />
+    </Suspense>
   );
 }

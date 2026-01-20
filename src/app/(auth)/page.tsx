@@ -8,15 +8,19 @@ import styles from "./page.module.scss";
 
 export default function AuthPage() {
   const router = useRouter();
-  const [currentCharacter, setCurrentCharacter] = useState(1);
 
   // Scene refs
   const splashTitleRef = useRef<HTMLDivElement>(null);
   const characterWrapperRef = useRef<HTMLDivElement>(null);
-  const characterRef = useRef<HTMLImageElement>(null);
   const bottomSectionRef = useRef<HTMLDivElement>(null);
   const titleFrameRef = useRef<HTMLDivElement>(null);
   const buttonFrameRef = useRef<HTMLDivElement>(null);
+
+  // 캐릭터 이미지 refs (4개 모두 - 크로스 페이드용)
+  const char1Ref = useRef<HTMLImageElement>(null);
+  const char2Ref = useRef<HTMLImageElement>(null);
+  const char3Ref = useRef<HTMLImageElement>(null);
+  const char4Ref = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -24,6 +28,12 @@ export default function AuthPage() {
       gsap.set([titleFrameRef.current, bottomSectionRef.current], {
         opacity: 0,
         y: "100vh",
+      });
+
+      // 캐릭터 초기 상태: 첫 번째만 보이게
+      gsap.set(char1Ref.current, { opacity: 1 });
+      gsap.set([char2Ref.current, char3Ref.current, char4Ref.current], {
+        opacity: 0,
       });
 
       // 🎬 Main Timeline: 전체 연출을 씬(Scene)처럼 구성
@@ -85,15 +95,45 @@ export default function AuthPage() {
           "crossMotion+=0.4" // bottomSection이 조금 올라온 후 fade-in
         );
 
-      // [ Scene 3 ] 캐릭터 Frame Animation (1→2→3→4)
-      // 캐릭터 이미지가 순차적으로 전환 (1초 간격)
-      tl.call(() => setCurrentCharacter(1))
-        .to({}, { duration: 1.0 })
-        .call(() => setCurrentCharacter(2))
-        .to({}, { duration: 1.0 })
-        .call(() => setCurrentCharacter(3))
-        .to({}, { duration: 1.0 })
-        .call(() => setCurrentCharacter(4));
+      // [ Scene 3 ] 캐릭터 Frame Animation (1→2→3→4) - 부드러운 크로스 페이드
+      // 1 → 2
+      tl.to(
+        char1Ref.current,
+        { opacity: 0, duration: 0.4, ease: "power2.inOut" },
+        "char1to2"
+      )
+        .to(
+          char2Ref.current,
+          { opacity: 1, duration: 0.4, ease: "power2.inOut" },
+          "char1to2"
+        )
+        .to({}, { duration: 0.6 }) // 1초 대기 (0.4초 전환 + 0.6초 = 1초)
+
+        // 2 → 3
+        .to(
+          char2Ref.current,
+          { opacity: 0, duration: 0.4, ease: "power2.inOut" },
+          "char2to3"
+        )
+        .to(
+          char3Ref.current,
+          { opacity: 1, duration: 0.4, ease: "power2.inOut" },
+          "char2to3"
+        )
+        .to({}, { duration: 0.6 })
+
+        // 3 → 4
+        .to(
+          char3Ref.current,
+          { opacity: 0, duration: 0.4, ease: "power2.inOut" },
+          "char3to4"
+        )
+        .to(
+          char4Ref.current,
+          { opacity: 1, duration: 0.4, ease: "power2.inOut" },
+          "char3to4"
+        )
+        .to({}, { duration: 0.6 });
 
       // [ Scene 4 ] 마무리 이동 - 배경 확장 → 타이틀 이동 → 버튼 등장 (순차적)
       tl.to(
@@ -141,11 +181,6 @@ export default function AuthPage() {
     router.push("/login");
   };
 
-  // 캐릭터 이미지 경로 (4개 이미지 순차 전환)
-  const getCharacterImage = () => {
-    return `/img/auth/chh-${currentCharacter}.png`;
-  };
-
   return (
     <div className={styles.container}>
       {/* 스플래쉬 타이틀 (Scene 1 & 2) - 이미지보다 위에 있다가 사라짐 */}
@@ -173,14 +208,31 @@ export default function AuthPage() {
           />
         </svg>
 
-        {/* 캐릭터 이미지 - 곡선 위에 위치 */}
+        {/* 캐릭터 이미지 - 곡선 위에 위치 (4개 모두 렌더, opacity로 크로스 페이드) */}
         <div ref={characterWrapperRef} className={styles.characterInCurve}>
           <img
-            ref={characterRef}
-            src={getCharacterImage()}
-            alt="Wellness character"
+            ref={char1Ref}
+            src="/img/auth/chh-1.png"
+            alt="Wellness character 1"
             className={styles.characterImage}
-            key={currentCharacter}
+          />
+          <img
+            ref={char2Ref}
+            src="/img/auth/chh-2.png"
+            alt="Wellness character 2"
+            className={styles.characterImage}
+          />
+          <img
+            ref={char3Ref}
+            src="/img/auth/chh-3.png"
+            alt="Wellness character 3"
+            className={styles.characterImage}
+          />
+          <img
+            ref={char4Ref}
+            src="/img/auth/chh-4.png"
+            alt="Wellness character 4"
+            className={styles.characterImage}
           />
         </div>
 

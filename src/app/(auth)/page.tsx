@@ -1,6 +1,10 @@
 "use client";
 
-import { AuthActionButton } from "@/domains/auth/ui/AuthActionButton";
+import {
+  AuthActionButton,
+  AuthContainer,
+  AuthCurveMask,
+} from "@/domains/auth/ui";
 import styles from "./page.module.scss";
 import { useRouter } from "next/navigation";
 import { useAuthAnimation } from "@/features/auth/hooks/useAuthAnimation";
@@ -30,7 +34,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className={styles.container}>
+    <AuthContainer>
       {/* 스플래쉬 타이틀 (Scene 1 & 2) - 이미지보다 위에 있다가 사라짐 */}
       <div ref={splashTitleRef} className={styles.splashTitle}>
         <h1 className={styles.splashMainTitle}>
@@ -47,49 +51,31 @@ export default function AuthPage() {
           ref={char1Ref}
           src="/img/auth/ch-1.png"
           alt="Wellness character 1"
-          style={{ position: "absolute", width: "100%", height: "auto" }}
+          className={styles.image}
         />
         <img
           ref={char2Ref}
           src="/img/auth/ch-2.png"
           alt="Wellness character 2"
-          style={{ position: "absolute", width: "100%", height: "auto" }}
+          className={styles.image}
         />
         <img
           ref={char3Ref}
           src="/img/auth/ch-3.png"
           alt="Wellness character 3"
-          style={{ position: "absolute", width: "100%", height: "auto" }}
+          className={styles.image}
         />
         <img
           ref={char4Ref}
           src="/img/auth/ch-4.png"
           alt="Wellness character 4"
-          style={{ position: "absolute", width: "100%", height: "auto" }}
+          className={styles.image}
         />
       </div>
 
       {/* 하단 섹션 - 곡선 배경 + 타이틀 + 버튼 */}
       <section ref={sectionRef} className={styles.section}>
-        {/* SVG 곡선 배경 - 위로 파인 곡선 (∪ 모양) */}
-        <svg
-          className={styles.curveMask}
-          viewBox="0 0 360 80"
-          preserveAspectRatio="none"
-        >
-          <defs>
-            <mask id="curveMask">
-              <rect width="100%" height="100%" fill="white" />
-              <path d="M0,0 L0,40 Q180,80 360,40 L360,0 Z" fill="black" />
-            </mask>
-          </defs>
-          <rect
-            width="100%"
-            height="100%"
-            fill="#F7F3ED"
-            mask="url(#curveMask)"
-          />
-        </svg>
+        <AuthCurveMask />
 
         <div className={styles.content}>
           {/* Wellness 타이틀 - 캐릭터와 함께 등장 */}
@@ -133,6 +119,6 @@ export default function AuthPage() {
           </div>
         </div>
       </section>
-    </div>
+    </AuthContainer>
   );
 }

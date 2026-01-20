@@ -18,7 +18,11 @@ export function useAuthAnimation() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // 초기 상태 설정: titleFrame과 section을 화면 밖으로 숨김
+      // 초기 상태 설정: 모든 애니메이션 요소를 즉시 숨김 (FOUC 방지)
+      gsap.set(characterImageRef.current, {
+        opacity: 0,
+      });
+
       gsap.set(
         [titleFrameRef.current, buttonFrameRef.current, sectionRef.current],
         {
@@ -74,20 +78,29 @@ export function useAuthAnimation() {
           ease: "power3.inOut",
         },
         "crossMotion"
-      ).fromTo(
-        sectionRef.current,
-        {
-          y: "100vh",
-          opacity: 0,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1.4,
-          ease: "power3.out",
-        },
-        "crossMotion" // splashTitle 퇴장과 동시에 시작
-      );
+      )
+        .fromTo(
+          sectionRef.current,
+          {
+            y: "100vh",
+            opacity: 0,
+          },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 1.4,
+            ease: "power3.out",
+          },
+          "crossMotion" // splashTitle 퇴장과 동시에 시작
+        )
+        .to(
+          characterImageRef.current,
+          {
+            opacity: 1,
+            duration: 0.6,
+          },
+          "crossMotion+=0.4" // section이 조금 올라온 후 캐릭터 fade-in
+        );
 
       // [ Scene 3 ] 캐릭터 Frame Animation (1→2→3→4) - 부드러운 크로스 페이드
 
@@ -189,4 +202,3 @@ export function useAuthAnimation() {
     char4Ref,
   };
 }
-

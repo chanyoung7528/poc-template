@@ -1,0 +1,22 @@
+.section {
+  position: relative;
+  top: 45rem; // Scene 3에서 캐릭터보다 아래에 위치
+}
+
+.curveMask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 12.5rem; // 200px → rem
+}
+
+.content {
+  position: absolute;
+  top: 12rem; // 200px → rem
+  left: 0;
+  width: 100%;
+  background-color: #f7f3ed;
+  height: 100dvh;
+}
+

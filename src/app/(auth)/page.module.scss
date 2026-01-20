@@ -1,25 +1,22 @@
 .container {
   position: relative;
   min-height: 100vh;
-  width: 100%;
   display: flex;
   flex-direction: column;
   background-image: url("/img/auth/back-masking.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  overflow: hidden;
 }
 
-// 스플래쉬 타이틀 (Scene 1 & 2) - 더 높은 위치에서 시작
 .splashTitle {
   position: absolute;
-  top: 150px; // 더 높은 위치에서 시작
+  top: 6.25rem; // 100px → rem
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
   z-index: 10;
-  width: 205px;
+  width: 100%;
 }
 
 .splashMainTitle {
@@ -27,7 +24,7 @@
   font-weight: 800;
   font-size: 2.6rem;
   line-height: 3.2rem;
-  letter-spacing: -1.04px;
+  letter-spacing: -0.065rem; // -1.04px → rem
   color: #003223;
   margin-bottom: 1.2rem;
 }
@@ -37,71 +34,41 @@
   font-weight: 600;
   font-size: 2rem;
   line-height: 2.8rem;
-  letter-spacing: -0.8px;
+  letter-spacing: -0.05rem; // -0.8px → rem
   color: #5d8b5b;
 }
 
-// 곡선 섹션 - 화면 하단 2/3 영역
-.curveSection {
+.characterImage {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 66vh; // 화면의 2/3
-  background-color: rgba(247, 245, 241, 1);
-  z-index: 1;
-  overflow: visible; // 캐릭터가 곡선 위로 나오도록
-}
-
-// SVG 곡선 - 위로 파인 곡선 (∪ 모양)
-.curveSvg {
-  position: absolute;
-  top: -1px; // 틈새 방지
-  left: 0;
-  width: 100%;
-  height: 140px;
-  z-index: 1;
-  pointer-events: none;
-}
-
-// 캐릭터 - 곡선 위에 위치
-.characterInCurve {
-  position: absolute;
-  top: -80px; // 곡선 위로 올라오게
+  top: 29.875rem; // Scene 3 초기 위치 (위쪽)
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
-  height: 305px;
-  z-index: 2; // 곡선보다 위
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.characterImage {
-  position: absolute; // 모든 이미지를 같은 위치에 겹쳐서 배치
-  bottom: 0; // 부모의 align-items: flex-end와 동일한 효과
-  left: 50%;
-  transform: translateX(-50%); // 부모의 justify-content: center와 동일한 효과
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  // transition 제거: GSAP이 직접 opacity를 제어
-}
-
-// 컨텐츠 영역 - 타이틀 + 버튼
-.curveContent {
-  position: relative;
-  width: 100%;
+  width: 24rem;
   height: 100%;
-  z-index: 3;
-  padding: 200px 0 4rem; // 캐릭터를 위한 상단 여유 공간
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
-// Wellness 타이틀 영역
+.section {
+  position: relative;
+  top: 45rem; // Scene 3에서 캐릭터보다 아래에 위치
+}
+
+.curveMask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 12.5rem; // 200px → rem
+}
+
+.content {
+  position: absolute;
+  top: 12rem; // 200px → rem
+  left: 0;
+  width: 100%;
+  background-color: #f7f3ed;
+  height: 100dvh;
+}
+
 .titleFrame {
   display: flex;
   flex-direction: column;
@@ -109,7 +76,6 @@
   gap: 0.8rem;
   margin-bottom: 3.6rem;
   width: 100%;
-  max-width: 320px;
   padding: 0 2rem;
   opacity: 0; // 초기 상태: 보이지 않음 (GSAP 애니메이션으로 제어)
 }
@@ -120,7 +86,7 @@
   font-style: italic;
   font-size: 4rem;
   line-height: 1.2;
-  letter-spacing: -1px;
+  letter-spacing: -0.0625rem; // -1px → rem
   color: #ff6433;
   text-align: center;
 }
@@ -130,20 +96,15 @@
   font-weight: 500;
   font-size: 1.8rem;
   line-height: 1.2;
-  letter-spacing: -0.1px;
+  letter-spacing: -0.00625rem; // -0.1px → rem
   color: #003223;
   text-align: center;
 }
 
-// 버튼 영역
 .buttonFrame {
-  width: 320px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 1.6rem;
-}
-
-.button {
-  height: 8rem;
-  border-radius: 16px;
+  padding: 0 2rem;
 }

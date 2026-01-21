@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { PassAuthButton } from "@/domains/auth/ui/signup/PassAuthButton";
 import styles from "./page.module.scss";
@@ -9,7 +9,8 @@ import { usePortOnePass } from "@/features/auth/hooks/usePortOnePass";
 // Dynamic rendering 강제 (useSearchParams 사용으로 인해 필요)
 export const dynamic = "force-dynamic";
 
-export default function VerifyPage() {
+// 실제 페이지 컴포넌트 (useSearchParams 사용)
+function VerifyPageContent() {
   const searchParams = useSearchParams();
   const { handleAuth, isLoading, handleRedirectResult } = usePortOnePass();
   const [isVerifying, setIsVerifying] = useState(false);
@@ -87,5 +88,26 @@ export default function VerifyPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Suspense로 감싼 메인 컴포넌트
+export default function VerifyPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className={styles.container}>
+          <div className={styles.card}>
+            <div className={styles.content}>
+              <div className={styles.loadingOverlay}>
+                <p>로딩 중...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <VerifyPageContent />
+    </Suspense>
   );
 }

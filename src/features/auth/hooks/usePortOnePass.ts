@@ -71,7 +71,7 @@ export function usePortOnePass() {
     });
 
     // 리다이렉트 URL 설정 (본인인증 완료 후 돌아올 URL)
-    const redirectUrl = `${window.location.origin}/verify`;
+    const redirectUrl = `${window.location.origin}/signup/credentials`;
 
     // V1 본인인증 요청 데이터
     const data = {

@@ -21,7 +21,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { id, nickname, email, profileImage, cid } = body;
 
+    console.log('📱 네이티브 카카오 로그인 API 호출 - body:', body);
+
     if (!id) {
+      console.error('❌ 카카오 사용자 ID가 없음');
       return NextResponse.json(
         { error: 'invalid_request', message: '카카오 사용자 ID가 필요합니다.' },
         { status: 400 }
@@ -47,8 +50,9 @@ export async function POST(request: NextRequest) {
     let existingUser;
     try {
       existingUser = await findUserByKakaoId(userInfo.providerId);
+      console.log('DB 조회 결과:', existingUser ? '기존 사용자' : '신규 사용자');
     } catch (dbError) {
-      console.error('데이터베이스 조회 오류:', dbError);
+      console.error('❌ 데이터베이스 조회 오류:', dbError);
       return NextResponse.json(
         { error: 'db_error', message: '사용자 조회 중 오류가 발생했습니다.' },
         { status: 500 }
@@ -80,11 +84,17 @@ export async function POST(request: NextRequest) {
     }
 
     // 로그인 또는 회원가입 플로우 처리
+    console.log(
+      existingUser ? '🔄 로그인 플로우 실행' : '🆕 회원가입 플로우 실행'
+    );
     const result = existingUser
       ? await handleLoginFlow(userInfo, existingUser)
       : await handleSignupFlow(userInfo, existingUser);
 
+    console.log('플로우 처리 결과:', result);
+
     if (!result.success) {
+      console.error('❌ 플로우 처리 실패:', result.error);
       return NextResponse.json(
         {
           error: result.error || 'unknown_error',
@@ -95,13 +105,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('✅ 카카오 네이티브 로그인 성공:', result.redirectUrl);
     return NextResponse.json({
       success: true,
       redirectUrl: result.redirectUrl,
       isNewUser: !existingUser,
     });
   } catch (err) {
-    console.error('카카오 네이티브 로그인 처리 중 오류:', err);
+    console.error('❌ 카카오 네이티브 로그인 처리 중 오류:', err);
     return NextResponse.json(
       {
         error: 'server_error',

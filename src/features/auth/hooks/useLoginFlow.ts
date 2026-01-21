@@ -76,6 +76,8 @@ export function useLoginFlow(): UseLoginFlowReturn {
         setIsSocialLoading(true);
         setError(null);
 
+        console.log("📱 웹에서 카카오 로그인 데이터 수신:", data);
+
         const result = await kakaoNativeLoginMutation.mutateAsync({
           id: data.id,
           nickname: data.nickname,
@@ -84,17 +86,25 @@ export function useLoginFlow(): UseLoginFlowReturn {
           cid: data.cid || data.id,
         });
 
+        console.log("✅ 카카오 로그인 API 응답:", result);
+
         // 서버에서 반환한 redirectUrl로 이동
         if (result.redirectUrl) {
           router.push(result.redirectUrl);
         } else {
           router.push("/");
         }
-      } catch (err) {
+      } catch (err: any) {
+        console.error("❌ 카카오 로그인 처리 실패 - 전체 에러:", err);
+        console.error("에러 응답:", err?.response?.data);
+        console.error("에러 상태:", err?.response?.status);
+        console.error("에러 메시지:", err?.message);
+
         const errorMessage =
-          err instanceof Error ? err.message : "카카오 로그인에 실패했습니다";
+          err?.response?.data?.message ||
+          err?.message ||
+          "카카오 로그인에 실패했습니다";
         setError(errorMessage);
-        console.error("카카오 로그인 처리 실패:", err);
       } finally {
         setIsSocialLoading(false);
       }
@@ -125,6 +135,8 @@ export function useLoginFlow(): UseLoginFlowReturn {
         setIsSocialLoading(true);
         setError(null);
 
+        console.log("📱 웹에서 네이버 로그인 데이터 수신:", data);
+
         const result = await naverNativeLoginMutation.mutateAsync({
           id: data.id,
           nickname: data.nickname,
@@ -133,17 +145,25 @@ export function useLoginFlow(): UseLoginFlowReturn {
           cid: data.cid || data.id,
         });
 
+        console.log("✅ 네이버 로그인 API 응답:", result);
+
         // 서버에서 반환한 redirectUrl로 이동
         if (result.redirectUrl) {
           router.push(result.redirectUrl);
         } else {
           router.push("/");
         }
-      } catch (err) {
+      } catch (err: any) {
+        console.error("❌ 네이버 로그인 처리 실패 - 전체 에러:", err);
+        console.error("에러 응답:", err?.response?.data);
+        console.error("에러 상태:", err?.response?.status);
+        console.error("에러 메시지:", err?.message);
+
         const errorMessage =
-          err instanceof Error ? err.message : "네이버 로그인에 실패했습니다";
+          err?.response?.data?.message ||
+          err?.message ||
+          "네이버 로그인에 실패했습니다";
         setError(errorMessage);
-        console.error("네이버 로그인 처리 실패:", err);
       } finally {
         setIsSocialLoading(false);
       }

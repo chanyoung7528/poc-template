@@ -133,3 +133,39 @@ export async function checkWellnessIdDuplicate(
     throw error;
   }
 }
+
+/**
+ * 네이티브 앱에서 받은 카카오 로그인 데이터를 서버로 전송합니다
+ */
+export async function loginWithKakaoNative(data: {
+  id: string;
+  nickname?: string;
+  email?: string;
+  profileImage?: string;
+  cid?: string;
+}): Promise<{ success: boolean; redirectUrl: string; isNewUser: boolean }> {
+  const response = await apiClient.post<{
+    success: boolean;
+    redirectUrl: string;
+    isNewUser: boolean;
+  }>("/api/auth/kakao/native", data);
+  return response.data;
+}
+
+/**
+ * 네이티브 앱에서 받은 네이버 로그인 데이터를 서버로 전송합니다
+ */
+export async function loginWithNaverNative(data: {
+  id: string;
+  nickname?: string;
+  email?: string;
+  profileImage?: string;
+  cid?: string;
+}): Promise<{ success: boolean; redirectUrl: string; isNewUser: boolean }> {
+  const response = await apiClient.post<{
+    success: boolean;
+    redirectUrl: string;
+    isNewUser: boolean;
+  }>("/api/auth/naver/native", data);
+  return response.data;
+}

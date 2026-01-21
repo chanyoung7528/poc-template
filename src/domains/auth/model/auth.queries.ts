@@ -9,6 +9,8 @@ import {
   sendVerificationCode,
   verifyCode,
   verifyCertification,
+  loginWithKakaoNative,
+  loginWithNaverNative,
 } from './auth.api';
 import { useAuthStore } from './auth.store';
 import type { SignupData, ResetPasswordData } from './auth.types';
@@ -139,5 +141,49 @@ export function useVerifyCode() {
 export function useVerifyCertification() {
   return useMutation({
     mutationFn: (impUid: string) => verifyCertification(impUid),
+  });
+}
+
+/**
+ * 네이티브 카카오 로그인 Mutation
+ */
+export function useKakaoNativeLogin() {
+  const queryClient = useQueryClient();
+  const setUser = useAuthStore((state) => state.setUser);
+
+  return useMutation({
+    mutationFn: (data: {
+      id: string;
+      nickname?: string;
+      email?: string;
+      profileImage?: string;
+      cid?: string;
+    }) => loginWithKakaoNative(data),
+    onSuccess: () => {
+      // 로그인 성공 시 사용자 정보 다시 조회
+      queryClient.invalidateQueries({ queryKey: authKeys.me() });
+    },
+  });
+}
+
+/**
+ * 네이티브 네이버 로그인 Mutation
+ */
+export function useNaverNativeLogin() {
+  const queryClient = useQueryClient();
+  const setUser = useAuthStore((state) => state.setUser);
+
+  return useMutation({
+    mutationFn: (data: {
+      id: string;
+      nickname?: string;
+      email?: string;
+      profileImage?: string;
+      cid?: string;
+    }) => loginWithNaverNative(data),
+    onSuccess: () => {
+      // 로그인 성공 시 사용자 정보 다시 조회
+      queryClient.invalidateQueries({ queryKey: authKeys.me() });
+    },
   });
 }

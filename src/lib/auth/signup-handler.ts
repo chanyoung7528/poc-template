@@ -1,5 +1,4 @@
 import type { SessionUser } from '@/lib/types';
-import { createSessionToken, setSessionCookie } from '@/lib/session';
 import { findUserByEmail } from '@/lib/database';
 import type { OAuthUserInfo } from './types';
 import type { User } from '@prisma/client';
@@ -11,6 +10,7 @@ export interface SignupResult {
   success: boolean;
   redirectUrl: string;
   error?: string;
+  sessionUser?: SessionUser;
 }
 
 /**
@@ -76,21 +76,9 @@ export async function handleSignupFlow(
 
   console.log('🆕 신규 회원 - 약관 동의 페이지로 이동:', userInfo.providerId);
 
-  // 임시 토큰 생성 및 쿠키 설정
-  try {
-    const tempToken = await createSessionToken(tempUser);
-    await setSessionCookie(tempToken);
-
-    return {
-      success: true,
-      redirectUrl: '/terms-agreement',
-    };
-  } catch (error) {
-    console.error('세션 토큰 생성 오류:', error);
-    return {
-      success: false,
-      redirectUrl: '/signup?error=session_error',
-      error: 'session_error',
-    };
-  }
+  return {
+    success: true,
+    redirectUrl: '/terms-agreement',
+    sessionUser: tempUser,
+  };
 }

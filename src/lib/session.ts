@@ -1,9 +1,10 @@
-import { SignJWT, jwtVerify } from 'jose';
-import { cookies } from 'next/headers';
-import { env } from '@/lib/config';
-import type { SessionUser } from './types';
+import { SignJWT, jwtVerify } from "jose";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
+import { env } from "@/lib/config";
+import type { SessionUser } from "./types";
 
-const SESSION_COOKIE_NAME = 'session';
+const SESSION_COOKIE_NAME = "session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7일
 
 /**
@@ -12,7 +13,7 @@ const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7일
 export async function createSessionToken(user: SessionUser): Promise<string> {
   const secret = new TextEncoder().encode(env.jwt.secret);
 
-  console.log('🔐 세션 토큰 생성:', {
+  console.log("🔐 세션 토큰 생성:", {
     id: user.id,
     provider: user.provider,
     isTemp: user.isTemp,
@@ -21,9 +22,9 @@ export async function createSessionToken(user: SessionUser): Promise<string> {
   return await new SignJWT({
     user,
   })
-    .setProtectedHeader({ alg: 'HS256' })
+    .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime('7d')
+    .setExpirationTime("7d")
     .sign(secret);
 }
 
@@ -40,7 +41,7 @@ export async function verifySessionToken(
     const user = (payload.user as SessionUser) || null;
 
     if (user) {
-      console.log('🔓 세션 토큰 검증 성공:', {
+      console.log("🔓 세션 토큰 검증 성공:", {
         id: user.id,
         provider: user.provider,
         isTemp: user.isTemp,
@@ -49,23 +50,43 @@ export async function verifySessionToken(
 
     return user;
   } catch (error) {
-    console.error('토큰 검증 실패:', error);
+    console.error("토큰 검증 실패:", error);
     return null;
   }
 }
 
 /**
- * 세션 쿠키 설정
+ * 세션 쿠키 설정 (Route Handler용)
+ * NextResponse에 쿠키를 설정합니다
+ */
+export function setSessionCookieOnResponse(
+  response: NextResponse,
+  token: string
+): NextResponse {
+  response.cookies.set(SESSION_COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: SESSION_MAX_AGE,
+    path: "/",
+  });
+
+  return response;
+}
+
+/**
+ * 세션 쿠키 설정 (레거시 호환용 - Server Component에서 사용)
+ * @deprecated Route Handler에서는 setSessionCookieOnResponse를 사용하세요
  */
 export async function setSessionCookie(token: string): Promise<void> {
   const cookieStore = await cookies();
 
   cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
     maxAge: SESSION_MAX_AGE,
-    path: '/',
+    path: "/",
   });
 }
 

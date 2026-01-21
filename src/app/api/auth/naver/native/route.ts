@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { handleLoginFlow } from '@/lib/auth/login-handler';
 import { handleSignupFlow } from '@/lib/auth/signup-handler';
 import { findUserByNaverId, findUserByEmail } from '@/lib/database';
+import { createSessionToken, setSessionCookieOnResponse } from '@/lib/session';
 import type { OAuthUserInfo } from '@/lib/auth/types';
 
 /**
@@ -85,27 +86,81 @@ export async function POST(request: NextRequest) {
       : await handleSignupFlow(userInfo, existingUser);
 
     if (!result.success) {
+      console.error("❌ 플로우 처리 실패:", result.error);
       return NextResponse.json(
         {
-          error: result.error || 'unknown_error',
-          message: '로그인 처리 중 오류가 발생했습니다.',
+          error: result.error || "unknown_error",
+          message: "로그인 처리 중 오류가 발생했습니다.",
           redirectUrl: result.redirectUrl,
         },
         { status: 400 }
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      redirectUrl: result.redirectUrl,
-      isNewUser: !existingUser,
-    });
+    // sessionUser가 없으면 에러
+    if (!result.sessionUser) {
+      console.error("❌ 세션 사용자 정보가 없음:", result);
+      return NextResponse.json(
+        {
+          error: "session_error",
+          message: "세션 사용자 정보를 생성할 수 없습니다.",
+        },
+        { status: 500 }
+      );
+    }
+
+    // 세션 토큰 생성 및 쿠키 설정
+    try {
+      console.log("🔐 세션 토큰 생성 시작:", {
+        userId: result.sessionUser.id,
+        provider: result.sessionUser.provider,
+      });
+
+      const sessionToken = await createSessionToken(result.sessionUser);
+
+      console.log("✅ 세션 토큰 생성 완료");
+
+      const response = NextResponse.json({
+        success: true,
+        redirectUrl: result.redirectUrl,
+        isNewUser: !existingUser,
+      });
+
+      // 쿠키 설정
+      setSessionCookieOnResponse(response, sessionToken);
+
+      console.log("✅ 네이버 네이티브 로그인 성공:", result.redirectUrl);
+      return response;
+    } catch (tokenError) {
+      console.error("❌ 세션 토큰 생성 실패:", tokenError);
+      console.error("에러 상세:", {
+        message:
+          tokenError instanceof Error ? tokenError.message : String(tokenError),
+        stack: tokenError instanceof Error ? tokenError.stack : undefined,
+        sessionUser: result.sessionUser,
+      });
+      return NextResponse.json(
+        {
+          error: "token_error",
+          message: "세션 토큰 생성 중 오류가 발생했습니다.",
+        },
+        { status: 500 }
+      );
+    }
   } catch (err) {
-    console.error('네이버 네이티브 로그인 처리 중 오류:', err);
+    console.error("❌ 네이버 네이티브 로그인 처리 중 오류:", err);
+    console.error("에러 상세 정보:", {
+      message: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+      name: err instanceof Error ? err.name : undefined,
+    });
     return NextResponse.json(
       {
-        error: 'server_error',
-        message: '서버 오류가 발생했습니다.',
+        error: "server_error",
+        message:
+          err instanceof Error
+            ? `서버 오류: ${err.message}`
+            : "서버 오류가 발생했습니다.",
       },
       { status: 500 }
     );

@@ -1,5 +1,4 @@
 import type { SessionUser } from '@/lib/types';
-import { createSessionToken, setSessionCookie } from '@/lib/session';
 import { updateUser, updateLastLogin } from '@/lib/database';
 import type { OAuthUserInfo } from './types';
 import { handleSignupFlow } from './signup-handler';
@@ -12,6 +11,7 @@ export interface LoginResult {
   success: boolean;
   redirectUrl: string;
   error?: string;
+  sessionUser?: SessionUser;
 }
 
 /**
@@ -62,23 +62,11 @@ export async function handleLoginFlow(
     provider: userInfo.provider,
   };
 
-  // 세션 토큰 생성 및 쿠키 설정
-  try {
-    const sessionToken = await createSessionToken(sessionUser);
-    await setSessionCookie(sessionToken);
+  console.log('✅ 로그인 성공:', existingUser.id);
 
-    console.log('✅ 로그인 성공:', existingUser.id);
-
-    return {
-      success: true,
-      redirectUrl: '/main',
-    };
-  } catch (error) {
-    console.error('세션 토큰 생성 오류:', error);
-    return {
-      success: false,
-      redirectUrl: '/login?error=session_error',
-      error: 'session_error',
-    };
-  }
+  return {
+    success: true,
+    redirectUrl: '/main',
+    sessionUser,
+  };
 }

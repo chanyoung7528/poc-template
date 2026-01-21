@@ -78,7 +78,7 @@ export function usePortOnePass() {
       channelKey: CHANNEL_KEY, // 포트원 본인인증 채널키
       merchant_uid: `mid_${Date.now()}`, // 주문번호 (타임스탬프로 생성)
       popup: !isInWebView, // 웹뷰에서는 popup 사용 안함
-      m_redirect_url: isInWebView ? redirectUrl : undefined, // 웹뷰에서는 리다이렉트 URL 설정
+      m_redirect_url: isInWebView ? redirectUrl : redirectUrl, // 웹뷰에서는 리다이렉트 URL 설정
     };
 
     console.log("📤 아임포트 V1 본인인증 요청:", {

@@ -70,15 +70,15 @@ export function usePortOnePass() {
       userAgent: navigator.userAgent,
     });
 
-    // 리다이렉트 URL 설정 (웹뷰에서 본인인증 완료 후 돌아올 URL)
+    // 리다이렉트 URL 설정 (본인인증 완료 후 돌아올 URL)
     const redirectUrl = `${window.location.origin}/verify`;
 
     // V1 본인인증 요청 데이터
     const data = {
       channelKey: CHANNEL_KEY, // 포트원 본인인증 채널키
       merchant_uid: `mid_${Date.now()}`, // 주문번호 (타임스탬프로 생성)
-      popup: !isInWebView, // 웹뷰에서는 popup 사용 안함
-      m_redirect_url: isInWebView ? redirectUrl : redirectUrl, // 웹뷰에서는 리다이렉트 URL 설정
+      popup: false, // 리다이렉트 방식 사용 (웹뷰 호환)
+      m_redirect_url: redirectUrl, // 리다이렉트 URL (모바일/웹뷰)
     };
 
     console.log("📤 아임포트 V1 본인인증 요청:", {
@@ -87,7 +87,20 @@ export function usePortOnePass() {
       isWebView: isInWebView,
     });
 
-    // 본인인증 창 열기
+    // 웹뷰 환경이면 리다이렉트만 하고 콜백은 처리하지 않음
+    if (isInWebView) {
+      console.log("📱 웹뷰 환경: 리다이렉트 방식으로 본인인증 시작");
+      // 본인인증 창 열기 (리다이렉트됨)
+      IMP.certification(data, (rsp: IamportCertificationResponse) => {
+        // 웹뷰에서는 이 콜백이 실행되지 않아야 함
+        // 만약 실행된다면 무시
+        console.log("⚠️ 웹뷰 환경에서 콜백 실행됨 (무시):", rsp);
+      });
+      return; // 콜백 처리하지 않고 리다이렉트 대기
+    }
+
+    // 일반 브라우저 환경: 콜백으로 처리
+    console.log("🌐 일반 브라우저 환경: 콜백 방식으로 본인인증 시작");
     IMP.certification(data, async (rsp: IamportCertificationResponse) => {
       console.log("아임포트 응답:", rsp);
 

@@ -63,12 +63,27 @@ export function setSessionCookieOnResponse(
   response: NextResponse,
   token: string
 ): NextResponse {
-  response.cookies.set(SESSION_COOKIE_NAME, token, {
+  const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "lax" as const,
     maxAge: SESSION_MAX_AGE,
     path: "/",
+  };
+
+  console.log("🍪 세션 쿠키 설정:", {
+    name: SESSION_COOKIE_NAME,
+    options: cookieOptions,
+    tokenLength: token.length,
+  });
+
+  response.cookies.set(SESSION_COOKIE_NAME, token, cookieOptions);
+
+  // 쿠키가 제대로 설정되었는지 확인
+  const setCookie = response.cookies.get(SESSION_COOKIE_NAME);
+  console.log("✅ 쿠키 설정 확인:", {
+    exists: !!setCookie,
+    value: setCookie?.value?.substring(0, 20) + "...",
   });
 
   return response;

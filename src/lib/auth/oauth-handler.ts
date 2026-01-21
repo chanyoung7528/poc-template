@@ -5,7 +5,7 @@ import { handleLoginFlow } from './login-handler';
 import { getSessionUser } from '@/lib/session';
 import { createKakaoUser, createNaverUser } from '@/lib/database';
 import type { SessionUser } from '@/lib/types';
-import { createSessionToken, setSessionCookie } from '@/lib/session';
+import { createSessionToken, setSessionCookieOnResponse } from '@/lib/session';
 
 /**
  * OAuth 콜백 요청에서 모드 추출
@@ -141,15 +141,19 @@ export async function handleOAuthCallback(
         };
 
         const finalSessionToken = await createSessionToken(finalSessionUser);
-        await setSessionCookie(finalSessionToken);
 
         console.log('✅ 회원가입 완료:', newUser.id);
 
-        // 회원가입 완료 페이지로 리다이렉트 (nickname 전달)
+        // 회원가입 완료 페이지로 리다이렉트 (nickname 전달, 쿠키 포함)
         const displayName = newUser.nickname || newUser.email || '회원';
         const redirectUrl = new URL('/signup/complete', request.url);
         redirectUrl.searchParams.set('wellnessId', displayName);
-        return NextResponse.redirect(redirectUrl);
+        
+        const response = NextResponse.redirect(redirectUrl);
+        setSessionCookieOnResponse(response, finalSessionToken);
+        
+        console.log('🍪 리다이렉트 응답에 쿠키 설정 완료');
+        return response;
       }
       // 약관 동의만 했으면 본인인증으로
       else if (existingSession.termsAgreed && !existingSession.verified) {
@@ -203,8 +207,26 @@ export async function handleOAuthCallback(
       result = await handleLoginFlow(userInfo, existingUser);
     }
 
-    // Step 5: 결과에 따라 리다이렉트
-    return NextResponse.redirect(new URL(result.redirectUrl, request.url));
+    console.log('OAuth 플로우 결과:', {
+      success: result.success,
+      redirectUrl: result.redirectUrl,
+      hasSessionUser: !!result.sessionUser,
+    });
+
+    // Step 5: 세션 토큰 생성 및 쿠키 설정
+    if (result.sessionUser) {
+      const sessionToken = await createSessionToken(result.sessionUser);
+      
+      const response = NextResponse.redirect(new URL(result.redirectUrl, request.url));
+      setSessionCookieOnResponse(response, sessionToken);
+      
+      console.log('🍪 OAuth 리다이렉트 응답에 쿠키 설정 완료');
+      return response;
+    }
+
+    // sessionUser가 없으면 에러
+    console.error('❌ sessionUser가 없습니다:', result);
+    return createErrorResponse(request, mode, 'session_error');
   } catch (err) {
     console.error(`${provider.name} 로그인 처리 중 오류:`, err);
     return NextResponse.redirect(

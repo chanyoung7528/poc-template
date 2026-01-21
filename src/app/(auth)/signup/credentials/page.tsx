@@ -201,6 +201,33 @@ function CredentialsPageContent() {
     setIsSubmitting(true);
 
     try {
+      console.log("📝 웰니스 회원가입 요청 시작");
+
+      // 세션 상태 확인을 위한 API 호출
+      const sessionCheck = await fetch("/api/auth/session");
+      const sessionData = await sessionCheck.json();
+
+      console.log("🔍 현재 세션 상태:", sessionData);
+
+      if (!sessionData.user) {
+        console.error("❌ 세션이 없습니다. 회원가입 페이지로 이동");
+        alert("세션이 만료되었습니다. 처음부터 다시 시도해주세요.");
+        router.push("/signup");
+        return;
+      }
+
+      if (sessionData.user.signupType !== "wellness") {
+        console.error(
+          "❌ 일반 회원가입 세션이 아닙니다:",
+          sessionData.user.signupType
+        );
+        alert("잘못된 회원가입 경로입니다. 처음부터 다시 시도해주세요.");
+        router.push("/signup");
+        return;
+      }
+
+      console.log("✅ 세션 확인 완료, 회원가입 API 호출");
+
       const response = await fetch("/api/auth/wellness/signup", {
         method: "POST",
         headers: {
@@ -221,6 +248,9 @@ function CredentialsPageContent() {
           alert("이미 사용 중인 아이디입니다.");
         } else if (result.error === "unauthorized") {
           alert("세션이 만료되었습니다. 처음부터 다시 시도해주세요.");
+          router.push("/signup");
+        } else if (result.error === "invalid_signup_type") {
+          alert("잘못된 회원가입 경로입니다. 처음부터 다시 시도해주세요.");
           router.push("/signup");
         } else {
           alert("회원가입 중 오류가 발생했습니다. 다시 시도해주세요.");

@@ -112,6 +112,9 @@ export function useLoginFlow(): UseLoginFlowReturn {
 
           console.log(`✅ ${providerName} 로그인 API 응답:`, result);
 
+          // 쿠키 확인
+          console.log("🍪 현재 브라우저 쿠키:", document.cookie);
+
           // 서버에서 반환한 redirectUrl로 이동
           router.push(result.redirectUrl || "/");
         } catch (err: any) {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/session';
 import type { SessionUser } from '@/lib/types';
-import { createSessionToken, setSessionCookie } from '@/lib/session';
+import { createSessionToken, setSessionCookieOnResponse } from '@/lib/session';
 import { findUserByPhone } from '@/lib/database';
 
 /**
@@ -72,7 +72,6 @@ export async function POST(request: NextRequest) {
 
     // 업데이트된 세션 토큰 생성
     const updatedToken = await createSessionToken(updatedUser);
-    await setSessionCookie(updatedToken);
 
     console.log('✅ 본인인증 상태 세션에 저장 완료');
 
@@ -86,17 +85,27 @@ export async function POST(request: NextRequest) {
 
         if (existingUser) {
           console.log('⚠️ 이미 가입된 전화번호:', phone);
-          // 중복 계정 페이지로 서버 사이드 리다이렉트
+          // 중복 계정 페이지로 서버 사이드 리다이렉트 (쿠키 포함)
           const redirectUrl = new URL('/duplicate-account', request.url);
           redirectUrl.searchParams.set('provider', existingUser.provider);
           redirectUrl.searchParams.set('phone', phone);
-          return NextResponse.redirect(redirectUrl);
+          
+          const response = NextResponse.redirect(redirectUrl);
+          setSessionCookieOnResponse(response, updatedToken);
+          
+          console.log('🍪 리다이렉트 응답에 쿠키 설정 완료');
+          return response;
         }
       }
 
-      // 중복이 아니면 ID/PW 입력 페이지로 서버 사이드 리다이렉트
+      // 중복이 아니면 ID/PW 입력 페이지로 서버 사이드 리다이렉트 (쿠키 포함)
       console.log('✅ 신규 회원 확인 완료, ID/PW 입력 페이지로 이동');
-      return NextResponse.redirect(new URL('/signup/credentials', request.url));
+      
+      const response = NextResponse.redirect(new URL('/signup/credentials', request.url));
+      setSessionCookieOnResponse(response, updatedToken);
+      
+      console.log('🍪 리다이렉트 응답에 쿠키 설정 완료');
+      return response;
     }
 
     // 소셜 회원가입인 경우 JSON 응답 (클라이언트에서 처리)

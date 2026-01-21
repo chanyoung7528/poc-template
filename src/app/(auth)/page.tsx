@@ -8,27 +8,9 @@ import {
 import styles from "./page.module.scss";
 import { useRouter } from "next/navigation";
 import { useAuthAnimation } from "@/features/auth/hooks/useAuthAnimation";
-import { useEffect } from "react";
 
 export default function AuthPage() {
   const router = useRouter();
-
-  // 페이지 접근 시 세션 초기화
-  useEffect(() => {
-    const clearSession = async () => {
-      try {
-        console.log("🔄 메인 auth 페이지 접근 - 세션 초기화");
-        await fetch("/api/auth/logout", {
-          method: "POST",
-        });
-        console.log("✅ 세션 초기화 완료");
-      } catch (error) {
-        console.error("❌ 세션 초기화 실패:", error);
-      }
-    };
-
-    clearSession();
-  }, []);
 
   // 커스텀 훅으로 애니메이션 로직 분리
   const {

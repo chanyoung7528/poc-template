@@ -129,6 +129,12 @@ export async function POST(request: NextRequest) {
       // 쿠키 설정
       setSessionCookieOnResponse(response, sessionToken);
 
+      // 응답 헤더 확인
+      console.log("📤 응답 헤더:", {
+        setCookie: response.headers.get("set-cookie"),
+        hasSetCookie: response.headers.has("set-cookie"),
+      });
+
       console.log("✅ 네이버 네이티브 로그인 성공:", result.redirectUrl);
       return response;
     } catch (tokenError) {

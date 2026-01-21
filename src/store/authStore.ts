@@ -1,20 +1,20 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 /**
  * 인증 Provider 타입
  */
-export type AuthProvider = 'kakao' | 'naver' | 'apple' | 'wellness';
+export type AuthProvider = "kakao" | "naver" | "apple" | "wellness";
 
 /**
  * 회원가입 진행 단계
  */
 export type SignupStep =
-  | 'idle' // 시작 전
-  | 'terms' // 약관 동의
-  | 'verification' // 본인인증
-  | 'credentials' // ID/PW 입력 (wellness only)
-  | 'completed'; // 완료
+  | "idle" // 시작 전
+  | "terms" // 약관 동의
+  | "verification" // 본인인증
+  | "credentials" // ID/PW 입력 (wellness only)
+  | "completed"; // 완료
 
 /**
  * 사용자 인증 상태
@@ -36,7 +36,7 @@ export interface AuthState {
     name?: string;
     phone?: string;
     birth?: string;
-    gender?: 'M' | 'F';
+    gender?: "M" | "F";
   } | null;
 
   // 사용자 프로필
@@ -75,7 +75,7 @@ interface AuthActions {
     name: string;
     phone: string;
     birth: string;
-    gender: 'M' | 'F';
+    gender: "M" | "F";
   }) => void;
 
   // 회원가입 단계 업데이트
@@ -99,7 +99,7 @@ const initialState: AuthState = {
   provider: null,
   isAuthenticated: false,
   isTemp: false,
-  signupStep: 'idle',
+  signupStep: "idle",
   termsAgreed: false,
   verified: false,
   verificationData: null,
@@ -121,7 +121,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
 
       // 세션 초기화 (서버에서 세션 데이터 가져온 후)
       initSession: (sessionData) => {
-        console.log('🔄 [Auth Store] 세션 초기화:', sessionData);
+        console.log("🔄 [Auth Store] 세션 초기화:", sessionData);
         set((state) => ({
           ...state,
           ...sessionData,
@@ -130,13 +130,13 @@ export const useAuthStore = create<AuthState & AuthActions>()(
 
       // 로그인
       login: (userData) => {
-        console.log('✅ [Auth Store] 로그인:', userData);
+        console.log("✅ [Auth Store] 로그인:", userData);
         set({
           userId: userData.userId,
           provider: userData.provider,
           isAuthenticated: true,
           isTemp: false,
-          signupStep: 'completed',
+          signupStep: "completed",
           email: userData.email || null,
           nickname: userData.nickname || null,
           profileImage: userData.profileImage || null,
@@ -145,72 +145,71 @@ export const useAuthStore = create<AuthState & AuthActions>()(
 
       // 로그아웃
       logout: () => {
-        console.log('🚪 [Auth Store] 로그아웃');
         set(initialState);
       },
 
       // 회원가입 시작
       startSignup: (provider) => {
-        console.log('🆕 [Auth Store] 회원가입 시작:', provider);
+        console.log("🆕 [Auth Store] 회원가입 시작:", provider);
         set({
           provider,
           isTemp: true,
-          signupStep: 'terms',
+          signupStep: "terms",
           isAuthenticated: false,
         });
       },
 
       // 약관 동의
       agreeToTerms: () => {
-        console.log('📋 [Auth Store] 약관 동의 완료');
+        console.log("📋 [Auth Store] 약관 동의 완료");
         set({
           termsAgreed: true,
-          signupStep: 'verification',
+          signupStep: "verification",
         });
       },
 
       // 본인인증 완료
       completeVerification: (data) => {
-        console.log('✅ [Auth Store] 본인인증 완료:', data);
+        console.log("✅ [Auth Store] 본인인증 완료:", data);
         set((state) => ({
           verified: true,
           verificationData: data,
           signupStep:
-            state.provider === 'wellness' ? 'credentials' : 'completed',
+            state.provider === "wellness" ? "credentials" : "completed",
         }));
       },
 
       // 회원가입 단계 업데이트
       setSignupStep: (step) => {
-        console.log('📍 [Auth Store] 단계 업데이트:', step);
+        console.log("📍 [Auth Store] 단계 업데이트:", step);
         set({ signupStep: step });
       },
 
       // 회원가입 완료
       completeSignup: (userId) => {
-        console.log('🎉 [Auth Store] 회원가입 완료:', userId);
+        console.log("🎉 [Auth Store] 회원가입 완료:", userId);
         set({
           userId,
           isAuthenticated: true,
           isTemp: false,
-          signupStep: 'completed',
+          signupStep: "completed",
         });
       },
 
       // 상태 초기화
       reset: () => {
-        console.log('🔄 [Auth Store] 상태 초기화');
+        console.log("🔄 [Auth Store] 상태 초기화");
         set(initialState);
       },
 
       // Provider만 설정
       setProvider: (provider) => {
-        console.log('🔧 [Auth Store] Provider 설정:', provider);
+        console.log("🔧 [Auth Store] Provider 설정:", provider);
         set({ provider });
       },
     }),
     {
-      name: 'auth-storage', // localStorage key
+      name: "auth-storage", // localStorage key
       storage: createJSONStorage(() => localStorage),
       // 민감한 정보는 제외하고 저장
       partialize: (state) => ({

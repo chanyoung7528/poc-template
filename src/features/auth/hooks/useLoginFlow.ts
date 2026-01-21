@@ -77,6 +77,11 @@ export function useLoginFlow(): UseLoginFlowReturn {
         setError(null);
 
         console.log("📱 웹에서 카카오 로그인 데이터 수신:", data);
+        console.log("API 요청 URL:", "/api/auth/kakao/native");
+        console.log(
+          "API baseURL:",
+          process.env.NEXT_PUBLIC_API_URL || "기본 경로"
+        );
 
         const result = await kakaoNativeLoginMutation.mutateAsync({
           id: data.id,
@@ -99,6 +104,8 @@ export function useLoginFlow(): UseLoginFlowReturn {
         console.error("에러 응답:", err?.response?.data);
         console.error("에러 상태:", err?.response?.status);
         console.error("에러 메시지:", err?.message);
+        console.error("에러 config URL:", err?.config?.url);
+        console.error("에러 config baseURL:", err?.config?.baseURL);
 
         const errorMessage =
           err?.response?.data?.message ||

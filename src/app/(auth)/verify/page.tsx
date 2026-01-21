@@ -14,12 +14,28 @@ function VerifyPageContent() {
   const searchParams = useSearchParams();
   const { handleAuth, isLoading, handleRedirectResult } = usePortOnePass();
   const [isVerifying, setIsVerifying] = useState(false);
+  const [hasProcessedRedirect, setHasProcessedRedirect] = useState(false); // 리다이렉트 처리 플래그
 
   // 웹뷰에서 리다이렉트로 돌아온 경우 처리
   useEffect(() => {
+    // 이미 처리했으면 무시
+    if (hasProcessedRedirect) {
+      console.log("ℹ️ 이미 리다이렉트 결과를 처리했습니다.");
+      return;
+    }
+
     const impUid = searchParams.get("imp_uid");
-    const impSuccess = searchParams.get("imp_success");
+    const impSuccess =
+      searchParams.get("imp_success") || searchParams.get("success"); // imp_success 또는 success
     const errorMsg = searchParams.get("error_msg");
+
+    console.log("📱 URL 파라미터 확인:", {
+      imp_uid: impUid,
+      imp_success: searchParams.get("imp_success"),
+      success: searchParams.get("success"),
+      error_msg: errorMsg,
+      allParams: Object.fromEntries(searchParams.entries()),
+    });
 
     if (impUid || impSuccess !== null) {
       console.log("📱 본인인증 리다이렉트 결과:", {
@@ -29,17 +45,23 @@ function VerifyPageContent() {
       });
 
       setIsVerifying(true);
+      setHasProcessedRedirect(true); // 처리 시작 플래그 설정
 
       // 리다이렉트 결과 처리
       if (handleRedirectResult) {
+        console.log("📱 handleRedirectResult 호출");
         handleRedirectResult({
           success: impSuccess === "true",
           imp_uid: impUid || undefined,
           error_msg: errorMsg || undefined,
         });
+      } else {
+        console.error("❌ handleRedirectResult가 없습니다");
       }
+    } else {
+      console.log("ℹ️ 본인인증 리다이렉트 파라미터 없음 - 일반 페이지 접근");
     }
-  }, [searchParams, handleRedirectResult]);
+  }, [searchParams, hasProcessedRedirect]); // handleRedirectResult 제거
 
   const handlePassAuth = () => {
     setIsVerifying(true);

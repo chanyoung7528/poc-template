@@ -229,6 +229,10 @@ export function useLoginFlow(): UseLoginFlowReturn {
           process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || ""
         );
         kakaoAuthUrl.searchParams.set("response_type", "code");
+        // prompt=login 추가: 자동 로그인 방지, 항상 로그인 페이지 표시
+        kakaoAuthUrl.searchParams.set("prompt", "login");
+
+        console.log("🔐 카카오 인증 페이지로 이동 (자동 로그인 방지)");
         window.location.href = kakaoAuthUrl.toString();
       }
     } else if (provider === "naver") {

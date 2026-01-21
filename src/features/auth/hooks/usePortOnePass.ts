@@ -90,12 +90,17 @@ export function usePortOnePass() {
     // 웹뷰 환경이면 리다이렉트만 하고 콜백은 처리하지 않음
     if (isInWebView) {
       console.log("📱 웹뷰 환경: 리다이렉트 방식으로 본인인증 시작");
+      console.log("📱 리다이렉트 URL:", redirectUrl);
+
       // 본인인증 창 열기 (리다이렉트됨)
       IMP.certification(data, (rsp: IamportCertificationResponse) => {
         // 웹뷰에서는 이 콜백이 실행되지 않아야 함
         // 만약 실행된다면 무시
         console.log("⚠️ 웹뷰 환경에서 콜백 실행됨 (무시):", rsp);
+        console.log("⚠️ 이 콜백은 무시됩니다. 리다이렉트 결과를 기다려주세요.");
       });
+
+      console.log("📱 본인인증 페이지로 이동 중... 리다이렉트 대기");
       return; // 콜백 처리하지 않고 리다이렉트 대기
     }
 

@@ -66,7 +66,7 @@ export async function handleLoginFlow(
 
   return {
     success: true,
-    redirectUrl: '/main',
+    redirectUrl: '/terms-agreement',
     sessionUser,
   };
 }

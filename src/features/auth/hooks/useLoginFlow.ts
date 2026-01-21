@@ -9,6 +9,7 @@ import {
 } from "@/domains/auth/model/auth.queries";
 
 export type LoginStep = "login" | "find-id" | "reset-password";
+export type SocialProvider = "kakao" | "naver" | "apple";
 
 interface UseLoginFlowReturn {
   currentStep: LoginStep;
@@ -16,7 +17,20 @@ interface UseLoginFlowReturn {
   error: string | null;
   setStep: (step: LoginStep) => void;
   handleLogin: (email: string, password: string) => Promise<void>;
-  handleSocialLogin: (provider: "kakao" | "naver" | "apple") => void;
+  handleSocialLogin: (provider: SocialProvider) => void;
+}
+
+interface SocialLoginData {
+  id: string;
+  nickname?: string;
+  email?: string;
+  profileImage?: string;
+  cid?: string;
+}
+
+interface SocialLoginError {
+  error: string;
+  message?: string;
 }
 
 // 앱에서 주입하는 함수 타입 정의
@@ -24,24 +38,31 @@ declare global {
   interface Window {
     requestKakaoLogin?: () => void;
     requestNaverLogin?: () => void;
-    onKakaoLoginSuccess?: (data: {
-      id: string;
-      nickname?: string;
-      email?: string;
-      profileImage?: string;
-      cid?: string;
-    }) => void;
-    onKakaoLoginError?: (error: { error: string; message?: string }) => void;
-    onNaverLoginSuccess?: (data: {
-      id: string;
-      nickname?: string;
-      email?: string;
-      profileImage?: string;
-      cid?: string;
-    }) => void;
-    onNaverLoginError?: (error: { error: string; message?: string }) => void;
+    onKakaoLoginSuccess?: (data: SocialLoginData) => void;
+    onKakaoLoginError?: (error: SocialLoginError) => void;
+    onNaverLoginSuccess?: (data: SocialLoginData) => void;
+    onNaverLoginError?: (error: SocialLoginError) => void;
   }
 }
+
+// Provider별 설정
+const PROVIDER_CONFIG = {
+  kakao: {
+    name: "카카오",
+    authUrl: "https://kauth.kakao.com/oauth/authorize",
+    clientIdKey: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || "",
+    redirectUri: process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || "",
+    requestFunction: "requestKakaoLogin" as const,
+    additionalParams: { prompt: "login" }, // 자동 로그인 방지
+  },
+  naver: {
+    name: "네이버",
+    authUrl: "https://nid.naver.com/oauth2.0/authorize",
+    clientIdKey: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || "",
+    redirectUri: process.env.NEXT_PUBLIC_NAVER_REDIRECT_URI || "",
+    requestFunction: "requestNaverLogin" as const,
+  },
+} as const;
 
 export function useLoginFlow(): UseLoginFlowReturn {
   const router = useRouter();
@@ -53,6 +74,7 @@ export function useLoginFlow(): UseLoginFlowReturn {
   const kakaoNativeLoginMutation = useKakaoNativeLogin();
   const naverNativeLoginMutation = useNaverNativeLogin();
 
+  // 일반 로그인 처리
   const handleLogin = async (email: string, password: string) => {
     try {
       setError(null);
@@ -63,129 +85,88 @@ export function useLoginFlow(): UseLoginFlowReturn {
     }
   };
 
-  // 카카오 로그인 성공 콜백
+  // 소셜 로그인 성공 공통 핸들러
+  const createSocialLoginSuccessHandler = useCallback(
+    (
+      provider: "kakao" | "naver",
+      mutation:
+        | typeof kakaoNativeLoginMutation
+        | typeof naverNativeLoginMutation
+    ) => {
+      return async (data: SocialLoginData) => {
+        const providerName = PROVIDER_CONFIG[provider].name;
+
+        try {
+          setIsSocialLoading(true);
+          setError(null);
+
+          console.log(`📱 웹에서 ${providerName} 로그인 데이터 수신:`, data);
+
+          const result = await mutation.mutateAsync({
+            id: data.id,
+            nickname: data.nickname,
+            email: data.email,
+            profileImage: data.profileImage,
+            cid: data.cid || data.id,
+          });
+
+          console.log(`✅ ${providerName} 로그인 API 응답:`, result);
+
+          // 서버에서 반환한 redirectUrl로 이동
+          router.push(result.redirectUrl || "/");
+        } catch (err: any) {
+          console.error(`❌ ${providerName} 로그인 처리 실패:`, {
+            error: err,
+            response: err?.response?.data,
+            status: err?.response?.status,
+            message: err?.message,
+          });
+
+          const errorMessage =
+            err?.response?.data?.message ||
+            err?.message ||
+            `${providerName} 로그인에 실패했습니다`;
+          setError(errorMessage);
+        } finally {
+          setIsSocialLoading(false);
+        }
+      };
+    },
+    [router]
+  );
+
+  // 소셜 로그인 실패 공통 핸들러
+  const createSocialLoginErrorHandler = useCallback(
+    (provider: "kakao" | "naver") => {
+      return (error: SocialLoginError) => {
+        const providerName = PROVIDER_CONFIG[provider].name;
+        setIsSocialLoading(false);
+        setError(error.message || `${providerName} 로그인에 실패했습니다`);
+        console.error(`${providerName} 로그인 실패:`, error);
+      };
+    },
+    []
+  );
+
+  // 콜백 함수 생성
   const handleKakaoLoginSuccess = useCallback(
-    async (data: {
-      id: string;
-      nickname?: string;
-      email?: string;
-      profileImage?: string;
-      cid?: string;
-    }) => {
-      try {
-        setIsSocialLoading(true);
-        setError(null);
-
-        console.log("📱 웹에서 카카오 로그인 데이터 수신:", data);
-        console.log("API 요청 URL:", "/api/auth/kakao/native");
-        console.log(
-          "API baseURL:",
-          process.env.NEXT_PUBLIC_API_URL || "기본 경로"
-        );
-
-        const result = await kakaoNativeLoginMutation.mutateAsync({
-          id: data.id,
-          nickname: data.nickname,
-          email: data.email,
-          profileImage: data.profileImage,
-          cid: data.cid || data.id,
-        });
-
-        console.log("✅ 카카오 로그인 API 응답:", result);
-
-        // 서버에서 반환한 redirectUrl로 이동
-        if (result.redirectUrl) {
-          router.push(result.redirectUrl);
-        } else {
-          router.push("/");
-        }
-      } catch (err: any) {
-        console.error("❌ 카카오 로그인 처리 실패 - 전체 에러:", err);
-        console.error("에러 응답:", err?.response?.data);
-        console.error("에러 상태:", err?.response?.status);
-        console.error("에러 메시지:", err?.message);
-        console.error("에러 config URL:", err?.config?.url);
-        console.error("에러 config baseURL:", err?.config?.baseURL);
-
-        const errorMessage =
-          err?.response?.data?.message ||
-          err?.message ||
-          "카카오 로그인에 실패했습니다";
-        setError(errorMessage);
-      } finally {
-        setIsSocialLoading(false);
-      }
-    },
-    [kakaoNativeLoginMutation, router]
+    createSocialLoginSuccessHandler("kakao", kakaoNativeLoginMutation),
+    [createSocialLoginSuccessHandler, kakaoNativeLoginMutation]
   );
 
-  // 카카오 로그인 실패 콜백
   const handleKakaoLoginError = useCallback(
-    (error: { error: string; message?: string }) => {
-      setIsSocialLoading(false);
-      setError(error.message || "카카오 로그인에 실패했습니다");
-      console.error("카카오 로그인 실패:", error);
-    },
-    []
+    createSocialLoginErrorHandler("kakao"),
+    [createSocialLoginErrorHandler]
   );
 
-  // 네이버 로그인 성공 콜백
   const handleNaverLoginSuccess = useCallback(
-    async (data: {
-      id: string;
-      nickname?: string;
-      email?: string;
-      profileImage?: string;
-      cid?: string;
-    }) => {
-      try {
-        setIsSocialLoading(true);
-        setError(null);
-
-        console.log("📱 웹에서 네이버 로그인 데이터 수신:", data);
-
-        const result = await naverNativeLoginMutation.mutateAsync({
-          id: data.id,
-          nickname: data.nickname,
-          email: data.email,
-          profileImage: data.profileImage,
-          cid: data.cid || data.id,
-        });
-
-        console.log("✅ 네이버 로그인 API 응답:", result);
-
-        // 서버에서 반환한 redirectUrl로 이동
-        if (result.redirectUrl) {
-          router.push(result.redirectUrl);
-        } else {
-          router.push("/");
-        }
-      } catch (err: any) {
-        console.error("❌ 네이버 로그인 처리 실패 - 전체 에러:", err);
-        console.error("에러 응답:", err?.response?.data);
-        console.error("에러 상태:", err?.response?.status);
-        console.error("에러 메시지:", err?.message);
-
-        const errorMessage =
-          err?.response?.data?.message ||
-          err?.message ||
-          "네이버 로그인에 실패했습니다";
-        setError(errorMessage);
-      } finally {
-        setIsSocialLoading(false);
-      }
-    },
-    [naverNativeLoginMutation, router]
+    createSocialLoginSuccessHandler("naver", naverNativeLoginMutation),
+    [createSocialLoginSuccessHandler, naverNativeLoginMutation]
   );
 
-  // 네이버 로그인 실패 콜백
   const handleNaverLoginError = useCallback(
-    (error: { error: string; message?: string }) => {
-      setIsSocialLoading(false);
-      setError(error.message || "네이버 로그인에 실패했습니다");
-      console.error("네이버 로그인 실패:", error);
-    },
-    []
+    createSocialLoginErrorHandler("naver"),
+    [createSocialLoginErrorHandler]
   );
 
   // 앱에서 주입하는 콜백 함수 등록
@@ -196,7 +177,6 @@ export function useLoginFlow(): UseLoginFlowReturn {
     window.onNaverLoginError = handleNaverLoginError;
 
     return () => {
-      // cleanup
       delete window.onKakaoLoginSuccess;
       delete window.onKakaoLoginError;
       delete window.onNaverLoginSuccess;
@@ -209,60 +189,63 @@ export function useLoginFlow(): UseLoginFlowReturn {
     handleNaverLoginError,
   ]);
 
-  const handleSocialLogin = (provider: "kakao" | "naver" | "apple") => {
+  // 네이티브 앱 로그인 요청
+  const requestNativeLogin = (provider: "kakao" | "naver"): boolean => {
+    const config = PROVIDER_CONFIG[provider];
+    const requestFn = window[config.requestFunction];
+
+    if (typeof requestFn === "function") {
+      console.log(`📱 ${config.name} 네이티브 로그인 요청 (플러터 앱)`);
+      setIsSocialLoading(true);
+      requestFn();
+      return true;
+    }
+
+    return false;
+  };
+
+  // 웹 OAuth 로그인
+  const requestWebOAuthLogin = (provider: "kakao" | "naver") => {
+    const config = PROVIDER_CONFIG[provider];
+    console.log(`🌐 ${config.name} 웹 OAuth 로그인 (웹 환경)`);
+
+    const authUrl = new URL(config.authUrl);
+    authUrl.searchParams.set("response_type", "code");
+    authUrl.searchParams.set("client_id", config.clientIdKey);
+    authUrl.searchParams.set("redirect_uri", config.redirectUri);
+
+    // Provider별 추가 파라미터
+    if (provider === "kakao") {
+      // 카카오: 자동 로그인 방지
+      authUrl.searchParams.set("prompt", "login");
+    } else if (provider === "naver") {
+      // 네이버: state 토큰 필요
+      const state = Math.random().toString(36).substring(2, 15);
+      sessionStorage.setItem("naver_state", state);
+      authUrl.searchParams.set("state", state);
+    }
+
+    window.location.href = authUrl.toString();
+  };
+
+  // 소셜 로그인 처리
+  const handleSocialLogin = (provider: SocialProvider) => {
     setError(null);
 
-    if (provider === "kakao") {
-      // 앱에 주입된 함수가 있으면 사용, 없으면 웹뷰 방식으로 폴백
-      if (typeof window.requestKakaoLogin === "function") {
-        setIsSocialLoading(true);
-        window.requestKakaoLogin();
-      } else {
-        // 웹뷰 환경이 아닌 경우 기존 방식으로 폴백
-        const kakaoAuthUrl = new URL("https://kauth.kakao.com/oauth/authorize");
-        kakaoAuthUrl.searchParams.set(
-          "client_id",
-          process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || ""
-        );
-        kakaoAuthUrl.searchParams.set(
-          "redirect_uri",
-          process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || ""
-        );
-        kakaoAuthUrl.searchParams.set("response_type", "code");
-        // prompt=login 추가: 자동 로그인 방지, 항상 로그인 페이지 표시
-        kakaoAuthUrl.searchParams.set("prompt", "login");
+    console.log(`🔐 소셜 로그인 시작: ${provider}`);
+    console.log(`📱 플러터 브리지 확인:`, {
+      kakao: typeof window.requestKakaoLogin,
+      naver: typeof window.requestNaverLogin,
+    });
 
-        console.log("🔐 카카오 인증 페이지로 이동 (자동 로그인 방지)");
-        window.location.href = kakaoAuthUrl.toString();
-      }
-    } else if (provider === "naver") {
-      // 앱에 주입된 함수가 있으면 사용, 없으면 웹뷰 방식으로 폴백
-      if (typeof window.requestNaverLogin === "function") {
-        setIsSocialLoading(true);
-        window.requestNaverLogin();
-      } else {
-        // 웹뷰 환경이 아닌 경우 기존 방식으로 폴백
-        const state = Math.random().toString(36).substring(2, 15);
-        sessionStorage.setItem("naver_state", state);
-
-        const naverAuthUrl = new URL(
-          "https://nid.naver.com/oauth2.0/authorize"
-        );
-        naverAuthUrl.searchParams.set("response_type", "code");
-        naverAuthUrl.searchParams.set(
-          "client_id",
-          process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || ""
-        );
-        naverAuthUrl.searchParams.set(
-          "redirect_uri",
-          process.env.NEXT_PUBLIC_NAVER_REDIRECT_URI || ""
-        );
-        naverAuthUrl.searchParams.set("state", state);
-        window.location.href = naverAuthUrl.toString();
-      }
-    } else if (provider === "apple") {
-      // Apple 로그인 구현 예정
+    if (provider === "apple") {
       console.log("Apple login not implemented yet");
+      return;
+    }
+
+    // 네이티브 앱 로그인 시도, 실패 시 웹 OAuth로 폴백
+    if (!requestNativeLogin(provider)) {
+      requestWebOAuthLogin(provider);
     }
   };
 

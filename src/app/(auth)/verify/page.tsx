@@ -6,6 +6,9 @@ import { PassAuthButton } from "@/domains/auth/ui/signup/PassAuthButton";
 import styles from "./page.module.scss";
 import { usePortOnePass } from "@/features/auth/hooks/usePortOnePass";
 
+// Dynamic rendering 강제 (useSearchParams 사용으로 인해 필요)
+export const dynamic = "force-dynamic";
+
 export default function VerifyPage() {
   const searchParams = useSearchParams();
   const { handleAuth, isLoading, handleRedirectResult } = usePortOnePass();

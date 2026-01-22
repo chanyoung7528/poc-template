@@ -348,17 +348,11 @@ function SignupCompleteContent() {
   );
 }
 
+import { LoadingOverlay } from "@/domains/auth/ui/common/LoadingOverlay";
+
 export default function SignupCompletePage() {
   return (
-    <Suspense
-      fallback={
-        <div className={styles.container}>
-          <div className={styles.content}>
-            <p>로딩 중...</p>
-          </div>
-        </div>
-      }
-    >
+    <Suspense fallback={<LoadingOverlay message="로딩 중..." />}>
       <SignupCompleteContent />
     </Suspense>
   );

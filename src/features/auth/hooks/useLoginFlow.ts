@@ -10,6 +10,11 @@ import {
 
 export type LoginStep = "login" | "find-id" | "reset-password";
 export type SocialProvider = "kakao" | "naver" | "apple";
+export type AuthMode = "login" | "signup";
+
+interface UseLoginFlowProps {
+  mode?: AuthMode; // 'login' 또는 'signup'
+}
 
 interface UseLoginFlowReturn {
   currentStep: LoginStep;
@@ -64,7 +69,8 @@ const PROVIDER_CONFIG = {
   },
 } as const;
 
-export function useLoginFlow(): UseLoginFlowReturn {
+export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
+  const mode = props?.mode || "login"; // 기본값은 'login'
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<LoginStep>("login");
   const [error, setError] = useState<string | null>(null);
@@ -108,6 +114,7 @@ export function useLoginFlow(): UseLoginFlowReturn {
             email: data.email,
             profileImage: data.profileImage,
             cid: data.cid || data.id,
+            mode, // ✅ mode 전달
           });
 
           console.log(`✅ ${providerName} 로그인 API 응답:`, result);
@@ -135,7 +142,7 @@ export function useLoginFlow(): UseLoginFlowReturn {
         }
       };
     },
-    [router]
+    [router, mode] // ✅ mode를 의존성 배열에 추가
   );
 
   // 소셜 로그인 실패 공통 핸들러
@@ -210,22 +217,33 @@ export function useLoginFlow(): UseLoginFlowReturn {
   // 웹 OAuth 로그인
   const requestWebOAuthLogin = (provider: "kakao" | "naver") => {
     const config = PROVIDER_CONFIG[provider];
-    console.log(`🌐 ${config.name} 웹 OAuth 로그인 (웹 환경)`);
+    console.log(`🌐 ${config.name} 웹 OAuth 로그인 (웹 환경), mode: ${mode}`);
 
     const authUrl = new URL(config.authUrl);
     authUrl.searchParams.set("response_type", "code");
     authUrl.searchParams.set("client_id", config.clientIdKey);
     authUrl.searchParams.set("redirect_uri", config.redirectUri);
 
+    // state에 mode 정보 포함
+    const stateData = { mode };
+
     // Provider별 추가 파라미터
     if (provider === "kakao") {
-      // 카카오: 자동 로그인 방지
+      // 카카오: 자동 로그인 방지 + state 추가
       authUrl.searchParams.set("prompt", "login");
+      authUrl.searchParams.set(
+        "state",
+        encodeURIComponent(JSON.stringify(stateData))
+      );
     } else if (provider === "naver") {
-      // 네이버: state 토큰 필요
-      const state = Math.random().toString(36).substring(2, 15);
-      sessionStorage.setItem("naver_state", state);
-      authUrl.searchParams.set("state", state);
+      // 네이버: state에 mode 정보 포함
+      const randomState = Math.random().toString(36).substring(2, 15);
+      const stateWithMode = { ...stateData, naver_state: randomState };
+      sessionStorage.setItem("naver_state", randomState);
+      authUrl.searchParams.set(
+        "state",
+        encodeURIComponent(JSON.stringify(stateWithMode))
+      );
     }
 
     window.location.href = authUrl.toString();

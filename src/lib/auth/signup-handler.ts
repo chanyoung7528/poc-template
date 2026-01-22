@@ -62,7 +62,7 @@ export async function handleSignupFlow(
     }
   }
 
-  // 임시 세션 사용자 생성
+  // 임시 세션 사용자 생성 (소셜 로그인)
   const tempUser: SessionUser = {
     id: `temp-${userInfo.provider}-${userInfo.providerId}`,
     [userInfo.provider === 'kakao' ? 'kakaoId' : 'naverId']:
@@ -72,9 +72,10 @@ export async function handleSignupFlow(
     profileImage: userInfo.profileImage,
     provider: userInfo.provider,
     isTemp: true,
+    signupType: 'social', // 소셜 로그인 명시
   };
 
-  console.log('🆕 신규 회원 - 약관 동의 페이지로 이동:', userInfo.providerId);
+  console.log('🆕 신규 소셜 회원 - 약관 동의 페이지로 이동:', userInfo.providerId);
 
   return {
     success: true,

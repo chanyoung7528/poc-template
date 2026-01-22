@@ -20,9 +20,10 @@ import type { OAuthUserInfo } from "@/lib/auth/types";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, nickname, email, profileImage, cid } = body;
+    const { id, nickname, email, profileImage, cid, mode = "login" } = body; // ✅ mode 파라미터 추가 (기본값: login)
 
     console.log("📱 네이티브 카카오 로그인 API 호출 - body:", body);
+    console.log("🔐 모드:", mode);
 
     if (!id) {
       console.error("❌ 카카오 사용자 ID가 없음");
@@ -88,12 +89,19 @@ export async function POST(request: NextRequest) {
     }
 
     // 로그인 또는 회원가입 플로우 처리
-    console.log(
-      existingUser ? "🔄 로그인 플로우 실행" : "🆕 회원가입 플로우 실행"
-    );
-    const result = existingUser
-      ? await handleLoginFlow(userInfo, existingUser)
-      : await handleSignupFlow(userInfo, existingUser);
+    // mode가 'signup'이면 무조건 회원가입 플로우, 'login'이면 기존 로직 유지
+    let result;
+    if (mode === "signup") {
+      console.log("🆕 회원가입 모드 - 회원가입 플로우 실행");
+      result = await handleSignupFlow(userInfo, existingUser);
+    } else {
+      console.log(
+        existingUser ? "🔄 로그인 플로우 실행" : "🆕 회원가입 플로우 실행"
+      );
+      result = existingUser
+        ? await handleLoginFlow(userInfo, existingUser)
+        : await handleSignupFlow(userInfo, existingUser);
+    }
 
     console.log("플로우 처리 결과:", result);
 

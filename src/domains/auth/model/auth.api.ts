@@ -143,6 +143,7 @@ export async function loginWithKakaoNative(data: {
   email?: string;
   profileImage?: string;
   cid?: string;
+  mode?: "login" | "signup"; // ✅ mode 추가
 }): Promise<{ success: boolean; redirectUrl: string; isNewUser: boolean }> {
   const response = await apiClient.post<{
     success: boolean;
@@ -161,6 +162,7 @@ export async function loginWithNaverNative(data: {
   email?: string;
   profileImage?: string;
   cid?: string;
+  mode?: "login" | "signup"; // ✅ mode 추가
 }): Promise<{ success: boolean; redirectUrl: string; isNewUser: boolean }> {
   const response = await apiClient.post<{
     success: boolean;

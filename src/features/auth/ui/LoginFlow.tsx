@@ -11,7 +11,7 @@ interface LoginFlowProps {
 
 export function LoginFlow({ onNavigateToSignup }: LoginFlowProps) {
   const { handleLogin, handleSocialLogin, isLoading, error, setStep } =
-    useLoginFlow();
+    useLoginFlow({ mode: "login" }); // ✅ 로그인 모드
 
   return (
     <div className={styles.loginFlow}>

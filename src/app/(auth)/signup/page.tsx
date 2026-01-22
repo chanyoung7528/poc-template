@@ -8,7 +8,7 @@ import { useLoginFlow } from "@/features/auth/hooks/useLoginFlow";
 import { useAuthStore } from "@/store/authStore";
 
 export default function SignupPage() {
-  const { handleSocialLogin } = useLoginFlow();
+  const { handleSocialLogin } = useLoginFlow({ mode: "signup" }); // ✅ 회원가입 모드
   const router = useRouter();
 
   // Zustand Store 사용

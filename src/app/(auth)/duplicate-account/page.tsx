@@ -1,37 +1,38 @@
-'use client';
+"use client";
 
-import { Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Button } from '@/shared/ui/Button';
-import styles from './page.module.scss';
+import { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/shared/ui/Button";
+import { LoadingOverlay } from "@/domains/auth/ui/common/LoadingOverlay";
+import styles from "./page.module.scss";
 
 function DuplicateAccountContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   // URL 파라미터에서 정보 가져오기 (서버에서 리다이렉트할 때 전달됨)
-  const provider = searchParams.get('provider') || '';
-  const phone = searchParams.get('phone') || '';
+  const provider = searchParams.get("provider") || "";
+  const phone = searchParams.get("phone") || "";
 
   const getProviderName = (provider: string) => {
     switch (provider) {
-      case 'kakao':
-        return '카카오';
-      case 'naver':
-        return '네이버';
-      case 'wellness':
-        return '일반 회원가입';
+      case "kakao":
+        return "카카오";
+      case "naver":
+        return "네이버";
+      case "wellness":
+        return "일반 회원가입";
       default:
         return provider;
     }
   };
 
   const handleGoToLogin = () => {
-    router.push('/login');
+    router.push("/login");
   };
 
   const handleGoToSignup = () => {
-    router.push('/signup');
+    router.push("/signup");
   };
 
   // URL 파라미터가 없으면 에러 (서버에서 리다이렉트되지 않은 경우)
@@ -78,20 +79,10 @@ function DuplicateAccountContent() {
         </p>
 
         <div className={styles.buttonGroup}>
-          <Button
-            variant="primary"
-            size="large"
-            onClick={handleGoToLogin}
-            className={styles.button}
-          >
+          <Button onClick={handleGoToLogin} className={styles.button}>
             로그인하기
           </Button>
-          <Button
-            variant="secondary"
-            size="large"
-            onClick={handleGoToSignup}
-            className={styles.button}
-          >
+          <Button onClick={handleGoToSignup} className={styles.button}>
             다시 가입하기
           </Button>
         </div>
@@ -102,7 +93,7 @@ function DuplicateAccountContent() {
 
 export default function DuplicateAccountPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingOverlay message="로딩 중..." />}>
       <DuplicateAccountContent />
     </Suspense>
   );

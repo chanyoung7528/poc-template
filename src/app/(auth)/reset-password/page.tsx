@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useResetPasswordFlow } from '@/features/auth/hooks/useResetPasswordFlow';
-import { validatePassword } from '@/domains/auth/model/auth.utils';
-import { Button } from '@/shared/ui/Button';
-import { Input } from '@/shared/ui/Input';
-import styles from './page.module.scss';
+import { useState } from "react";
+import { useResetPasswordFlow } from "@/features/auth/hooks/useResetPasswordFlow";
+import { validatePassword } from "@/domains/auth/model/auth.utils";
+import { Button } from "@/shared/ui/Button";
+import { Input } from "@/shared/ui/Input";
+import styles from "./page.module.scss";
 
 export default function ResetPasswordPage() {
   const {
@@ -19,10 +19,10 @@ export default function ResetPasswordPage() {
     handleResetPassword,
   } = useResetPasswordFlow();
 
-  const [localEmail, setLocalEmail] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [localEmail, setLocalEmail] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleSendCodeClick = async () => {
     try {
@@ -61,7 +61,7 @@ export default function ResetPasswordPage() {
 
   const renderContent = () => {
     switch (currentStep) {
-      case 'verify':
+      case "verify":
         return (
           <div className={styles.content}>
             <h1 className={styles.title}>비밀번호 재설정</h1>
@@ -78,12 +78,8 @@ export default function ResetPasswordPage() {
               required
             />
 
-            <Button
-              onClick={handleSendCodeClick}
-              disabled={isLoading}
-              fullWidth
-            >
-              {isLoading ? '발송 중...' : '인증 코드 발송'}
+            <Button onClick={handleSendCodeClick} disabled={isLoading}>
+              {isLoading ? "발송 중..." : "인증 코드 발송"}
             </Button>
 
             {email && (
@@ -98,19 +94,15 @@ export default function ResetPasswordPage() {
                   required
                 />
 
-                <Button
-                  onClick={handleVerifyCodeClick}
-                  disabled={isLoading}
-                  fullWidth
-                >
-                  {isLoading ? '인증 중...' : '인증 확인'}
+                <Button onClick={handleVerifyCodeClick} disabled={isLoading}>
+                  {isLoading ? "인증 중..." : "인증 확인"}
                 </Button>
               </>
             )}
           </div>
         );
 
-      case 'reset':
+      case "reset":
         return (
           <div className={styles.content}>
             <h1 className={styles.title}>새 비밀번호 설정</h1>
@@ -134,13 +126,13 @@ export default function ResetPasswordPage() {
               required
             />
 
-            <Button onClick={handleResetClick} disabled={isLoading} fullWidth>
-              {isLoading ? '재설정 중...' : '비밀번호 재설정'}
+            <Button onClick={handleResetClick} disabled={isLoading}>
+              {isLoading ? "재설정 중..." : "비밀번호 재설정"}
             </Button>
           </div>
         );
 
-      case 'complete':
+      case "complete":
         return (
           <div className={styles.completeContent}>
             <svg

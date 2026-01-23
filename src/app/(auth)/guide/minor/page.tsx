@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { Button } from '@/shared/ui/Button';
-import styles from './page.module.scss';
+import { useRouter } from "next/navigation";
+import { Button } from "@/shared/ui/Button";
+import styles from "./page.module.scss";
 
 export default function MinorGuidePage() {
   const router = useRouter();
@@ -17,8 +17,6 @@ export default function MinorGuidePage() {
             fill="none"
             stroke="currentColor"
           >
-
-            
             <circle cx="12" cy="12" r="10" strokeWidth="2" />
             <line
               x1="12"
@@ -66,9 +64,7 @@ export default function MinorGuidePage() {
           </div>
         </div>
 
-        <Button onClick={() => router.push('/')} fullWidth>
-          홈으로 돌아가기
-        </Button>
+        <Button onClick={() => router.push("/")}>홈으로 돌아가기</Button>
       </div>
     </div>
   );

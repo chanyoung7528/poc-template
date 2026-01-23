@@ -1,7 +1,12 @@
-import { CACHE_CONFIG } from '@core/config';
-import { dehydrate, type FetchQueryOptions, HydrationBoundary, QueryClient } from '@tanstack/react-query';
-import type { ReactNode } from 'react';
-import { cache } from 'react';
+import { CACHE_CONFIG } from "@/core/config/constants";
+import {
+  dehydrate,
+  type FetchQueryOptions,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import type { ReactNode } from "react";
+import { cache } from "react";
 
 /**
  * Server Component QueryClient (요청당 캐시)
@@ -29,21 +34,32 @@ interface PrefetchBoundaryProps {
  * Server Prefetch Boundary
  * 서버에서 데이터를 prefetch하고 클라이언트로 hydrate
  */
-export async function PrefetchBoundary({ children, queryOptions }: PrefetchBoundaryProps) {
+export async function PrefetchBoundary({
+  children,
+  queryOptions,
+}: PrefetchBoundaryProps) {
   const queryClient = getQueryClient();
 
   if (queryOptions) {
     const options = Array.isArray(queryOptions) ? queryOptions : [queryOptions];
-    await Promise.all(options.map(option => queryClient.prefetchQuery(option)));
+    await Promise.all(
+      options.map((option) => queryClient.prefetchQuery(option))
+    );
   }
 
-  return <HydrationBoundary state={dehydrate(queryClient)}>{children}</HydrationBoundary>;
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      {children}
+    </HydrationBoundary>
+  );
 }
 
 /**
  * Server Query Fetcher
  */
-export async function serverQuery<TData>(queryOptions: AnyQueryOptions): Promise<TData> {
+export async function serverQuery<TData>(
+  queryOptions: AnyQueryOptions
+): Promise<TData> {
   const queryClient = getQueryClient();
   return queryClient.fetchQuery(queryOptions);
 }

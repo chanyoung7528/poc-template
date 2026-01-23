@@ -1,66 +1,25 @@
 .button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
+  color: var(--base);
+  border-radius: 52px;
+  line-height: 24px;
+  font-size: 16px;
+}
 
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+.default {
+  background-color: #ff6400;
+  color: #ffffff;
+}
 
-  &.primary {
-    background-color: #1f2937;
-    color: white;
+.secondary {
+  background-color: #dde2ce;
+  color: #003223;
+}
 
-    &:hover:not(:disabled) {
-      background-color: #374151;
-    }
-  }
+.full {
+  width: 100%;
+}
 
-  &.secondary {
-    background-color: #f3f4f6;
-    color: #1f2937;
-
-    &:hover:not(:disabled) {
-      background-color: #e5e7eb;
-    }
-  }
-
-  &.outline {
-    background-color: transparent;
-    color: #1f2937;
-    border: 1px solid #d1d5db;
-  }
-
-  &.danger {
-    background-color: #dc2626;
-    color: white;
-
-    &:hover:not(:disabled) {
-      background-color: #b91c1c;
-    }
-  }
-
-  &.small {
-    padding: 0.5rem 1rem;
-    font-size: 0.75rem;
-  }
-
-  &.large {
-    padding: 1rem 2rem;
-    font-size: 1rem;
-  }
-
-  &.fullWidth {
-    width: 100%;
-  }
+.button:disabled {
+  background-color: rgba(221, 226, 206, 1);
+  color: #ffffff;
 }

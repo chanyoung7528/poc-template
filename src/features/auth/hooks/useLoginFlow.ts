@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import type { Route } from "next";
 import {
   useLogin,
   useKakaoNativeLogin,
@@ -123,7 +124,8 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
           console.log("🍪 현재 브라우저 쿠키:", document.cookie);
 
           // 서버에서 반환한 redirectUrl로 이동
-          router.push(result.redirectUrl || "/");
+          const redirectPath = (result.redirectUrl || "/") as Route;
+          router.push(redirectPath);
         } catch (err: any) {
           console.error(`❌ ${providerName} 로그인 처리 실패:`, {
             error: err,

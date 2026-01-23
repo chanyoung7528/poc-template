@@ -1,0 +1,93 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background-color: #f7f5f1;
+}
+
+.header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--header-height);
+  padding: 0 1.6rem;
+  padding-top: 50px;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  margin-left: -0.8rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray100);
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--brand60);
+  }
+
+  &:active {
+    color: var(--brand80);
+  }
+}
+
+.title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--gray100);
+}
+
+.progressBar {
+  position: relative;
+  width: calc(100% - 4rem); // 양측 20px(2rem) 간격
+  height: 0.8rem;
+  margin: 1rem 2rem 0; // top 10px, 좌우 20px
+  background-color: #ffffff;
+  border-radius: 3rem; // 30px
+  overflow: hidden;
+}
+
+.progressFill {
+  position: relative;
+  height: 100%;
+  background: linear-gradient(123.52deg, #e3c018 19.92%, #809504 100%);
+  border-radius: 2rem; // 20px
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(227, 192, 24, 0.3);
+  min-width: 5.8rem; // 한 칸 최소 크기
+}
+
+.progressGlow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.6rem;
+  overflow-y: auto;
+}

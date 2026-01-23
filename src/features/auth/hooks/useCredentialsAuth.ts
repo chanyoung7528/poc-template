@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import type { Route } from "next";
 import { useVerifyCertification } from "@/domains/auth/model/auth.queries";
 
 interface SessionData {
@@ -99,15 +100,15 @@ export function useCredentialsAuth(): UseCredentialsAuthReturn {
 
         // 이미 가입된 사용자
         if (certResult.status === "EXISTING") {
-          router.push(
-            `/auth/result?maskedId=${certResult.user?.maskedId}&provider=${certResult.user?.provider}`
-          );
+          const resultPath =
+            `/auth/result?maskedId=${certResult.user?.maskedId}&provider=${certResult.user?.provider}` as Route;
+          router.push(resultPath);
           return;
         }
 
         // 14세 미만
         if (certResult.status === "UNDER_14") {
-          router.push("/auth/guide/minor");
+          router.push("/auth/guide/minor" as Route);
           return;
         }
 
@@ -140,7 +141,11 @@ export function useCredentialsAuth(): UseCredentialsAuthReturn {
       console.log("✅ 본인인증 완료 응답:", data);
 
       // 중복 전화번호 등의 에러 처리
-      if (!data.success && data.error === "duplicate_phone" && data.redirectUrl) {
+      if (
+        !data.success &&
+        data.error === "duplicate_phone" &&
+        data.redirectUrl
+      ) {
         console.log("⚠️ 중복 전화번호 - 중복 계정 페이지로 이동");
         router.push(data.redirectUrl);
         return;
@@ -157,7 +162,8 @@ export function useCredentialsAuth(): UseCredentialsAuthReturn {
       if (data.signupType === "wellness" && data.redirectUrl) {
         console.log("✅ 웰니스 회원가입 - 아이디/비밀번호 입력 페이지로 이동");
         // verified=true 플래그를 URL에 추가하여 직접 폼 표시
-        router.push(`${data.redirectUrl}?verified=true`);
+        const credentialsPath = `${data.redirectUrl}?verified=true` as Route;
+        router.push(credentialsPath);
         return;
       }
 
@@ -221,4 +227,3 @@ export function useCredentialsAuth(): UseCredentialsAuthReturn {
     hasProcessed,
   };
 }
-

@@ -179,7 +179,7 @@ function SignupCompleteContent() {
         yoyo: true,
         repeat: 1,
         onComplete: () => {
-          router.push("/main");
+          router.push("/onboarding/group");
         },
       });
     } else {
@@ -319,7 +319,6 @@ function SignupCompleteContent() {
         <div ref={actionsRef} className={styles.actions}>
           <Button
             onClick={handleGroupMatching}
-            fullWidth
             className={styles.primaryButton}
           >
             소속 그룹 매칭하기

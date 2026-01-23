@@ -1,0 +1,140 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.matchingContent {
+  flex: 1;
+}
+
+.header {
+  margin-bottom: 3.2rem;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-family: "SUITE";
+  font-weight: 700;
+  line-height: 3rem;
+  color: #111111;
+  margin-bottom: 1.8rem;
+}
+.subTitle {
+  font-family: "SUITE";
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 2rem;
+  color: #5f646f;
+  margin-bottom: 0.8rem;
+}
+
+.description {
+  font-size: 1.4rem;
+  color: #589e3a;
+  line-height: 2rem;
+  font-weight: 600;
+}
+
+.optionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+  margin-bottom: 2.4rem;
+  flex: 1;
+}
+
+.optionCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  padding: 2.4rem 1.6rem;
+  background-color: var(--base-white);
+  border: 2px solid var(--gray30);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: var(--brand60);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(43, 179, 191, 0.15);
+  }
+
+  &.active {
+    background-color: var(--brand10);
+    border-color: var(--brand60);
+    box-shadow: 0 4px 12px rgba(43, 179, 191, 0.2);
+  }
+}
+
+.icon {
+  font-size: 3.2rem;
+  line-height: 1;
+}
+
+.label {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gray100);
+}
+
+.buttonGroup {
+  padding-bottom: 50px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 700;
+  font-style: Bold;
+  font-size: 1.6rem;
+  line-height: 2.4rem;
+  letter-spacing: 0px;
+  border: none;
+  gap: 1rem;
+
+  button {
+    padding: 1.2rem;
+    will-change: transform, opacity; // 렌더링 최적화
+  }
+}
+
+.skipButton {
+  font-size: 1.4rem;
+  color: #003223;
+  background: #fff;
+  overflow: hidden;
+  will-change: height, opacity, margin, padding; // 렌더링 최적화
+}
+
+.buttonGroupTitle {
+  font-weight: 600;
+  font-size: 1.2rem;
+  line-height: 1;
+  text-align: center;
+  color: #2f403b;
+  margin-bottom: 1.8rem;
+  overflow: hidden;
+  will-change: height, opacity, margin; // 렌더링 최적화
+}
+
+.header {
+  margin-bottom: 3.2rem;
+  will-change: transform, opacity; // 렌더링 최적화
+}
+
+.matchingContent {
+  flex: 1;
+  will-change: transform, opacity; // 렌더링 최적화
+  height: 100%;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 2rem;
+  right: 2rem;
+  will-change: transform, opacity; // 렌더링 최적화
+}

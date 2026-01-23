@@ -1,0 +1,38 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: var(--height-header);
+  padding-inline: 2.4rem;
+  background-color: var(--white);
+
+  .left,
+  .right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.4rem;
+  }
+
+  .center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding-inline: 1.6rem;
+
+    .title {
+      color: var(--gray100);
+      font-size: 1.6rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}

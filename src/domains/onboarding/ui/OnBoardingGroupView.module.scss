@@ -1,9 +1,9 @@
 .container {
+  margin-top: 10rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin-top: 10.7rem;
+  height: 100dvh;
 }
 
 .subtitle {
@@ -22,5 +22,5 @@
   line-height: 3rem;
   letter-spacing: -0.5px;
   color: rgba(17, 17, 17, 1);
-  margin-bottom: 2.9rem;
+  margin-bottom: 12.8rem;
 }

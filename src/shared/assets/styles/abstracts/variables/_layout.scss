@@ -6,9 +6,9 @@
   --sal: env(safe-area-inset-left, 0);
 
   /* Layout Tokens */
-  --header-height: 4.8rem;
+  --height-header: 4.8rem;
   --gnb-height: 5.9rem;
-  --content-height: calc(100dvh - var(--header-height));
+  --content-height: calc(100dvh - var(--height-header));
 
   /* Border Radius */
   --radius-xl: 1rem;

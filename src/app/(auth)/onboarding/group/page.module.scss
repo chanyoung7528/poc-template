@@ -1,17 +1,10 @@
-.container {
+.content {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
 }
-
-.matchingContent {
-  flex: 1;
-}
-
-.header {
-  margin-bottom: 3.2rem;
-}
-
 .title {
   font-size: 2.2rem;
   font-family: "SUITE";
@@ -20,121 +13,86 @@
   color: #111111;
   margin-bottom: 1.8rem;
 }
-.subTitle {
-  font-family: "SUITE";
-  font-size: 1.4rem;
-  font-weight: 700;
-  line-height: 2rem;
-  color: #5f646f;
-  margin-bottom: 0.8rem;
-}
 
-.description {
+.subTitle {
   font-size: 1.4rem;
   color: #589e3a;
   line-height: 2rem;
   font-weight: 600;
 }
 
-.optionGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.2rem;
-  margin-bottom: 2.4rem;
-  flex: 1;
-}
-
-.optionCard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.2rem;
-  padding: 2.4rem 1.6rem;
-  background-color: var(--base-white);
-  border: 2px solid var(--gray30);
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    border-color: var(--brand60);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(43, 179, 191, 0.15);
-  }
-
-  &.active {
-    background-color: var(--brand10);
-    border-color: var(--brand60);
-    box-shadow: 0 4px 12px rgba(43, 179, 191, 0.2);
-  }
-}
-
-.icon {
-  font-size: 3.2rem;
-  line-height: 1;
-}
-
-.label {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--gray100);
-}
-
-.buttonGroup {
-  padding-bottom: 50px;
+.line {
+  border-bottom: 1px solid rgba(226, 229, 217, 1);
   width: 100%;
+  height: 1px;
+}
+
+.groupItemLists {
+  width: 100%;
+  margin-top: 2rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  font-weight: 700;
-  font-style: Bold;
-  font-size: 1.6rem;
-  line-height: 2.4rem;
-  letter-spacing: 0px;
-  border: none;
-  gap: 1rem;
+  gap: 1.2rem;
+}
 
-  button {
-    padding: 1.2rem;
-    will-change: transform, opacity; // 렌더링 최적화
+.groupItemList {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.groupItem {
+  display: flex;
+  gap: 1.2rem;
+  img {
+    width: 4.8rem;
+    height: 4.8rem;
+    border-radius: 50%;
+    object-fit: cover;
   }
 }
 
-.skipButton {
-  font-size: 1.4rem;
-  color: #003223;
-  background: #fff;
-  overflow: hidden;
-  will-change: height, opacity, margin, padding; // 렌더링 최적화
+.groupItemTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  p {
+    font-weight: 600;
+    font-size: 1.2rem;
+    line-height: 1.6rem;
+    letter-spacing: 0px;
+    color: rgba(95, 100, 111, 1);
+  }
+  h2 {
+    font-weight: 600;
+    font-size: 1.7rem;
+    line-height: 2.4rem;
+    letter-spacing: 0px;
+    color: rgba(34, 34, 34, 1);
+  }
 }
 
-.buttonGroupTitle {
+.groupItemStatus {
   font-weight: 600;
   font-size: 1.2rem;
-  line-height: 1;
-  text-align: center;
-  color: #2f403b;
-  margin-bottom: 1.8rem;
-  overflow: hidden;
-  will-change: height, opacity, margin; // 렌더링 최적화
-}
-
-.header {
-  margin-bottom: 3.2rem;
-  will-change: transform, opacity; // 렌더링 최적화
-}
-
-.matchingContent {
-  flex: 1;
-  will-change: transform, opacity; // 렌더링 최적화
-  height: 100%;
+  line-height: 1.6rem;
+  letter-spacing: 0px;
+  color: rgba(4, 121, 10, 1);
+  background-color: rgba(235, 242, 215, 1);
+  padding: 0.2rem 0.8rem 0.1rem 0.8rem;
+  border-radius: 0.8rem;
 }
 
 .footer {
   position: fixed;
-  bottom: 0;
+  bottom: 2rem;
   left: 2rem;
   right: 2rem;
-  will-change: transform, opacity; // 렌더링 최적화
+}
+
+.button {
+  padding: 1.2rem;
+  font-weight: 700;
+  width: 100%;
 }

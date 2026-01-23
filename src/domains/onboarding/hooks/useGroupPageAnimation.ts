@@ -1,5 +1,5 @@
-import { gsap } from 'gsap';
-import { useEffect, useRef } from 'react';
+import { gsap } from "gsap";
+import { useEffect, useRef } from "react";
 
 interface UseGroupPageAnimationProps {
   isMatching: boolean;
@@ -12,15 +12,19 @@ interface UseGroupPageAnimationProps {
  * 1. 페이지 진입 시 헤더와 footer 애니메이션
  * 2. 매칭 시작 시 버튼 이동 애니메이션
  */
-export function useGroupPageAnimation({ isMatching }: UseGroupPageAnimationProps) {
+export function useGroupPageAnimation({
+  isMatching,
+}: UseGroupPageAnimationProps) {
   const headerRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
   const skipButtonRef = useRef<HTMLButtonElement>(null);
   const buttonGroupTitleRef = useRef<HTMLParagraphElement>(null);
   const matchingContentRef = useRef<HTMLDivElement>(null);
+  const searchImageRef = useRef<HTMLImageElement>(null);
 
   // 페이지 진입 애니메이션
   useEffect(() => {
+    console.log("isMatching", matchingContentRef.current);
     const ctx = gsap.context(() => {
       const tl = gsap.timeline();
 
@@ -36,7 +40,7 @@ export function useGroupPageAnimation({ isMatching }: UseGroupPageAnimationProps
             y: 0,
             opacity: 1,
             duration: 0.5,
-            ease: 'power2.out',
+            ease: "power2.out",
           },
           0
         );
@@ -54,7 +58,7 @@ export function useGroupPageAnimation({ isMatching }: UseGroupPageAnimationProps
             y: 0,
             opacity: 1,
             duration: 0.6,
-            ease: 'power2.out',
+            ease: "power2.out",
           },
           0.2
         );
@@ -71,7 +75,7 @@ export function useGroupPageAnimation({ isMatching }: UseGroupPageAnimationProps
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         defaults: {
-          ease: 'power2.out',
+          ease: "power2.out",
         },
       });
 
@@ -112,28 +116,22 @@ export function useGroupPageAnimation({ isMatching }: UseGroupPageAnimationProps
             paddingTop: 0,
             paddingBottom: 0,
             duration: 0.45,
-            ease: 'power3.inOut',
+            ease: "power3.inOut",
           },
           0.1
         );
       }
 
-      // 3. 매칭 컨텐츠 페이드인 (살짝 딜레이)
-      if (matchingContentRef.current) {
-        tl.fromTo(
-          matchingContentRef.current,
-          {
-            opacity: 0,
-            y: 30,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.5,
-            ease: 'power2.out',
-          },
-          0.35
-        );
+      // 3. 검색 이미지 좌우 흔들림 애니메이션 (무한 반복)
+      if (searchImageRef.current) {
+        gsap.to(searchImageRef.current, {
+          x: -15,
+          duration: 0.8,
+          ease: "sine.inOut",
+          repeat: -1,
+          yoyo: true,
+          delay: 0.5,
+        });
       }
     });
 
@@ -146,5 +144,6 @@ export function useGroupPageAnimation({ isMatching }: UseGroupPageAnimationProps
     skipButtonRef,
     buttonGroupTitleRef,
     matchingContentRef,
+    searchImageRef,
   };
 }

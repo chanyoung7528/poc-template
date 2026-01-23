@@ -42,7 +42,6 @@ let nextConfig: NextConfig = {
   // React & Type Safety
   reactStrictMode: true,
   reactCompiler: true,
-  typedRoutes: true,
 
   // Experimental
   experimental: {

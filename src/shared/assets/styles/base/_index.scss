@@ -1,3 +1,25 @@
-@forward 'preflight';
-@forward 'normalize';
-@forward 'mobile';
+@forward "preflight";
+@forward "normalize";
+@forward "mobile";
+
+.icon {
+  --size-sm: 1.6rem;
+  --size-md: 2.4rem;
+  --size-lg: 3.2rem;
+  --size: var(--size-md);
+
+  display: inline-block;
+  width: var(--size);
+  height: var(--size);
+  flex-shrink: 0;
+  vertical-align: middle;
+
+  &.size-sm {
+    width: var(--size-sm);
+    height: var(--size-sm);
+  }
+  &.size-lg {
+    width: var(--size-lg);
+    height: var(--size-lg);
+  }
+}

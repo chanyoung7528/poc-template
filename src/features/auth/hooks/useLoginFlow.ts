@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { Route } from "next";
 import {
-  useLogin,
   useKakaoNativeLogin,
   useNaverNativeLogin,
 } from "@/domains/auth/model/auth.queries";
@@ -77,15 +76,16 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
   const [error, setError] = useState<string | null>(null);
   const [isSocialLoading, setIsSocialLoading] = useState(false);
 
-  const loginMutation = useLogin();
+  const loginMutation = { isPending: false }; // @deprecated
   const kakaoNativeLoginMutation = useKakaoNativeLogin();
   const naverNativeLoginMutation = useNaverNativeLogin();
 
-  // 일반 로그인 처리
+  // 일반 로그인 처리 (@deprecated - useGeneralLoginFlow 사용 권장)
   const handleLogin = async (email: string, password: string) => {
     try {
       setError(null);
-      await loginMutation.mutateAsync({ email, password });
+      console.warn('useLoginFlow.handleLogin is deprecated. Use useGeneralLoginFlow instead.');
+      // 기존 로그인 로직은 useGeneralLoginFlow로 이동
       router.push("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "로그인에 실패했습니다");

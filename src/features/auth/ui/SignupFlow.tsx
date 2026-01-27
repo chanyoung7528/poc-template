@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { TermsAgreement } from '@/domains/auth/ui/terms-agreement/TermsAgreement';
-import { SignupStepper } from '../components/SignupStepper';
+import { SignupStepper } from '@/domains/auth/ui/signup/SignupStepper';
 import { useSignupFlow } from '../hooks/useSignupFlow';
 import {
   validatePassword,
@@ -56,7 +56,7 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
 
   const handleVerifyCodeClick = async () => {
     try {
-      await handleVerifyCode(verificationCode);
+      await handleVerifyCode(email, verificationCode);
     } catch (err) {
       console.error(err);
     }
@@ -92,7 +92,7 @@ export function SignupFlow({ onNavigateToLogin }: SignupFlowProps) {
         return (
           <TermsAgreement
             onAgree={(agreed) => {
-              handleTermsAgree(agreed);
+              handleTermsAgree?.(); // ✅ optional chaining
               if (!agreed.terms || !agreed.privacy) {
                 setShowTermsError(true);
               } else {

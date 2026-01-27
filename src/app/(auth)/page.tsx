@@ -7,7 +7,7 @@ import {
 } from "@/domains/auth/ui";
 import styles from "./page.module.scss";
 import { useRouter } from "next/navigation";
-import { useAuthAnimation } from "@/features/auth/hooks/useAuthAnimation";
+import { useAuthAnimation } from "@/shared/hooks/animations";
 
 export default function AuthPage() {
   const router = useRouter();

@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { LoadingOverlay } from "@/domains/auth/ui/common/LoadingOverlay";
-import { useSignupCompleteAnimation } from "@/features/auth/hooks/useSignupCompleteAnimation";
+import { useSignupCompleteAnimation } from "@/shared/hooks/animations";
 import { useSignupCompleteFlow } from "@/features/auth/hooks/useSignupCompleteFlow";
 import { useGroupMatching } from "@/features/auth/hooks/useGroupMatching";
 import { SignupCompleteView } from "@/features/auth/ui/SignupCompleteView";

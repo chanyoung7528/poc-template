@@ -1,130 +1,68 @@
-'use client';
+/**
+ * @deprecated 회원가입 플로우
+ * 
+ * 신규 인증 시스템에서는 useGeneralSignupFlow 또는 useSnsAuthFlow를 사용합니다.
+ */
+
+"use client";
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  useSignup,
-  useSendVerificationCode,
-  useVerifyCode,
-} from '@/domains/auth/model/auth.queries';
-import type { SignupData } from '@/domains/auth/model/auth.types';
 
-export type SignupStep = 'terms' | 'verify' | 'form' | 'complete';
-export type UserStatus = 'new' | 'existing' | 'minor';
+export type SignupStep = 'form' | 'verify' | 'complete' | 'terms';
 
 interface UseSignupFlowReturn {
   currentStep: SignupStep;
-  userStatus: UserStatus | null;
   isLoading: boolean;
   error: string | null;
   email: string;
   setEmail: (email: string) => void;
   setStep: (step: SignupStep) => void;
-  handleTermsAgree: (agreed: {
-    terms: boolean;
-    privacy: boolean;
-    marketing: boolean;
-  }) => void;
+  handleSignup: (data: any) => Promise<void>;
   handleSendCode: (email: string) => Promise<void>;
-  handleVerifyCode: (code: string) => Promise<void>;
-  handleSignup: (
-    data: Omit<SignupData, 'termsAgreed' | 'privacyAgreed'>
-  ) => Promise<void>;
+  handleVerifyCode: (email: string, code: string) => Promise<void>;
+  handleTermsAgree?: () => Promise<void>;
 }
 
+/**
+ * @deprecated 
+ * 신규 인증 시스템:
+ * - 일반 회원가입: useGeneralSignupFlow
+ * - SNS 회원가입: useSnsAuthFlow
+ */
 export function useSignupFlow(): UseSignupFlowReturn {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState<SignupStep>('terms');
-  const [userStatus, setUserStatus] = useState<UserStatus | null>(null);
+  const [currentStep, setCurrentStep] = useState<SignupStep>('form');
   const [email, setEmail] = useState('');
-  const [termsAgreed, setTermsAgreed] = useState({
-    terms: false,
-    privacy: false,
-    marketing: false,
-  });
   const [error, setError] = useState<string | null>(null);
 
-  const signupMutation = useSignup();
-  const sendCodeMutation = useSendVerificationCode();
-  const verifyCodeMutation = useVerifyCode();
-
-  const handleTermsAgree = (agreed: {
-    terms: boolean;
-    privacy: boolean;
-    marketing: boolean;
-  }) => {
-    setTermsAgreed(agreed);
-    if (agreed.terms && agreed.privacy) {
-      setCurrentStep('verify');
-    }
+  const handleSignup = async (data: any) => {
+    console.warn('useSignupFlow is deprecated. Use useGeneralSignupFlow or useSnsAuthFlow.');
   };
 
   const handleSendCode = async (emailValue: string) => {
-    try {
-      setError(null);
-      setEmail(emailValue);
-      await sendCodeMutation.mutateAsync(emailValue);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : '인증 코드 발송에 실패했습니다'
-      );
-      throw err;
-    }
+    console.warn('useSignupFlow is deprecated.');
+    setEmail(emailValue);
   };
 
-  const handleVerifyCode = async (code: string) => {
-    try {
-      setError(null);
-      await verifyCodeMutation.mutateAsync({ email, code });
-
-      // 실제로는 서버에서 사용자 상태를 받아와야 함
-      // 여기서는 임시로 신규 사용자로 설정
-      setUserStatus('new');
-      setCurrentStep('form');
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : '인증 코드 검증에 실패했습니다'
-      );
-      throw err;
-    }
+  const handleVerifyCode = async (emailValue: string, code: string) => {
+    console.warn('useSignupFlow is deprecated.');
   };
 
-  const handleSignup = async (
-    data: Omit<SignupData, 'termsAgreed' | 'privacyAgreed'>
-  ) => {
-    try {
-      setError(null);
-      await signupMutation.mutateAsync({
-        ...data,
-        termsAgreed: termsAgreed.terms,
-        privacyAgreed: termsAgreed.privacy,
-      });
-      setCurrentStep('complete');
-
-      // 2초 후 메인 페이지로 이동
-      setTimeout(() => {
-        router.push('/');
-      }, 2000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '회원가입에 실패했습니다');
-      throw err;
-    }
+  const handleTermsAgree = async () => {
+    console.warn('useSignupFlow is deprecated.');
   };
 
   return {
     currentStep,
-    userStatus,
-    isLoading:
-      signupMutation.isPending ||
-      sendCodeMutation.isPending ||
-      verifyCodeMutation.isPending,
+    isLoading: false,
     error,
     email,
     setEmail,
     setStep: setCurrentStep,
-    handleTermsAgree,
+    handleSignup,
     handleSendCode,
     handleVerifyCode,
-    handleSignup,
+    handleTermsAgree,
   };
 }

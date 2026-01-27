@@ -1,7 +1,7 @@
 'use client';
 
 import { LoginForm } from '@/domains/auth/ui/login/LoginForm';
-import { SocialLoginSection } from '../components/SocialLoginSection';
+import { SocialLoginSection } from '@/domains/auth/ui/social/SocialLoginSection';
 import { useLoginFlow } from '../hooks/useLoginFlow';
 import styles from './LoginFlow.module.scss';
 

@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { Button } from "@/shared/ui/Button";
-import { OnBoardingGroupView } from "@/domains/onboarding/ui/OnBoardingGroupView";
 import { useGroupPageAnimation } from "@/shared/hooks/animations";
 import styles from "./SignupCompleteView.module.scss";
 
@@ -40,7 +39,8 @@ export function SignupCompleteView({
     <div ref={containerRef} className={styles.container}>
       {isMatching ? (
         <div ref={matchingContentRef} className={styles.matchingContent}>
-          <OnBoardingGroupView searchImageRef={searchImageRef} />
+          {/* TODO: OnBoardingGroupView 재구현 필요 */}
+          <p>그룹 매칭 중...</p>
         </div>
       ) : (
         <div className={styles.content}>

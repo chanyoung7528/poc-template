@@ -1,288 +1,274 @@
-# POC Template - Next.js 실무 프로젝트
+# POC Template - 엔터프라이즈급 Next.js 프로젝트
 
-> **FSD + DDD 아키텍처 기반 엔터프라이즈급 Next.js 애플리케이션**
+> **FSD + DDD 아키텍처 | 시니어 10년+ 경험 기반 실무 검증 구조**
 
 ---
 
 ## 🚀 Quick Start
 
 ```bash
-# 의존성 설치
 pnpm install
-
-# 개발 서버 실행
 pnpm dev
-
-# 프로덕션 빌드
-pnpm build
 ```
 
 ---
 
-## 📁 프로젝트 구조
+## 📁 핵심 구조 (5초 이해)
+
+```
+app/ ────────── Page (라우팅만)
+  ↓
+widgets/ ────── Widget (Feature 조립)
+  ↓
+features/ ───── Feature (비즈니스 로직 + 플로우)
+  ↓
+domains/ ────── Domain (순수 데이터 + 재사용 UI)
+  ↓
+shared/ ─────── Shared (범용)
+  ↓
+core/ ───────── Core (인프라)
+```
+
+### 의존성 방향 (철칙)
+
+```
+✅ 상위 → 하위 참조 가능
+❌ 하위 → 상위 참조 금지
+
+❌ domains → features 금지
+❌ domains → widgets 금지
+❌ features → widgets 금지
+❌ shared → domains 금지
+```
+
+---
+
+## 🎯 Domains vs Features (명확한 구분)
+
+### Domain = "무엇" (What)
+
+```typescript
+// ✅ 비즈니스 사실 (Fact)
+const result = await checkUserStatus(id);
+// { status: 'NEW_USER', verificationToken: '...' }
+
+// ❌ 판단/분기 금지
+if (result.isNewUser) router.push('/signup') // Feature 영역
+```
+
+**특징:**
+- 비즈니스 엔티티 (User, Auth, Product)
+- 재사용 가능
+- 라우팅 금지
+- 순수 데이터
+
+### Feature = "어떻게" (How)
+
+```typescript
+// ✅ 비즈니스 정책 (Decision)
+const result = await checkStatus.mutateAsync(id);
+
+if (result.status === 'NEW_USER') {
+  router.push('/signup'); // ✅ 정책
+} else {
+  router.push('/main'); // ✅ 정책
+}
+```
+
+**특징:**
+- 사용자 시나리오 (로그인, 회원가입)
+- 비즈니스 규칙
+- 라우팅 포함
+- Domain 조합
+
+---
+
+## 📂 상세 폴더 구조
 
 ```
 src/
-├── app/              # Next.js Pages (라우팅만)
-├── domains/          # 비즈니스 엔티티 (무엇: User, Auth)
-├── features/         # 사용자 시나리오 (어떻게: 로그인, 회원가입)
-├── shared/           # 전역 공통 (Button, Input, useDebounce)
-└── core/             # 핵심 인프라 (API 클라이언트, 환경 변수)
+├── app/                     # Page
+│   ├── (auth)/
+│   │   ├── login/
+│   │   │   └── page.tsx     # <LoginWidget />
+│   │   └── signup/
+│   │       └── page.tsx     # <SignupWidget />
+│   └── api/                 # Backend API
+│       └── auth/
+│
+├── widgets/                 # Widget (조립)
+│   └── auth/
+│       ├── LoginWidget.tsx  # LoginFlow + Layout
+│       └── SignupWidget.tsx
+│
+├── features/                # Feature (비즈니스 로직)
+│   └── auth/
+│       ├── hooks/           # 플로우 로직
+│       │   ├── useGeneralSignupFlow.ts
+│       │   ├── useSnsAuthFlow.ts
+│       │   └── useGeneralLoginFlow.ts
+│       └── ui/              # Feature UI
+│           ├── LoginFlow.tsx
+│           └── SignupFlow.tsx
+│
+├── domains/                 # Domain (순수 데이터)
+│   └── auth/
+│       ├── model/           # 데이터 레이어
+│       │   ├── auth.api.ts         # ✅ API 함수
+│       │   ├── auth.queries.ts     # ✅ React Query
+│       │   ├── auth.types.ts       # ✅ 타입
+│       │   ├── auth.errors.ts      # ✅ 에러
+│       │   └── auth.store.ts       # ✅ 상태
+│       └── ui/              # 재사용 UI
+│           ├── login/
+│           │   └── LoginForm.tsx   # ✅ 순수 UI
+│           ├── signup/
+│           │   ├── PassAuthButton.tsx
+│           │   ├── CredentialsForm.tsx
+│           │   └── SignupStepper.tsx
+│           ├── social/
+│           │   └── SocialLoginSection.tsx
+│           └── common/
+│               └── LoadingOverlay.tsx
+│
+├── shared/                  # Shared (범용)
+│   ├── ui/
+│   │   ├── Button.tsx
+│   │   └── Input.tsx
+│   ├── hooks/
+│   │   ├── useHistory.ts
+│   │   └── animations/
+│   └── utils/
+│
+└── core/                    # Core (인프라)
+    ├── api/
+    │   └── client.ts
+    ├── config/
+    │   └── env.ts
+    └── lib/
 ```
 
-### 핵심 원칙
-
-**Domains = 무엇 (What)**
-- 비즈니스 엔티티 중심
-- 재사용 가능
-- 순수 로직
-
-**Features = 어떻게 (How)**
-- 사용자 시나리오
-- 비즈니스 규칙
-- 여러 Domain 조합
-
 ---
 
-## 🎯 주요 기능
+## 💡 실전 예시
 
-### 인증/회원가입
-✅ 일반 회원가입 (아이디/비밀번호)  
-✅ SNS 간편가입 (카카오/네이버)  
-✅ 본인인증 (PASS)  
-✅ 계정 연동 (일반 ↔ SNS)  
+### 일반 회원가입 플로우
 
-### 토큰 기반 인증
-- **Verification Token** (15분) - 본인인증 후 일반 회원가입
-- **Register Token** (5분) - SNS 회원가입
-- **Link Token** (5분) - 계정 연동
-- **Auth Token** (24시간) - API 인증
-- **Refresh Token** (30일) - 토큰 재발급
+```typescript
+// 1. Domain: 데이터 처리
+domains/auth/model/auth.api.ts
+→ checkUserStatus(), registerGeneral()
 
----
+domains/auth/model/auth.queries.ts
+→ useCheckUserStatus(), useRegisterGeneral()
 
-## 📖 문서
+// 2. Domain: 재사용 UI
+domains/auth/ui/signup/CredentialsForm.tsx
+→ 순수 폼 컴포넌트
 
-### 필독 문서
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - 전체 아키텍처 가이드 ⭐⭐⭐
-  - Domains vs Features 구분 기준
-  - 전체 폴더 구조 상세 설명
-  - 실전 예시
-  - 인증 시스템 구조
+// 3. Feature: 비즈니스 로직
+features/auth/hooks/useGeneralSignupFlow.ts
+→ 본인인증 → 상태 확인 → 분기 → 회원가입
+
+// 4. Feature: UI 조합
+features/auth/ui/SignupFlow.tsx
+→ CredentialsForm + PassAuthButton 조합
+
+// 5. Widget: 조립
+widgets/auth/SignupWidget.tsx
+→ SignupFlow + AuthContainer
+
+// 6. Page: 라우팅
+app/(auth)/signup/page.tsx
+→ <SignupWidget />
+```
 
 ---
 
 ## 🛠️ 기술 스택
 
-### Core
-- **Framework:** Next.js 16.1.1 (App Router + Turbopack)
+- **Framework:** Next.js 16.1.1 (App Router)
 - **Language:** TypeScript
 - **Styling:** SCSS Modules
 - **Animation:** GSAP
-
-### State Management
 - **Server State:** TanStack React Query
 - **Client State:** Zustand
-- **Form:** React Hook Form + Zod
-
-### Infrastructure
-- **Database:** Prisma (PostgreSQL)
-- **Auth:** JWT (jose)
 - **Validation:** Zod
 
 ---
 
-## 🔐 환경 변수 설정
+## 🔐 환경 변수
 
-`.env.local` 파일 생성:
+`.env.local` 파일:
 
 ```env
-# API
 NEXT_PUBLIC_API_URL=http://localhost:3000
-NEXT_PUBLIC_API_TIMEOUT=30000
-
-# OAuth
-NEXT_PUBLIC_KAKAO_CLIENT_ID=your_kakao_client_id
-NEXT_PUBLIC_KAKAO_REDIRECT_URI=http://localhost:3000/api/auth/kakao/callback
-NEXT_PUBLIC_NAVER_CLIENT_ID=your_naver_client_id
-NEXT_PUBLIC_NAVER_REDIRECT_URI=http://localhost:3000/api/auth/naver/callback
-
-# 본인인증
-NEXT_PUBLIC_IMP_CODE=your_iamport_code
-NEXT_PUBLIC_PORTONE_CHANNEL_KEY=your_portone_channel_key
-IAMPORT_API_KEY=your_iamport_api_key
-IAMPORT_API_SECRET=your_iamport_api_secret
-
-# Database
-DATABASE_URL=postgresql://user:password@localhost:5432/dbname
-
-# JWT
-JWT_SECRET=your-jwt-secret-min-32-characters
+NEXT_PUBLIC_KAKAO_CLIENT_ID=your_id
+NEXT_PUBLIC_NAVER_CLIENT_ID=your_id
+NEXT_PUBLIC_IMP_CODE=your_code
+DATABASE_URL=postgresql://...
+JWT_SECRET=your_secret
 ```
 
 ---
 
-## 📊 폴더 구조 상세
+## 📖 주요 문서
 
-### Domains (비즈니스 엔티티)
-
-```
-domains/auth/
-├── model/                    # 데이터 레이어
-│   ├── auth.api.ts          # API 호출 함수 (순수)
-│   ├── auth.queries.ts      # React Query hooks
-│   ├── auth.types.ts        # 타입 정의
-│   ├── auth.errors.ts       # 에러 코드 & 메시지
-│   ├── auth.store.ts        # Zustand 상태
-│   └── auth.utils.ts        # 유틸리티
-└── ui/                      # 프레젠테이션 레이어
-    ├── login/               # 로그인 UI
-    ├── signup/              # 회원가입 UI
-    └── common/              # 공통 UI
-```
-
-### Features (사용자 시나리오)
-
-```
-features/auth/
-├── hooks/                   # 비즈니스 로직
-│   ├── useGeneralSignupFlow.ts    # 일반 회원가입
-│   ├── useSnsAuthFlow.ts          # SNS 로그인/회원가입
-│   └── useGeneralLoginFlow.ts     # 일반 로그인
-└── ui/                      # 플로우 조합 UI
-    ├── LoginFlow.tsx        # 로그인 전체 화면
-    └── SignupFlow.tsx       # 회원가입 전체 화면
-```
+### 필독
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - 완전한 아키텍처 가이드 ⭐⭐⭐
+  - Domains vs Features 구분 기준
+  - 7가지 철칙
+  - 실전 예시 (Before/After)
+  - 의존성 검증 방법
 
 ---
 
-## 🎯 개발 가이드
+## 🚨 개발 규칙
 
-### 새 기능 개발 시
-
-1. **Domain Model 작성** (`domains/[entity]/model/`)
-   ```typescript
-   // API 함수
-   export const authApi = {
-     getData: () => apiClient.get('/api/...'),
-   }
-   
-   // React Query Hook
-   export function useGetData() {
-     return useQuery({ queryFn: authApi.getData })
-   }
-   ```
-
-2. **Domain UI 작성** (`domains/[entity]/ui/`)
-   ```typescript
-   // 재사용 가능한 UI
-   export function DataCard({ data }: Props) {
-     return <div>{data.name}</div>
-   }
-   ```
-
-3. **Feature Hook 작성** (`features/[scenario]/hooks/`)
-   ```typescript
-   // 비즈니스 로직 + 플로우
-   export function useDataFlow() {
-     const router = useRouter();
-     const getData = useGetData(); // ← Domain hook 사용
-     
-     const handleAction = async () => {
-       const result = await getData.refetch();
-       if (result.needsAction) {
-         router.push('/next-step'); // ← 라우팅
-       }
-     }
-     
-     return { handleAction }
-   }
-   ```
-
-4. **Feature UI 작성** (`features/[scenario]/ui/`)
-   ```typescript
-   // 여러 Domain UI 조합
-   export function DataFlow() {
-     const { handleAction } = useDataFlow();
-     return (
-       <>
-         <DataCard /> {/* ← Domain UI */}
-         <Button onClick={handleAction} />
-       </>
-     )
-   }
-   ```
-
-5. **Page 작성** (`app/[route]/page.tsx`)
-   ```typescript
-   export default function DataPage() {
-     return <DataFlow />
-   }
-   ```
-
----
-
-## 🚨 금지 사항
-
-### ❌ Component에서 직접 fetch
+### Domain
 ```typescript
-const response = await fetch('/api/...'); // ❌
+✅ 순수 데이터, API 호출, React Query
+✅ 재사용 가능한 UI
+❌ useRouter 금지
+❌ Feature import 금지
+❌ 비즈니스 규칙 금지
 ```
 
-### ❌ Feature에서 axios 직접 호출
+### Feature
 ```typescript
-await axios.post('/api/...'); // ❌
+✅ 비즈니스 로직, 플로우
+✅ 라우팅, 분기
+✅ Domain hook 사용
+❌ 직접 fetch 금지
+❌ Widget import 금지
 ```
 
-### ❌ process.env 직접 접근
+### Widget
 ```typescript
-const apiUrl = process.env.NEXT_PUBLIC_API_URL; // ❌
+✅ Feature 조립
+✅ 레이아웃 관리
+❌ 비즈니스 로직 금지
+```
 
-// ✅ 올바른 방법
-import { env } from '@/core/config/env';
-const apiUrl = env.API_URL;
+### Page
+```typescript
+✅ Widget 렌더링만
+❌ 모든 로직 금지
 ```
 
 ---
 
-## 📋 코드 리뷰 체크리스트
+## 🎓 학습 순서
 
-### Domain 체크
-- [ ] 특정 엔티티에 대한 것인가?
-- [ ] 재사용 가능한가?
-- [ ] 비즈니스 로직이 없는가?
-- [ ] 라우팅이 없는가?
-
-### Feature 체크
-- [ ] 특정 시나리오를 다루는가?
-- [ ] Domain hook을 사용하는가?
-- [ ] 비즈니스 규칙을 포함하는가?
-- [ ] 여러 Domain을 조합하는가?
+1. **ARCHITECTURE.md** 읽기 (30분)
+2. 기존 코드 분석 (30분)
+   - `domains/auth/` 구조
+   - `features/auth/` 플로우
+3. 실습: 간단한 기능 추가 (1시간)
 
 ---
 
-## 🔍 주요 API 엔드포인트
-
-### 인증
-```
-POST /api/auth/check-user-status      # 사용자 상태 확인
-POST /api/auth/check-sns-user         # SNS 사용자 확인
-POST /api/auth/register-general       # 일반 회원가입
-POST /api/auth/register-sns           # SNS 회원가입
-POST /api/auth/login-general          # 일반 로그인
-POST /api/auth/login-sns              # SNS 로그인
-POST /api/auth/link-general           # 일반 계정 연동
-POST /api/auth/link-sns               # SNS 계정 연동
-```
-
----
-
-## 📞 문의
-
-프로젝트 구조나 개발 방식에 대한 질문은 [ARCHITECTURE.md](./ARCHITECTURE.md)를 참고하세요.
-
----
-
-**Version:** 1.0.0  
+**Version:** 2.0  
 **Status:** ✅ Production Ready  
+**Architecture:** FSD + DDD + Widget Layer  
 **Last Updated:** 2026-01-27

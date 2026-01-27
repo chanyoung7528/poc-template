@@ -9,7 +9,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export type SignupStep = 'form' | 'verify' | 'complete';
+export type SignupStep = 'form' | 'verify' | 'complete' | 'terms';
 
 interface UseSignupFlowReturn {
   currentStep: SignupStep;

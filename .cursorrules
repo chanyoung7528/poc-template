@@ -1,0 +1,159 @@
+# Cursor Rules – Next.js FSD + DDD Architecture
+
+You are a senior frontend architect.
+This project follows a **modified FSD + DDD architecture**.
+All code changes must strictly comply with the rules below.
+
+---
+
+## 1. API Architecture Rule (Backend Assumption)
+
+- The `src/api` directory represents a **backend domain**, not frontend utilities.
+- Even though this is a POC using Next.js Route Handlers, treat it as a real backend.
+- API structure MUST follow **backend domain boundaries**, not page or feature structure.
+
+### Allowed API Structure
+src/api/
+- auth/
+- payments/
+- shared/
+
+### Rules
+- Frontend code MUST NOT import from `src/api/*` directly
+- All API communication must go through `core/config/client.ts`
+- API folder structure becomes the **source of truth** for domain boundaries
+
+---
+
+## 2. Domain vs Feature Separation Rule (Mandatory)
+
+The project uses a modified FSD architecture.
+The distinction between `domains` and `features` MUST be explicit.
+
+### domains/
+Use when:
+- Entity or business data is the 중심
+- Server data, schema, types, state, query logic
+- Reusable across multiple features or pages
+
+Examples:
+- User, Auth, Payment
+- React Query hooks
+- Zustand stores
+- Domain-specific UI (UserCard, PaymentRow)
+
+### features/
+Use when:
+- User 행동 / 시나리오 중심
+- Multiple domains are orchestrated
+- Page-level business logic
+
+Examples:
+- login
+- signup
+- change-password
+- payment-flow
+
+### Rule
+- If a file can exist without UI interaction → domain
+- If a file loses meaning without a user action → feature
+- Ambiguous cases MUST include a comment explaining the decision
+
+---
+
+## 3. API Call Pattern Rule (React Query Only)
+
+Direct HTTP calls are **FORBIDDEN** in:
+- components
+- pages
+- features
+
+### Mandatory Flow
+1. API call logic → domain/model
+2. Create React Query hooks (query / mutation)
+3. Use `core/config/client.ts` for HTTP
+4. UI consumes only hooks
+
+### Forbidden
+- fetch / axios inside components
+- calling API inside feature without domain hook
+- duplicating API logic
+
+---
+
+## 4. Environment Variable Rule
+
+- All environment variables must be accessed ONLY via `env.ts`
+- `process.env.*` usage outside `env.ts` is FORBIDDEN
+- `env.ts` must provide:
+  - type safety
+  - default validation
+  - runtime safety
+
+### Usage
+- `core/config/client.ts` imports env.ts
+- No other layer accesses env directly
+
+---
+
+## 5. Authentication Error Handling Rule (Centralized)
+
+Authentication-related error handling MUST be centralized.
+
+### Backend Assumption
+- Backend returns structured error codes (string enums)
+
+### Frontend Rules
+- Error codes → message mapping must live in one place
+- UI must NEVER hardcode error strings
+- React Query `onError` must use error parser
+
+### Example Error Codes
+- AUTH_INVALID_CREDENTIALS
+- AUTH_USER_NOT_FOUND
+- AUTH_DUPLICATED_ACCOUNT
+- AUTH_PASSWORD_EXPIRED
+- AUTH_NEED_PASSWORD_CHANGE
+
+### Required Structure
+domains/auth/model/
+- authErrorMap.ts
+- parseAuthError.ts
+
+---
+
+## 6. Side Effect Prevention Rule (Critical)
+
+Refactoring must NOT break existing behavior.
+
+### Mandatory Checklist
+- API still works
+- Auth flow remains intact
+- React Query cache behaves correctly
+- No env undefined errors
+- Import paths remain valid
+
+### Rule
+If something worked before and breaks after change → the change is invalid.
+
+---
+
+## 7. Output & Change Discipline
+
+When making changes, always:
+- Explain architectural decisions
+- List moved / added files
+- Keep changes incremental
+- Avoid big-bang refactors
+
+---
+
+## Absolute Rules
+
+❌ No shortcut architecture
+❌ No temporary hacks
+❌ No mixed domain/feature responsibilities
+❌ No duplicated API logic
+
+✅ Maintain long-term maintainability
+✅ Optimize for team scalability

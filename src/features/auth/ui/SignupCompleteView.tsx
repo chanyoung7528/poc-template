@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Button } from "@/shared/ui/Button";
 import { OnBoardingGroupView } from "@/domains/onboarding/ui/OnBoardingGroupView";
-import { useGroupPageAnimation } from "@/domains/onboarding/hooks/useGroupPageAnimation";
+import { useGroupPageAnimation } from "@/shared/hooks/animations";
 import styles from "./SignupCompleteView.module.scss";
 
 interface SignupCompleteViewProps {

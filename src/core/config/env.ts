@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const envSchema = z.object({
+  // API 설정
   NEXT_PUBLIC_API_URL: z
     .string()
     .min(1, "API_URL은 필수입니다")
@@ -19,19 +20,40 @@ const envSchema = z.object({
     .min(1000, "타임아웃은 최소 1000ms 이상이어야 합니다")
     .default(30000),
 
+  NEXT_PUBLIC_API_ACCEPT_LANGUAGE: z.string().optional(),
+
+  API_TARGET_URL: z.string().url().optional(),
+
+  // OAuth 설정
+  NEXT_PUBLIC_KAKAO_CLIENT_ID: z.string().optional(),
+  NEXT_PUBLIC_KAKAO_REDIRECT_URI: z.string().optional(),
+  NEXT_PUBLIC_NAVER_CLIENT_ID: z.string().optional(),
+  NEXT_PUBLIC_NAVER_REDIRECT_URI: z.string().optional(),
+
+  // 본인인증 설정
+  NEXT_PUBLIC_IMP_CODE: z.string().optional(),
+  NEXT_PUBLIC_PORTONE_CHANNEL_KEY: z.string().optional(),
+  IAMPORT_API_KEY: z.string().optional(),
+  IAMPORT_API_SECRET: z.string().optional(),
+
+  // Database
+  DATABASE_URL: z.string().optional(),
+
+  // JWT
+  JWT_SECRET: z.string().optional(),
+
+  // Feature Flags
   NEXT_PUBLIC_FEATURE_DEBUG: z
     .string()
     .optional()
     .default("false")
     .transform((val) => val === "true"),
 
-  NEXT_PUBLIC_API_ACCEPT_LANGUAGE: z.string().optional(),
-
-  API_TARGET_URL: z.string().url().optional(),
-
+  // Runtime
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
+  
   ANALYZE: z
     .string()
     .optional()
@@ -44,14 +66,37 @@ type EnvSchema = z.infer<typeof envSchema>;
 function validateEnv(): EnvSchema {
   try {
     return envSchema.parse({
+      // API 설정
       NEXT_PUBLIC_API_URL:
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
       NEXT_PUBLIC_API_TIMEOUT: process.env.NEXT_PUBLIC_API_TIMEOUT || 30000,
-      NEXT_PUBLIC_FEATURE_DEBUG:
-        process.env.NEXT_PUBLIC_FEATURE_DEBUG || "false",
       NEXT_PUBLIC_API_ACCEPT_LANGUAGE:
         process.env.NEXT_PUBLIC_API_ACCEPT_LANGUAGE || "ko-KR",
       API_TARGET_URL: process.env.API_TARGET_URL || "http://localhost:3000",
+
+      // OAuth 설정
+      NEXT_PUBLIC_KAKAO_CLIENT_ID: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID,
+      NEXT_PUBLIC_KAKAO_REDIRECT_URI: process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI,
+      NEXT_PUBLIC_NAVER_CLIENT_ID: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID,
+      NEXT_PUBLIC_NAVER_REDIRECT_URI: process.env.NEXT_PUBLIC_NAVER_REDIRECT_URI,
+
+      // 본인인증 설정
+      NEXT_PUBLIC_IMP_CODE: process.env.NEXT_PUBLIC_IMP_CODE,
+      NEXT_PUBLIC_PORTONE_CHANNEL_KEY: process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY,
+      IAMPORT_API_KEY: process.env.IAMPORT_API_KEY,
+      IAMPORT_API_SECRET: process.env.IAMPORT_API_SECRET,
+
+      // Database
+      DATABASE_URL: process.env.DATABASE_URL,
+
+      // JWT
+      JWT_SECRET: process.env.JWT_SECRET,
+
+      // Feature Flags
+      NEXT_PUBLIC_FEATURE_DEBUG:
+        process.env.NEXT_PUBLIC_FEATURE_DEBUG || "false",
+
+      // Runtime
       NODE_ENV: process.env.NODE_ENV || "development",
       ANALYZE: process.env.ANALYZE || "false",
     });
@@ -76,13 +121,30 @@ export const env = {
   API_TIMEOUT: parsed.NEXT_PUBLIC_API_TIMEOUT,
   API_ACCEPT_LANGUAGE: parsed.NEXT_PUBLIC_API_ACCEPT_LANGUAGE,
 
+  // OAuth 설정
+  KAKAO_CLIENT_ID: parsed.NEXT_PUBLIC_KAKAO_CLIENT_ID,
+  KAKAO_REDIRECT_URI: parsed.NEXT_PUBLIC_KAKAO_REDIRECT_URI,
+  NAVER_CLIENT_ID: parsed.NEXT_PUBLIC_NAVER_CLIENT_ID,
+  NAVER_REDIRECT_URI: parsed.NEXT_PUBLIC_NAVER_REDIRECT_URI,
+
+  // 본인인증 설정
+  IMP_CODE: parsed.NEXT_PUBLIC_IMP_CODE,
+  PORTONE_CHANNEL_KEY: parsed.NEXT_PUBLIC_PORTONE_CHANNEL_KEY,
+
   // Feature Flags
   FEATURE_DEBUG: parsed.NEXT_PUBLIC_FEATURE_DEBUG,
 
-  // Server-only
+  // Server-only (클라이언트에서 undefined)
   API_TARGET_URL: isServer ? parsed.API_TARGET_URL : undefined,
+  IAMPORT_API_KEY: isServer ? parsed.IAMPORT_API_KEY : undefined,
+  IAMPORT_API_SECRET: isServer ? parsed.IAMPORT_API_SECRET : undefined,
+  DATABASE_URL: isServer ? parsed.DATABASE_URL : undefined,
+  JWT_SECRET: isServer ? parsed.JWT_SECRET : undefined,
 
   // Runtime
   NODE_ENV: parsed.NODE_ENV,
   ANALYZE: parsed.ANALYZE,
+  IS_SERVER: isServer,
+  IS_DEV: parsed.NODE_ENV === "development",
+  IS_PROD: parsed.NODE_ENV === "production",
 } as const;

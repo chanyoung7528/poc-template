@@ -1,11 +1,19 @@
 import { apiClient } from "@/shared/api/axios.instance";
 import type {
   User,
-  LoginResponse,
-  SignupData,
-  ResetPasswordData,
+  AuthSuccessResponse,
+  CheckUserStatusResponse,
+  CheckSnsUserResponse,
+  RegisterGeneralRequest,
+  RegisterSnsRequest,
+  LinkGeneralAccountRequest,
+  LinkSnsAccountRequest,
+  LoginGeneralRequest,
   CertificationResult,
+  SnsType,
 } from "./auth.types";
+
+// ==================== 인증 상태 조회 ====================
 
 /**
  * 현재 로그인한 사용자 정보를 조회합니다
@@ -27,77 +35,26 @@ export async function logout(): Promise<void> {
   await apiClient.post("/api/auth/logout");
 }
 
-/**
- * 이메일/비밀번호로 로그인합니다
- */
-export async function loginWithCredentials(
-  email: string,
-  password: string
-): Promise<LoginResponse> {
-  const response = await apiClient.post<LoginResponse>("/api/auth/login", {
-    email,
-    password,
-  });
-  return response.data;
-}
+// ==================== 본인인증 ====================
 
 /**
- * 회원가입을 수행합니다
+ * NICE 본인인증 결과를 서버에 전송하여 사용자 상태를 확인합니다
+ * @param transactionId NICE 본인인증 거래 ID (imp_uid)
+ * @returns 사용자 상태 및 발급된 토큰
  */
-export async function signup(data: SignupData): Promise<LoginResponse> {
-  const response = await apiClient.post<LoginResponse>(
-    "/api/auth/signup",
-    data
+export async function checkUserStatus(
+  transactionId: string
+): Promise<CheckUserStatusResponse> {
+  const response = await apiClient.post<CheckUserStatusResponse>(
+    "/api/auth/check-user-status",
+    { transactionId }
   );
   return response.data;
 }
 
 /**
- * 비밀번호 재설정을 수행합니다
- */
-export async function resetPassword(data: ResetPasswordData): Promise<void> {
-  await apiClient.post("/api/auth/reset-password", data);
-}
-
-/**
- * 이메일로 아이디 찾기를 수행합니다
- */
-export async function findIdByEmail(
-  email: string
-): Promise<{ maskedId: string }> {
-  const response = await apiClient.post<{ maskedId: string }>(
-    "/api/auth/find-id",
-    { email }
-  );
-  return response.data;
-}
-
-/**
- * 인증 코드를 발송합니다
- */
-export async function sendVerificationCode(email: string): Promise<void> {
-  await apiClient.post("/api/auth/send-code", { email });
-}
-
-/**
- * 인증 코드를 검증합니다
- */
-export async function verifyCode(
-  email: string,
-  code: string
-): Promise<{ token: string }> {
-  const response = await apiClient.post<{ token: string }>(
-    "/api/auth/verify-code",
-    {
-      email,
-      code,
-    }
-  );
-  return response.data;
-}
-
-/**
- * 아임포트 본인인증 결과를 서버에 전송하여 검증합니다
+ * 아임포트 본인인증 결과를 서버에 전송하여 검증합니다 (레거시)
+ * @deprecated checkUserStatus 사용 권장
  */
 export async function verifyCertification(
   impUid: string
@@ -110,6 +67,134 @@ export async function verifyCertification(
   );
   return response.data;
 }
+
+// ==================== SNS 로그인/회원가입 ====================
+
+/**
+ * SNS 사용자 상태를 확인합니다
+ * @param snsType SNS 유형 (KAKAO, NAVER, APPLE)
+ * @param snsId SNS 식별자
+ * @param snsEmail SNS 이메일
+ * @returns 사용자 상태 및 발급된 토큰
+ */
+export async function checkSnsUser(
+  snsType: SnsType,
+  snsId: string,
+  snsEmail?: string
+): Promise<CheckSnsUserResponse> {
+  const response = await apiClient.post<CheckSnsUserResponse>(
+    "/api/auth/check-sns-user",
+    {
+      snsType,
+      snsId,
+      snsEmail,
+    }
+  );
+  return response.data;
+}
+
+/**
+ * SNS 간편 회원가입을 수행합니다
+ * @param data registerToken + transactionId + 약관 동의
+ * @returns 인증 성공 응답
+ */
+export async function registerSnsUser(
+  data: RegisterSnsRequest
+): Promise<AuthSuccessResponse> {
+  const response = await apiClient.post<AuthSuccessResponse>(
+    "/api/auth/register-sns",
+    data
+  );
+  return response.data;
+}
+
+/**
+ * SNS 로그인을 수행합니다
+ * @param snsType SNS 유형
+ * @param snsId SNS 식별자
+ * @returns 인증 성공 응답
+ */
+export async function loginSns(
+  snsType: SnsType,
+  snsId: string
+): Promise<AuthSuccessResponse> {
+  const response = await apiClient.post<AuthSuccessResponse>(
+    "/api/auth/login-sns",
+    {
+      snsType,
+      snsId,
+    }
+  );
+  return response.data;
+}
+
+// ==================== 일반 로그인/회원가입 ====================
+
+/**
+ * 일반 회원가입을 수행합니다
+ * @param data verificationToken + 회원정보 + 약관 동의
+ * @returns 인증 성공 응답
+ */
+export async function registerGeneral(
+  data: RegisterGeneralRequest
+): Promise<AuthSuccessResponse> {
+  const response = await apiClient.post<AuthSuccessResponse>(
+    "/api/auth/register-general",
+    data
+  );
+  return response.data;
+}
+
+/**
+ * 일반 로그인을 수행합니다
+ * @param data wellnessId + password
+ * @returns 인증 성공 응답
+ */
+export async function loginGeneral(
+  data: LoginGeneralRequest
+): Promise<AuthSuccessResponse> {
+  const response = await apiClient.post<AuthSuccessResponse>(
+    "/api/auth/login-general",
+    data
+  );
+  return response.data;
+}
+
+// ==================== 계정 연동 ====================
+
+/**
+ * 일반 로그인 계정을 연동합니다
+ * (SNS 계정에 아이디/비밀번호 추가)
+ * @param data linkToken + wellnessId + password
+ * @returns 인증 성공 응답
+ */
+export async function linkGeneralAccount(
+  data: LinkGeneralAccountRequest
+): Promise<AuthSuccessResponse> {
+  const response = await apiClient.post<AuthSuccessResponse>(
+    "/api/auth/link-general",
+    data
+  );
+  return response.data;
+}
+
+/**
+ * SNS 로그인 계정을 연동합니다
+ * (일반 계정에 SNS 로그인 추가)
+ * @param data linkToken + registerToken
+ * @returns 인증 성공 응답
+ */
+export async function linkSnsAccount(
+  data: LinkSnsAccountRequest
+): Promise<AuthSuccessResponse> {
+  const response = await apiClient.post<AuthSuccessResponse>(
+    "/api/auth/link-sns",
+    data
+  );
+  return response.data;
+}
+
+// ==================== 기타 ====================
 
 /**
  * Wellness ID 중복 확인을 수행합니다
@@ -129,13 +214,29 @@ export async function checkWellnessIdDuplicate(
     return response.data.isDuplicate;
   } catch (error) {
     console.error("아이디 중복 확인 중 오류:", error);
-    // 에러 발생 시 중복으로 처리하여 사용 불가능하게 함
     throw error;
   }
 }
 
 /**
+ * 이메일로 아이디 찾기를 수행합니다 (레거시)
+ * @deprecated 새로운 인증 플로우에서는 사용하지 않음
+ */
+export async function findIdByEmail(
+  email: string
+): Promise<{ maskedId: string }> {
+  const response = await apiClient.post<{ maskedId: string }>(
+    "/api/auth/find-id",
+    { email }
+  );
+  return response.data;
+}
+
+// ==================== 네이티브 앱 지원 (레거시) ====================
+
+/**
  * 네이티브 앱에서 받은 카카오 로그인 데이터를 서버로 전송합니다
+ * @deprecated checkSnsUser + loginSns / registerSnsUser 플로우 사용 권장
  */
 export async function loginWithKakaoNative(data: {
   id: string;
@@ -143,7 +244,7 @@ export async function loginWithKakaoNative(data: {
   email?: string;
   profileImage?: string;
   cid?: string;
-  mode?: "login" | "signup"; // ✅ mode 추가
+  mode?: "login" | "signup";
 }): Promise<{ success: boolean; redirectUrl: string; isNewUser: boolean }> {
   const response = await apiClient.post<{
     success: boolean;
@@ -155,6 +256,7 @@ export async function loginWithKakaoNative(data: {
 
 /**
  * 네이티브 앱에서 받은 네이버 로그인 데이터를 서버로 전송합니다
+ * @deprecated checkSnsUser + loginSns / registerSnsUser 플로우 사용 권장
  */
 export async function loginWithNaverNative(data: {
   id: string;
@@ -162,7 +264,7 @@ export async function loginWithNaverNative(data: {
   email?: string;
   profileImage?: string;
   cid?: string;
-  mode?: "login" | "signup"; // ✅ mode 추가
+  mode?: "login" | "signup";
 }): Promise<{ success: boolean; redirectUrl: string; isNewUser: boolean }> {
   const response = await apiClient.post<{
     success: boolean;

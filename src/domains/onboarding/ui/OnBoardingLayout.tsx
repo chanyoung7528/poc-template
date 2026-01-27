@@ -1,6 +1,6 @@
 "use client";
 
-import { useOnboardingStore } from "../hooks/useOnboardingStore";
+import { useOnboardingStore } from "../model/onboarding.store";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 

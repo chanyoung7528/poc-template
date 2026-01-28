@@ -1,0 +1,49 @@
+.authActionButton {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  width: 100%;
+  height: 8rem;
+  padding: 2rem 2rem 2rem 1rem;
+  background-color: var(--base-white);
+  border-radius: 1.6rem;
+}
+
+.iconWrapper {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 6em;
+  height: 6rem;
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label {
+  font-family: "Pretendard", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: left;
+  line-height: 20px;
+  letter-spacing: -0.2px;
+  color: #5f646f;
+}
+
+.title {
+  font-family: "Pretendard", sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 26px;
+  letter-spacing: -0.5px;
+  color: #222;
+}

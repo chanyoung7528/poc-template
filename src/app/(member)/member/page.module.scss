@@ -1,0 +1,100 @@
+.splashTitle {
+  position: absolute;
+  top: 6.25rem; // 100px → rem
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 10;
+  width: 100%;
+}
+
+.splashMainTitle {
+  font-family: "SUITE", sans-serif;
+  font-weight: 800;
+  font-size: 2.6rem;
+  line-height: 3.2rem;
+  letter-spacing: -0.065rem; // -1.04px → rem
+  color: #003223;
+  margin-bottom: 1.2rem;
+}
+
+.splashSubTitle {
+  font-family: "SUITE", sans-serif;
+  font-weight: 600;
+  font-size: 2rem;
+  line-height: 2.8rem;
+  letter-spacing: -0.05rem; // -0.8px → rem
+  color: #5d8b5b;
+}
+
+.characterImage {
+  position: absolute;
+  top: 29.875rem; // Scene 3 초기 위치 (위쪽)
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24rem;
+  height: 100%;
+  opacity: 0; // 초기 상태: 보이지 않음 (GSAP 애니메이션으로 제어)
+}
+
+.image {
+  position: absolute;
+  width: 100%;
+  height: auto;
+}
+
+.section {
+  position: relative;
+  top: 45rem; // Scene 3에서 캐릭터보다 아래에 위치
+  opacity: 0; // 초기 상태: 보이지 않음 (GSAP 애니메이션으로 제어)
+}
+
+.content {
+  position: absolute;
+  top: 12rem; // 200px → rem
+  left: 0;
+  width: 100%;
+  background-color: #f7f3ed;
+  height: 100dvh;
+}
+
+.titleFrame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 3.6rem;
+  width: 100%;
+  padding: 0 2rem;
+  opacity: 0; // 초기 상태: 보이지 않음 (GSAP 애니메이션으로 제어)
+}
+
+.wellnessTitle {
+  font-family: "PP Editorial New", serif;
+  font-weight: 800;
+  font-style: italic;
+  font-size: 4rem;
+  line-height: 1.2;
+  letter-spacing: -0.0625rem; // -1px → rem
+  color: #ff6433;
+  text-align: center;
+}
+
+.wellnessSubtitle {
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 1.8rem;
+  line-height: 1.2;
+  letter-spacing: -0.00625rem; // -0.1px → rem
+  color: #003223;
+  text-align: center;
+}
+
+.buttonFrame {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  padding: 0 2rem;
+  opacity: 0; // 초기 상태: 보이지 않음 (GSAP 애니메이션으로 제어)
+}

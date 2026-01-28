@@ -1,0 +1,8 @@
+@use '@/shared/assets/styles/abstracts' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 320px;
+}

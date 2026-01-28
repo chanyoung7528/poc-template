@@ -1,0 +1,15 @@
+.characterImage {
+  position: absolute;
+  top: 29.875rem; // Scene 3 초기 위치 (위쪽)
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24rem;
+  height: 100%;
+}
+
+.image {
+  position: absolute;
+  width: 100%;
+  height: auto;
+}
+

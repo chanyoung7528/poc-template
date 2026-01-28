@@ -1,0 +1,93 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+.content {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loadingOverlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px;
+  text-align: center;
+
+  p {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333333;
+    margin: 0;
+  }
+
+  // 로딩 스피너 애니메이션 (선택사항)
+  &::before {
+    content: "";
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// 반응형 디자인
+@media (max-width: 768px) {
+  .container {
+    min-height: 100dvh; // 모바일 브라우저 주소창 고려
+  }
+
+  .loadingOverlay {
+    padding: 32px;
+
+    p {
+      font-size: 15px;
+    }
+
+    &::before {
+      width: 36px;
+      height: 36px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 16px;
+  }
+
+  .loadingOverlay {
+    padding: 24px;
+
+    p {
+      font-size: 14px;
+    }
+
+    &::before {
+      width: 32px;
+      height: 32px;
+      border-width: 3px;
+    }
+  }
+}

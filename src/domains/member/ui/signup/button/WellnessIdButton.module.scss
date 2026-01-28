@@ -1,0 +1,38 @@
+@use '@/shared/assets/styles/abstracts' as *;
+
+.wellnessIdButton {
+  width: 100%;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 8px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: var(--font-pretendard), 'Pretendard', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  transition: opacity 0.2s;
+  background: linear-gradient(
+    107.37deg,
+    rgba(255, 149, 0, 1) 9.56%,
+    rgba(246, 71, 7, 1) 91.09%
+  );
+  color: white;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  &:active:not(:disabled) {
+    opacity: 0.8;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

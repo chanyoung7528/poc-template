@@ -4,8 +4,12 @@
 
 /** 성공 응답 (데이터 포함) */
 export interface ApiResponse<T> {
+  code: string;
+  message: string;
   data: T;
-  message?: string;
+  succeeded: boolean;
+  total: number;
+  jackson: boolean;
 }
 
 /** 페이지네이션 메타데이터 */

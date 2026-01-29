@@ -2,156 +2,98 @@
  * Domain: Member - API
  * 
  * 역할: 회원 API 함수 정의 (순수 API 호출)
- * - 판단 없음
- * - 라우팅 없음
- * - 순수 데이터만
+ * - 공통 Response 형식 사용 (ApiResponse<T>)
+ * - data 필드만 반환
  */
 
 import { apiClient } from "@/core/api/client";
+import type { ApiResponse } from "@/core/api/types";
 import type {
   CheckUserStatusRequest,
-  CheckUserStatusResponse,
+  CheckUserStatusData,
   CheckSnsUserRequest,
-  CheckSnsUserResponse,
+  CheckSnsUserData,
   RegisterGeneralRequest,
-  RegisterSnsRequest,
-  LinkGeneralRequest,
-  LinkSnsRequest,
+  RegisterGeneralData,
+  RegisterSnsUserRequest,
+  RegisterSnsUserData,
   LoginGeneralRequest,
-  LoginSnsRequest,
-  FindLoginInfoRequest,
-  FindLoginInfoResponse,
+  LoginGeneralData,
   CheckLoginIdRequest,
-  CheckLoginIdResponse,
-  ResetPasswordRequest,
-  ResetPasswordResponse,
-  SaveAgreementsRequest,
-  SaveAgreementsResponse,
-  AuthSuccessResponse,
-  WithdrawResponse,
+  CheckLoginIdData,
 } from "./member.types";
 
 /**
  * Member API
+ * 
+ * 모든 API는 공통 Response 형식을 사용:
+ * {
+ *   code: string,
+ *   message: string,
+ *   data: T,  // 실제 데이터
+ *   succeeded: boolean,
+ *   total: number,
+ *   isJackson: boolean
+ * }
  */
 export const memberApi = {
-  // ============================================
-  // 회원 상태 조회
-  // ============================================
-
   /**
-   * 회원 상태 조회 (NICE 본인인증 후)
-   * - 신규 회원: verificationToken 발급
-   * - 기존 회원: 회원 정보 반환
-   * - 연동 필요: linkToken 발급
+   * 회원 상태 조회 (본인인증 후)
+   * Response: ApiResponse<CheckUserStatusData>
    */
   checkUserStatus: (data: CheckUserStatusRequest) =>
-    apiClient.post<CheckUserStatusResponse>(
+    apiClient.post<ApiResponse<CheckUserStatusData>>(
       "/api/member/checkUserStatus",
       data
     ),
 
   /**
    * SNS 회원 조회
-   * - 기존 회원: 회원 정보 반환
-   * - 미가입: registerToken 발급
-   * - 연동 필요: linkToken 발급
+   * Response: ApiResponse<CheckSnsUserData>
    */
   checkSnsUser: (data: CheckSnsUserRequest) =>
-    apiClient.post<CheckSnsUserResponse>("/api/member/checkSnsUser", data),
-
-  // ============================================
-  // 회원가입
-  // ============================================
+    apiClient.post<ApiResponse<CheckSnsUserData>>(
+      "/api/member/sns/check",
+      data
+    ),
 
   /**
    * 일반 회원가입
+   * Response: ApiResponse<RegisterGeneralData>
    */
   registerGeneral: (data: RegisterGeneralRequest) =>
-    apiClient.post<AuthSuccessResponse>("/api/member/general", data),
+    apiClient.post<ApiResponse<RegisterGeneralData>>(
+      "/api/member/general",
+      data
+    ),
 
   /**
    * SNS 회원가입
+   * Response: ApiResponse<RegisterSnsUserData>
    */
-  registerSns: (data: RegisterSnsRequest) =>
-    apiClient.post<AuthSuccessResponse>("/api/member/sns/register", data),
-
-  // ============================================
-  // 계정 연동
-  // ============================================
-
-  /**
-   * 일반 계정 연동 (SNS 계정에 일반 로그인 추가)
-   */
-  linkGeneral: (data: LinkGeneralRequest) =>
-    apiClient.post<AuthSuccessResponse>("/api/member/linkGeneral", data),
-
-  /**
-   * SNS 계정 연동 (일반 계정에 SNS 로그인 추가)
-   */
-  linkSns: (data: LinkSnsRequest) =>
-    apiClient.post<AuthSuccessResponse>("/api/member/sns/link", data),
-
-  // ============================================
-  // 로그인
-  // ============================================
+  registerSnsUser: (data: RegisterSnsUserRequest) =>
+    apiClient.post<ApiResponse<RegisterSnsUserData>>(
+      "/api/member/sns/register",
+      data
+    ),
 
   /**
    * 일반 로그인
+   * Response: ApiResponse<LoginGeneralData>
    */
   loginGeneral: (data: LoginGeneralRequest) =>
-    apiClient.post<AuthSuccessResponse>("/api/member/login", data),
-
-  /**
-   * SNS 로그인
-   */
-  loginSns: (data: LoginSnsRequest) =>
-    apiClient.post<AuthSuccessResponse>("/api/member/sns/check", data),
-
-  /**
-   * 로그아웃
-   */
-  logout: () => apiClient.post<{ success: boolean }>("/api/member/logout"),
-
-  // ============================================
-  // 아이디/비밀번호 찾기
-  // ============================================
-
-  /**
-   * 아이디 찾기 (NICE 본인인증 후)
-   */
-  findLoginInfo: (data: FindLoginInfoRequest) =>
-    apiClient.post<FindLoginInfoResponse>("/api/member/findLoginInfo", data),
+    apiClient.post<ApiResponse<LoginGeneralData>>(
+      "/api/member/login",
+      data
+    ),
 
   /**
    * 로그인 ID 중복 체크
+   * Response: ApiResponse<CheckLoginIdData>
    */
   checkLoginId: (data: CheckLoginIdRequest) =>
-    apiClient.post<CheckLoginIdResponse>("/api/member/checkLoginId", data),
-
-  /**
-   * 비밀번호 재설정 (NICE 본인인증 후)
-   */
-  resetPassword: (data: ResetPasswordRequest) =>
-    apiClient.post<ResetPasswordResponse>("/api/member/resetPassword", data),
-
-  // ============================================
-  // 약관 동의
-  // ============================================
-
-  /**
-   * 약관 동의 저장
-   */
-  saveAgreements: (data: SaveAgreementsRequest) =>
-    apiClient.post<SaveAgreementsResponse>("/api/member/agreements", data),
-
-  // ============================================
-  // 회원 탈퇴
-  // ============================================
-
-  /**
-   * 회원 탈퇴
-   */
-  withdraw: () =>
-    apiClient.post<WithdrawResponse>("/api/member/withdraw"),
+    apiClient.post<ApiResponse<CheckLoginIdData>>(
+      "/api/member/checkLoginId",
+      data
+    ),
 };

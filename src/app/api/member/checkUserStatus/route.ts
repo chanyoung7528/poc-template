@@ -12,42 +12,64 @@ export async function POST(request: NextRequest) {
     const { transactionId } = body;
 
     // Mock: transactionId로 상태 판단
-    if (transactionId.includes("new")) {
-      // 신규 회원
+    if (transactionId.includes("new") || transactionId.startsWith("imp_")) {
+      // 신규 회원 (기본값)
       return NextResponse.json({
-        status: "NEW_USER",
-        verificationToken: `verify_${Date.now()}`,
+        code: "0000",
+        message: "신규 회원입니다",
+        data: {
+          status: "new" as const,
+          verificationToken: `verify_${Date.now()}`,
+          linkToken: null,
+          message: "신규 회원입니다",
+        },
+        succeeded: true,
+        total: 0,
+        isJackson: true,
       });
     }
 
     if (transactionId.includes("link")) {
       // 계정 연동 필요
       return NextResponse.json({
-        status: "LINK_REQUIRED",
-        linkToken: `link_${Date.now()}`,
-        existingMember: {
-          mbrUlid: "ulid_123",
-          maskedId: "wel****",
-          loginType: "SNS",
-          snsType: "KAKAO",
+        code: "0000",
+        message: "계정 연동이 필요합니다",
+        data: {
+          status: "link_required" as const,
+          verificationToken: undefined,
+          linkToken: `link_${Date.now()}`,
+          message: "계정 연동이 필요합니다",
         },
+        succeeded: true,
+        total: 0,
+        isJackson: true,
       });
     }
 
     // 기존 회원
     return NextResponse.json({
-      status: "EXISTING_USER",
-      member: {
-        mbrUlid: "ulid_123",
-        wellnessId: "wellness123",
-        nickname: "테스트사용자",
-        email: "test@example.com",
-        createdAt: new Date().toISOString(),
+      code: "0000",
+      message: "이미 가입된 회원입니다",
+      data: {
+        status: "duplicate" as const,
+        verificationToken: undefined,
+        linkToken: null,
+        message: "이미 가입된 회원입니다",
       },
+      succeeded: true,
+      total: 0,
+      isJackson: true,
     });
   } catch (error) {
     return NextResponse.json(
-      { code: "MEMBER_041", message: "본인인증 정보가 유효하지 않습니다" },
+      {
+        code: "MEMBER_041",
+        message: "본인인증 정보가 유효하지 않습니다",
+        data: null,
+        succeeded: false,
+        total: 0,
+        isJackson: true,
+      },
       { status: 400 }
     );
   }

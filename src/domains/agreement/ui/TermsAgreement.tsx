@@ -1,6 +1,6 @@
 /**
  * Domain UI: Agreement - TermsAgreement
- * 
+ *
  * 역할: 약관 동의 컴포넌트
  * - API에서 약관 목록 조회
  * - 필수/선택 약관 구분
@@ -9,14 +9,15 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAgreementList } from "@/domains/agreement/model";
+import type { Agreement as AgreementConsent } from "@/domains/member/model";
 import styles from "./TermsAgreement.module.scss";
 
 interface TermsAgreementProps {
-  onAgree: (agreements: Record<string, boolean>) => void;
+  onAgree?: (agreements: AgreementConsent[]) => void;
   showError?: boolean;
-  onSubmit?: () => void;
+  onSubmit?: (agreements: AgreementConsent[]) => void;
 }
 
 export function TermsAgreement({
@@ -41,10 +42,38 @@ export function TermsAgreement({
     }
   }, [agreements]);
 
+  // 동의한 약관을 Agreement[] 형태로 변환
+  const getAgreementConsents = useMemo(() => {
+    return (state: Record<string, boolean>): AgreementConsent[] => {
+      console.log("🔄 getAgreementConsents 호출");
+      console.log("🔄 agreements 길이:", agreements.length);
+      console.log("🔄 state:", state);
+      
+      if (agreements.length === 0) {
+        console.error("❌ agreements 배열이 비어있습니다!");
+        return [];
+      }
+      
+      const consents = agreements
+        .filter((agreement) => state[agreement.agrmNo] === true)
+        .map((agreement) => ({
+          agrmNo: agreement.agrmNo,
+          agrYn: "Y" as const,
+        }));
+      
+      console.log("🔄 생성된 consents:", consents);
+      return consents;
+    };
+  }, [agreements]);
+
   const handleToggle = (agrmNo: string) => {
     const newAgreed = { ...agreedState, [agrmNo]: !agreedState[agrmNo] };
     setAgreedState(newAgreed);
-    onAgree(newAgreed);
+    
+    // 실시간 업데이트 (선택사항)
+    if (onAgree) {
+      onAgree(getAgreementConsents(newAgreed));
+    }
   };
 
   const handleToggleAll = () => {
@@ -56,12 +85,31 @@ export function TermsAgreement({
     });
 
     setAgreedState(newAgreed);
-    onAgree(newAgreed);
+    
+    // 실시간 업데이트 (선택사항)
+    if (onAgree) {
+      onAgree(getAgreementConsents(newAgreed));
+    }
   };
 
   const handleSubmit = () => {
+    console.log("📝 TermsAgreement handleSubmit 호출");
+    console.log("📝 isRequiredAgreed:", isRequiredAgreed);
+    console.log("📝 agreedState:", agreedState);
+    
     if (isRequiredAgreed) {
-      onSubmit?.();
+      const consents = getAgreementConsents(agreedState);
+      console.log("📝 생성된 consents:", consents);
+      console.log("📝 consents 길이:", consents.length);
+      
+      if (consents.length === 0) {
+        console.error("❌ consents가 비어있습니다!");
+        return;
+      }
+      
+      onSubmit?.(consents);
+    } else {
+      console.warn("⚠️ 필수 약관에 동의하지 않았습니다");
     }
   };
 

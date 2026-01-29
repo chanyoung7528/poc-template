@@ -4,6 +4,7 @@ import { ClearIcon } from "@/shared/ui/icon/ClearIcon";
 import { useEffect, useState } from "react";
 import type { Control, FieldValues, Path } from "react-hook-form";
 import { useController } from "react-hook-form";
+import { useWellnessIdDuplicateCheck } from "@/features/member/hooks/useWellnessIdDuplicateCheck";
 import styles from "./WellnessIdInput.module.scss";
 
 interface ValidationRule {
@@ -16,7 +17,8 @@ interface WellnessIdInputProps<T extends FieldValues = FieldValues> {
   control: Control<T>;
   label?: string;
   placeholder?: string;
-  onDuplicateCheck?: (value: string) => Promise<boolean>; // true면 중복, false면 사용가능
+  // onDuplicateCheck는 선택적 (없으면 내부 훅 사용)
+  onDuplicateCheck?: (value: string) => Promise<boolean>; // true면 사용가능, false면 중복/오류
 }
 
 const VALIDATION_RULES: ValidationRule[] = [
@@ -46,6 +48,10 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
     fieldState: { error },
   } = useController({ name, control });
 
+  // 내부 훅 사용 (onDuplicateCheck가 없을 때)
+  const { checkDuplicate: internalCheckDuplicate } =
+    useWellnessIdDuplicateCheck();
+
   const [isFocused, setIsFocused] = useState(false);
   const [isDuplicate, setIsDuplicate] = useState<boolean | null>(null);
   const [hasDuplicateCheck, setHasDuplicateCheck] = useState(false);
@@ -71,47 +77,46 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
   // 모든 규칙 통과 여부
   const allRulesPassed = ruleResults.every((r) => r.passed) && hasValue;
 
-  // 중복 확인 - 포커싱되었을 때 실행
-  useEffect(() => {
-    const checkDuplicate = async () => {
-      // 포커스 상태가 아니면 실행하지 않음
-      if (!isFocused) {
-        return;
-      }
+  // 중복 체크 함수 (블러 시 호출)
+  const performDuplicateCheck = async () => {
+    // 모든 규칙을 통과하지 않으면 중복 확인하지 않음
+    if (!allRulesPassed) {
+      setIsDuplicate(null);
+      setHasDuplicateCheck(false);
+      return;
+    }
 
-      // 모든 규칙을 통과하지 않으면 중복 확인하지 않음
-      if (!allRulesPassed || !onDuplicateCheck) {
-        setIsDuplicate(null);
-        setHasDuplicateCheck(false);
-        return;
-      }
+    // 중복 체크 함수 선택 (외부에서 전달된 함수 우선, 없으면 내부 훅 사용)
+    const checkFn = onDuplicateCheck || internalCheckDuplicate;
 
-      try {
-        const result = await onDuplicateCheck(value);
-        setIsDuplicate(result);
-        setHasDuplicateCheck(true);
-      } catch (error) {
-        console.error("중복 확인 중 오류:", error);
-        setIsDuplicate(null);
-        setHasDuplicateCheck(false);
-      }
-    };
-
-    // 입력이 멈춘 후 500ms 후에 중복 확인 실행 (디바운스)
-    const timer = setTimeout(() => {
-      checkDuplicate();
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [value, allRulesPassed, isFocused, onDuplicateCheck]);
+    try {
+      // true = 사용 가능, false = 중복/오류
+      const isAvailable = await checkFn(value);
+      setIsDuplicate(!isAvailable); // isDuplicate는 중복 여부이므로 반전
+      setHasDuplicateCheck(true);
+    } catch (error) {
+      console.error("중복 확인 중 오류:", error);
+      setIsDuplicate(null);
+      setHasDuplicateCheck(false);
+    }
+  };
 
   const handleFocus = () => {
     setIsFocused(true);
   };
 
-  const handleBlur = () => {
+  const handleBlur = async () => {
     setIsFocused(false);
     field.onBlur();
+    
+    // 블러 시 모든 벨리데이션이 통과되었으면 중복 체크 실행
+    if (allRulesPassed) {
+      await performDuplicateCheck();
+    } else {
+      // 벨리데이션 통과하지 않으면 중복 체크 결과 초기화
+      setIsDuplicate(null);
+      setHasDuplicateCheck(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

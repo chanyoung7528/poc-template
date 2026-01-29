@@ -47,7 +47,7 @@ export async function checkUserStatus(
 ): Promise<CheckUserStatusResponse> {
   const response = await apiClient.post<CheckUserStatusResponse>(
     "/api/auth/check-user-status",
-    { transactionId }
+    { transactionId: "tx_202401011234567890" }
   );
   return response.data;
 }

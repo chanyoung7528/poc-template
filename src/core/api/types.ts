@@ -9,7 +9,7 @@ export interface ApiResponse<T> {
   data: T;
   succeeded: boolean;
   total: number;
-  jackson: boolean;
+  isJackson: boolean;
 }
 
 /** 페이지네이션 메타데이터 */

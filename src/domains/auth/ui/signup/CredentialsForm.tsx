@@ -34,7 +34,7 @@ const accountSchema = z
 interface CredentialsFormProps {
   isSubmitting: boolean;
   onSubmit: (data: AccountForm) => Promise<void>;
-  onDuplicateCheck: (wellnessId: string) => Promise<boolean>;
+  onDuplicateCheck?: (wellnessId: string) => Promise<boolean>; // 선택적 (없으면 WellnessIdInput 내부 훅 사용)
 }
 
 export function CredentialsForm({

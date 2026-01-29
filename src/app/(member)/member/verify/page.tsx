@@ -1,7 +1,9 @@
 /**
  * Page: Member - 본인인증
- * 
- * 역할: PASS 본인인증 페이지
+ *
+ * 역할: PortOne 본인인증 페이지 (일반 & SNS 공통)
+ * - PortOne SDK를 사용하여 본인인증
+ * - 웹뷰/일반 브라우저 모두 지원
  */
 
 "use client";
@@ -10,7 +12,9 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { PassAuthButton } from "@/domains/auth/ui/signup/PassAuthButton";
 import styles from "./page.module.scss";
-import { useGeneralSignupFlow, useCredentialsAuth } from "@/features/member/hooks";
+import { useGeneralSignupFlow } from "@/features/member/hooks/useGeneralSignupFlow";
+import { useSnsSignupFlow } from "@/features/member/hooks/useSnsSignupFlow";
+import { useCredentialsAuth } from "@/features/member/hooks/useCredentialsAuth";
 
 // Dynamic rendering 강제
 export const dynamic = "force-dynamic";
@@ -18,10 +22,16 @@ export const dynamic = "force-dynamic";
 // 실제 페이지 컴포넌트
 function MemberVerifyPageContent() {
   const searchParams = useSearchParams();
-  const { handleVerificationComplete, isCheckingStatus } = useGeneralSignupFlow();
-  const { startPassAuth, isAuthenticating } = useCredentialsAuth();
+  const signupType = searchParams.get("type") || "general"; // "general" or "sns"
+
+  const generalFlow = useGeneralSignupFlow();
+  const snsFlow = useSnsSignupFlow();
+  const { startPassAuth, handleRedirectResult, isAuthenticating } =
+    useCredentialsAuth();
+
   const [isVerifying, setIsVerifying] = useState(false);
   const [hasProcessedRedirect, setHasProcessedRedirect] = useState(false);
+  const [hasAutoStarted, setHasAutoStarted] = useState(false);
 
   // 웹뷰에서 리다이렉트로 돌아온 경우 처리
   useEffect(() => {
@@ -45,30 +55,79 @@ function MemberVerifyPageContent() {
       setHasProcessedRedirect(true);
 
       if (impSuccess === "true" && impUid) {
-        // ✅ 본인인증 성공 → transactionId로 회원 상태 조회
-        handleVerificationComplete(impUid);
+        // ✅ 본인인증 성공 → transactionId로 처리
+        const transactionId = handleRedirectResult({
+          success: true,
+          imp_uid: impUid,
+        });
+
+        if (transactionId) {
+          if (signupType === "sns") {
+            snsFlow.handleVerificationComplete(transactionId);
+          } else {
+            generalFlow.handleVerificationComplete(transactionId);
+          }
+        }
       } else {
-        alert(errorMsg || "본인인증에 실패했습니다");
+        handleRedirectResult({
+          success: false,
+          error_msg: errorMsg || undefined,
+        });
         setIsVerifying(false);
       }
+      return; // 리다이렉트 처리했으면 자동 시작하지 않음
     }
-  }, [searchParams, hasProcessedRedirect, handleVerificationComplete]);
+
+    // 리다이렉트가 아닌 경우: 약관 동의 후 자동으로 본인인증 시작
+    if (!hasAutoStarted && !hasProcessedRedirect) {
+      setHasAutoStarted(true);
+      setIsVerifying(true);
+
+      startPassAuth(async (transactionId) => {
+        // PortOne 인증 완료 → transactionId로 처리
+        if (signupType === "sns") {
+          await snsFlow.handleVerificationComplete(transactionId);
+        } else {
+          await generalFlow.handleVerificationComplete(transactionId);
+        }
+        setIsVerifying(false);
+      });
+    }
+  }, [
+    searchParams,
+    hasProcessedRedirect,
+    hasAutoStarted,
+    signupType,
+    generalFlow,
+    snsFlow,
+    handleRedirectResult,
+    startPassAuth,
+  ]);
 
   const handlePassAuth = () => {
     setIsVerifying(true);
 
     try {
       startPassAuth(async (transactionId) => {
-        // PASS 인증 완료 → transactionId로 회원 상태 조회
-        await handleVerificationComplete(transactionId);
+        // PortOne 인증 완료 → transactionId로 처리
+        if (signupType === "sns") {
+          await snsFlow.handleVerificationComplete(transactionId);
+        } else {
+          await generalFlow.handleVerificationComplete(transactionId);
+        }
         setIsVerifying(false);
       });
     } catch (error) {
       console.error("본인인증 중 오류:", error);
-      alert("본인인증 중 오류가 발생했습니다. 다시 시도해주세요.");
       setIsVerifying(false);
     }
   };
+
+  const isLoading =
+    isVerifying ||
+    isAuthenticating ||
+    generalFlow.isLoading ||
+    snsFlow.isLoading;
 
   return (
     <div className={styles.container}>
@@ -92,7 +151,7 @@ function MemberVerifyPageContent() {
             </p>
           </div>
 
-          {(isVerifying || isAuthenticating || isCheckingStatus) && (
+          {isLoading && (
             <div className={styles.loadingOverlay}>
               <p>본인인증 처리 중...</p>
             </div>

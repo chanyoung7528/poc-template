@@ -8,4 +8,3 @@ export * from "./member.types";
 export * from "./member.api";
 export * from "./member.queries";
 export * from "./member.store";
-export * from "./member.errors";

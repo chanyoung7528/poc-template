@@ -1,304 +1,208 @@
 /**
  * Domain: Member - Types
- * 
- * 역할: 회원 도메인 타입 정의
- * - API 요청/응답 타입
- * - 토큰 타입
- * - 회원 정보 타입
+ *
+ * 역할: 회원 도메인 타입 정의 (비즈니스 로직 변경)
  */
-
-// ============================================
-// 토큰 타입
-// ============================================
-
-/**
- * Verification Token (인증완료 토큰)
- * 유효기간: 15분
- * 용도: NICE 본인인증 완료 후 일반 회원가입 시 사용
- */
-export interface VerificationTokenData {
-  token: string;
-  expiresAt: number; // timestamp
-}
-
-/**
- * Register Token (SNS 간편가입 토큰)
- * 유효기간: 5분
- * 용도: SNS 간편 회원가입 시 SNS 정보를 안전하게 전달
- */
-export interface RegisterTokenData {
-  token: string;
-  snsType: SnsType;
-  expiresAt: number;
-}
-
-/**
- * Link Token (계정 연동 토큰)
- * 유효기간: 5분
- * 용도: 기존 회원이 다른 로그인 방식을 추가할 때 사용
- */
-export interface LinkTokenData {
-  token: string;
-  userUlid: string;
-  expiresAt: number;
-}
 
 // ============================================
 // 회원 정보
 // ============================================
 
-export type SnsType = "KAKAO" | "NAVER" | "APPLE";
-
 export interface Member {
   mbrUlid: string;
-  wellnessId?: string; // 일반 로그인 ID
-  nickname: string;
-  email: string;
-  snsType?: SnsType;
-  snsId?: string;
-  createdAt: string;
+  oppbId: string; // 공개 ID
+}
+
+// ============================================
+// 토큰 타입 (FE에서 관리)
+// ============================================
+
+export interface VerificationToken {
+  token: string;
+  expiresAt: number; // 15분
+}
+
+export interface RegisterToken {
+  token: string;
+  expiresAt: number; // 5분
+}
+
+export interface LinkToken {
+  token: string;
+  userUlid: string;
+  expiresAt: number; // 5분
+}
+
+// ============================================
+// 약관 동의
+// ============================================
+
+export interface Agreement {
+  agrmNo: string;
+  agrYn: "Y" | "N";
+}
+
+// ============================================
+// 회원가입 데이터 (Store에서 관리)
+// ============================================
+
+export interface GeneralSignupData {
+  // 약관 동의 (terms-agreement 페이지)
+  agreements: Agreement[];
+
+  // 본인인증 (verify 페이지)
+  verificationToken: string;
+
+  // 회원가입 폼 (credentials 페이지)
+  loginId: string;
+  password: string;
+
+  // 추가 정보 (선택)
+  hegtVal?: number; // 키
+  wegtVal?: number; // 몸무게
+  actAmountCd?: string; // 활동량 코드
+
+  // 디바이스 정보
+  pushTknCont?: string;
+  dvcId?: string;
+  dvcTpCd?: string; // "AND" | "IOS"
+  dvcMdlNm?: string;
+  osVerNm?: string;
+  appVerNm?: string;
+}
+
+export interface SnsSignupData {
+  // SNS 정보
+  snsType: "KAKAO" | "NAVER" | "APPLE";
+  accessToken: string;
+
+  // 약관 동의
+  agreements: Agreement[];
+
+  // 본인인증
+  registerToken: string;
+  transactionId: string;
+
+  // 추가 정보
+  hegtVal?: number;
+  wegtVal?: number;
+  actAmountCd?: string;
 }
 
 // ============================================
 // API 요청 타입
 // ============================================
 
-/**
- * 회원 상태 조회 요청
- */
 export interface CheckUserStatusRequest {
-  transactionId: string; // NICE 본인인증 거래 ID
+  transactionId: string;
 }
 
+export type CheckUserStatus = "new" | "duplicate" | "link_required";
+
 /**
- * SNS 회원 조회 요청
+ * checkUserStatus API의 data 필드 타입
  */
+export interface CheckUserStatusData {
+  status: CheckUserStatus;
+  verificationToken?: string;
+  linkToken?: string | null;
+  message?: string;
+}
+
 export interface CheckSnsUserRequest {
-  snsType: SnsType;
-  snsId: string;
-  snsEmail?: string;
+  snsType: "KAKAO" | "NAVER" | "APPLE";
+  accessToken: string;
 }
 
 /**
- * 일반 회원가입 요청
+ * checkSnsUser API의 data 필드 타입
  */
+export interface CheckSnsUserData {
+  status: CheckUserStatus;
+  registerToken?: string;
+  linkToken?: string | null;
+  message?: string;
+}
+
 export interface RegisterGeneralRequest {
   verificationToken: string;
-  wellnessId: string;
+  loginId: string;
   password: string;
-  nickname: string;
-  email?: string;
-  agreeMarketing: boolean;
+  agreements: Agreement[];
+  hegtVal?: number;
+  wegtVal?: number;
+  actAmountCd?: string;
+  pushTknCont?: string;
+  dvcId?: string;
+  dvcTpCd?: string;
+  dvcMdlNm?: string;
+  osVerNm?: string;
+  appVerNm?: string;
 }
 
 /**
- * SNS 회원가입 요청
+ * registerGeneral API의 data 필드 타입
  */
-export interface RegisterSnsRequest {
+export interface RegisterGeneralData {
+  tokens: {
+    // 실제로는 HTTP-only 쿠키로 설정됨
+    accessToken?: string;
+    refreshToken?: string;
+  };
+  mbrUlid: string;
+  oppbId: string;
+}
+
+export interface RegisterSnsUserRequest {
   registerToken: string;
-  transactionId: string; // PASS 본인인증 거래 ID
-  nickname: string;
-  agreeMarketing: boolean;
+  transactionId: string;
+  agreements: Agreement[];
+  hegtVal?: number;
+  wegtVal?: number;
+  actAmountCd?: string;
 }
 
 /**
- * 일반 계정 연동 요청
+ * registerSnsUser API의 data 필드 타입
  */
-export interface LinkGeneralRequest {
-  linkToken: string;
-  wellnessId: string;
-  password: string;
+export interface RegisterSnsUserData {
+  tokens: {
+    accessToken?: string;
+    refreshToken?: string;
+  };
+  mbrUlid: string;
+  oppbId: string;
 }
 
-/**
- * SNS 계정 연동 요청
- */
-export interface LinkSnsRequest {
-  linkToken: string;
-  registerToken: string;
-}
+// ============================================
+// 로그인 관련
+// ============================================
 
-/**
- * 일반 로그인 요청
- */
 export interface LoginGeneralRequest {
-  wellnessId: string;
+  loginId: string;
   password: string;
 }
 
 /**
- * SNS 로그인 요청
+ * loginGeneral API의 data 필드 타입
  */
-export interface LoginSnsRequest {
-  snsType: SnsType;
-  snsId: string;
-  snsEmail?: string;
+export interface LoginGeneralData {
+  mbrUlid: string;
+  oppbId: string;
 }
 
-/**
- * 아이디 찾기 요청
- */
-export interface FindLoginInfoRequest {
-  transactionId: string;
-}
+// ============================================
+// 로그인 ID 중복 체크
+// ============================================
 
-/**
- * 로그인 ID 중복 체크 요청
- */
 export interface CheckLoginIdRequest {
-  wellnessId: string;
+  loginId: string;
 }
 
 /**
- * 비밀번호 재설정 요청
+ * checkLoginId API의 data 필드 타입
  */
-export interface ResetPasswordRequest {
-  transactionId: string;
-  newPassword: string;
-}
-
-/**
- * 약관 동의 저장 요청
- */
-export interface SaveAgreementsRequest {
-  agreeTerms: boolean;
-  agreePrivacy: boolean;
-  agreeMarketing: boolean;
-}
-
-// ============================================
-// API 응답 타입
-// ============================================
-
-/**
- * 회원 상태 조회 응답
- */
-export type CheckUserStatusResponse =
-  | {
-      status: "NEW_USER";
-      verificationToken: string;
-    }
-  | {
-      status: "EXISTING_USER";
-      member: Member;
-    }
-  | {
-      status: "LINK_REQUIRED";
-      linkToken: string;
-      existingMember: {
-        mbrUlid: string;
-        maskedId: string; // 마스킹된 아이디 (예: wel****)
-        loginType: "GENERAL" | "SNS";
-        snsType?: SnsType;
-      };
-    };
-
-/**
- * SNS 회원 조회 응답
- */
-export type CheckSnsUserResponse =
-  | {
-      status: "EXISTING_USER";
-      member: Member;
-    }
-  | {
-      status: "REGISTER_REQUIRED";
-      registerToken: string;
-    }
-  | {
-      status: "LINK_REQUIRED";
-      linkToken: string;
-      existingMember: {
-        mbrUlid: string;
-        maskedId: string;
-        loginType: "GENERAL" | "SNS";
-        snsType?: SnsType;
-      };
-    };
-
-/**
- * 회원가입/로그인 성공 응답
- */
-export interface AuthSuccessResponse {
-  member: Member;
-  accessToken: string;
-  refreshToken: string;
-}
-
-/**
- * 아이디 찾기 응답
- */
-export interface FindLoginInfoResponse {
-  wellnessId: string;
-  maskedId: string; // 마스킹된 아이디
-  createdAt: string;
-}
-
-/**
- * 로그인 ID 중복 체크 응답
- */
-export interface CheckLoginIdResponse {
+export interface CheckLoginIdData {
   available: boolean;
-  reason?: string; // 사용 불가 사유
-}
-
-/**
- * 비밀번호 재설정 응답
- */
-export interface ResetPasswordResponse {
-  success: boolean;
   message: string;
 }
-
-/**
- * 약관 동의 저장 응답
- */
-export interface SaveAgreementsResponse {
-  success: boolean;
-}
-
-/**
- * 회원 탈퇴 응답
- */
-export interface WithdrawResponse {
-  success: boolean;
-  message: string;
-}
-
-// ============================================
-// 에러 코드
-// ============================================
-
-export const MEMBER_ERROR_CODES = {
-  // 인증 관련
-  INVALID_VERIFICATION_TOKEN: "MEMBER_001",
-  EXPIRED_VERIFICATION_TOKEN: "MEMBER_002",
-  INVALID_REGISTER_TOKEN: "MEMBER_003",
-  EXPIRED_REGISTER_TOKEN: "MEMBER_004",
-  INVALID_LINK_TOKEN: "MEMBER_005",
-  EXPIRED_LINK_TOKEN: "MEMBER_006",
-
-  // 회원가입 관련
-  DUPLICATED_WELLNESS_ID: "MEMBER_011",
-  DUPLICATED_SNS_USER: "MEMBER_012",
-  INVALID_PASSWORD: "MEMBER_013",
-  UNDER_AGE: "MEMBER_014",
-
-  // 로그인 관련
-  INVALID_CREDENTIALS: "MEMBER_021",
-  USER_NOT_FOUND: "MEMBER_022",
-  ACCOUNT_LOCKED: "MEMBER_023",
-  PASSWORD_EXPIRED: "MEMBER_024",
-
-  // 계정 연동 관련
-  ALREADY_LINKED: "MEMBER_031",
-  LINK_NOT_ALLOWED: "MEMBER_032",
-
-  // 본인인증 관련
-  INVALID_TRANSACTION_ID: "MEMBER_041",
-  EXPIRED_TRANSACTION: "MEMBER_042",
-  VERIFICATION_FAILED: "MEMBER_043",
-} as const;
-
-export type MemberErrorCode =
-  (typeof MEMBER_ERROR_CODES)[keyof typeof MEMBER_ERROR_CODES];

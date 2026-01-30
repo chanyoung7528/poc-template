@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 interface TokenVerificationResult {
   success: boolean;
   provider?: string;
+  apiEndpoint?: string;
   verification?: any;
   storedToken?: {
     accessToken?: string;
@@ -142,6 +143,7 @@ export async function GET(request: NextRequest) {
         result = {
           success: false,
           provider: "naver",
+          apiEndpoint: "https://openapi.naver.com/v1/nid/me",
           error: "토큰 검증 실패",
           errorData,
           storedToken: {
@@ -158,6 +160,7 @@ export async function GET(request: NextRequest) {
         result = {
           success: true,
           provider: "naver",
+          apiEndpoint: "https://openapi.naver.com/v1/nid/me",
           verification: verificationResult,
           storedToken: {
             accessToken: user.accessToken?.substring(0, 20) + "...",

@@ -58,11 +58,16 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ 약관 동의 완료, 세션 업데이트');
 
-    // 약관 동의 상태를 세션에 추가
+    // 약관 동의 상태를 세션에 추가 (✅ 토큰 정보 유지)
     const updatedUser: SessionUser = {
       ...sessionUser,
       termsAgreed: true,
       // marketingAgreed 정보도 필요하면 추가
+      // ✅ 토큰 정보 명시적으로 유지
+      accessToken: sessionUser.accessToken,
+      refreshToken: sessionUser.refreshToken,
+      tokenType: sessionUser.tokenType,
+      expiresAt: sessionUser.expiresAt,
     };
 
     // 업데이트된 세션 토큰 생성

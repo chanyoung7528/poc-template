@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/session";
-import { findUserById } from "@/lib/database";
+import { prisma } from "@/lib/prisma";
 
 interface TokenVerificationResult {
   success: boolean;
@@ -42,8 +42,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // DB에서 사용자 정보 조회 (accessToken 포함)
-    const user = await findUserById(sessionUser.id);
+    // DB에서 사용자 정보 조회 (accessToken 포함) - 직접 prisma 사용
+    const user = await prisma.user.findUnique({
+      where: { id: sessionUser.id },
+      select: {
+        id: true,
+        email: true,
+        nickname: true,
+        provider: true,
+        accessToken: true,
+        refreshToken: true,
+        tokenType: true,
+        expiresAt: true,
+        createdAt: true,
+      },
+    });
 
     if (!user) {
       const url = new URL("/token-verify", request.url);

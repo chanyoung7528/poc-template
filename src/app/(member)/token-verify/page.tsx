@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface TokenVerificationData {
@@ -25,7 +25,7 @@ interface TokenVerificationData {
   errorData?: any;
 }
 
-export default function TokenVerifyPage() {
+function TokenVerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [data, setData] = useState<TokenVerificationData | null>(null);
@@ -261,5 +261,22 @@ export default function TokenVerifyPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function TokenVerifyPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">로딩 중...</p>
+          </div>
+        </div>
+      }
+    >
+      <TokenVerifyContent />
+    </Suspense>
   );
 }

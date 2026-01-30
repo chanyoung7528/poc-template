@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import styles from "./page.module.scss";
 
 interface TokenVerificationData {
   success: boolean;
@@ -68,45 +69,43 @@ function TokenVerifyContent() {
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">데이터 로딩 중...</p>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingContent}>
+          <div className={styles.spinner}></div>
+          <p className={styles.loadingText}>데이터 로딩 중...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6 px-4 overflow-y-auto">
-      <div className="max-w-6xl mx-auto">
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
         {/* 헤더 */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6 sticky top-0 z-10">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-gray-900">
+        <div className={styles.header}>
+          <div className={styles.headerContent}>
+            <div className={styles.headerLeft}>
+              <h1 className={styles.title}>
                 소셜 로그인 토큰 검증 결과
               </h1>
               <div
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  data.success
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
+                className={`${styles.statusBadge} ${
+                  data.success ? styles.statusSuccess : styles.statusError
                 }`}
               >
                 {data.success ? "✅ 검증 성공" : "❌ 검증 실패"}
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className={styles.headerButtons}>
               <button
                 onClick={() => window.location.href = '/api/auth/verify-token'}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition text-sm font-medium"
+                className={`${styles.button} ${styles.buttonPrimary}`}
               >
                 다시 검증
               </button>
               <button
                 onClick={() => router.push("/")}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition text-sm font-medium"
+                className={`${styles.button} ${styles.buttonSecondary}`}
               >
                 홈으로
               </button>
@@ -115,32 +114,32 @@ function TokenVerifyContent() {
         </div>
 
         {/* 테이블 형태의 데이터 표시 */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+        <div className={styles.tableContainer}>
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
+              <thead className={styles.tableHead}>
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-1/4">
+                  <th className={styles.tableHeader}>
                     항목
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className={styles.tableHeader}>
                     값
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className={styles.tableBody}>
                 {/* Provider 정보 */}
                 {data.provider && (
-                  <tr className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr className={styles.tableRow}>
+                    <td className={`${styles.tableCell} ${styles.tableCellLabel}`}>
                       Provider
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-700">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">
+                    <td className={`${styles.tableCell} ${styles.tableCellValue}`}>
+                      <div className={styles.providerContainer}>
+                        <span className={styles.providerIcon}>
                           {data.provider === "kakao" ? "🟡" : "🟢"}
                         </span>
-                        <span className="font-medium">
+                        <span className={styles.providerName}>
                           {data.provider === "kakao" ? "카카오" : "네이버"}
                         </span>
                       </div>
@@ -150,20 +149,20 @@ function TokenVerifyContent() {
 
                 {/* API 엔드포인트 정보 */}
                 {data.apiEndpoint && (
-                  <tr className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr className={styles.tableRow}>
+                    <td className={`${styles.tableCell} ${styles.tableCellLabel}`}>
                       API 엔드포인트
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-700">
-                      <div className="flex items-center gap-2">
-                        <span className="text-blue-600 font-mono break-all">
+                    <td className={`${styles.tableCell} ${styles.tableCellValue}`}>
+                      <div className={styles.apiEndpointContainer}>
+                        <span className={styles.apiEndpoint}>
                           {data.apiEndpoint}
                         </span>
                         <a
                           href={data.apiEndpoint}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-500 hover:text-blue-700 text-xs"
+                          className={styles.apiLink}
                           title="API 문서 보기"
                         >
                           🔗
@@ -176,35 +175,35 @@ function TokenVerifyContent() {
                 {/* 사용자 정보 */}
                 {data.user && (
                   <>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr className={styles.tableRow}>
+                      <td className={`${styles.tableCell} ${styles.tableCellLabel}`}>
                         사용자 ID
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-700 font-mono break-all">
+                      <td className={`${styles.tableCell} ${styles.tableCellValue} ${styles.tableCellMono}`}>
                         {data.user.id}
                       </td>
                     </tr>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr className={styles.tableRow}>
+                      <td className={`${styles.tableCell} ${styles.tableCellLabel}`}>
                         이메일
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-700">
-                        {data.user.email || <span className="text-gray-400">없음</span>}
+                      <td className={`${styles.tableCell} ${styles.tableCellValue}`}>
+                        {data.user.email || <span className={styles.tableCellEmpty}>없음</span>}
                       </td>
                     </tr>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr className={styles.tableRow}>
+                      <td className={`${styles.tableCell} ${styles.tableCellLabel}`}>
                         닉네임
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-700">
-                        {data.user.nickname || <span className="text-gray-400">없음</span>}
+                      <td className={`${styles.tableCell} ${styles.tableCellValue}`}>
+                        {data.user.nickname || <span className={styles.tableCellEmpty}>없음</span>}
                       </td>
                     </tr>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr className={styles.tableRow}>
+                      <td className={`${styles.tableCell} ${styles.tableCellLabel}`}>
                         가입일
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-700">
+                      <td className={`${styles.tableCell} ${styles.tableCellValue}`}>
                         {new Date(data.user.createdAt).toLocaleString("ko-KR")}
                       </td>
                     </tr>
@@ -214,43 +213,43 @@ function TokenVerifyContent() {
                 {/* 저장된 토큰 정보 */}
                 {data.storedToken && (
                   <>
-                    <tr className="bg-blue-50">
-                      <td colSpan={2} className="px-6 py-3 text-sm font-bold text-blue-900">
+                    <tr className={styles.sectionHeaderBlue}>
+                      <td colSpan={2} className={styles.sectionHeader}>
                         DB에 저장된 토큰 정보
                       </td>
                     </tr>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr className={styles.tableRow}>
+                      <td className={`${styles.tableCell} ${styles.tableCellLabel}`}>
                         Access Token
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-700 font-mono break-all">
-                        {data.storedToken.accessToken || <span className="text-gray-400">없음</span>}
+                      <td className={`${styles.tableCell} ${styles.tableCellValue} ${styles.tableCellMono}`}>
+                        {data.storedToken.accessToken || <span className={styles.tableCellEmpty}>없음</span>}
                       </td>
                     </tr>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr className={styles.tableRow}>
+                      <td className={`${styles.tableCell} ${styles.tableCellLabel}`}>
                         Refresh Token
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-700 font-mono break-all">
-                        {data.storedToken.refreshToken || <span className="text-gray-400">없음</span>}
+                      <td className={`${styles.tableCell} ${styles.tableCellValue} ${styles.tableCellMono}`}>
+                        {data.storedToken.refreshToken || <span className={styles.tableCellEmpty}>없음</span>}
                       </td>
                     </tr>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr className={styles.tableRow}>
+                      <td className={`${styles.tableCell} ${styles.tableCellLabel}`}>
                         Token Type
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-700">
-                        {data.storedToken.tokenType || <span className="text-gray-400">없음</span>}
+                      <td className={`${styles.tableCell} ${styles.tableCellValue}`}>
+                        {data.storedToken.tokenType || <span className={styles.tableCellEmpty}>없음</span>}
                       </td>
                     </tr>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr className={styles.tableRow}>
+                      <td className={`${styles.tableCell} ${styles.tableCellLabel}`}>
                         Expires At
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-700">
+                      <td className={`${styles.tableCell} ${styles.tableCellValue}`}>
                         {data.storedToken.expiresAt
                           ? new Date(data.storedToken.expiresAt).toLocaleString("ko-KR")
-                          : <span className="text-gray-400">없음</span>}
+                          : <span className={styles.tableCellEmpty}>없음</span>}
                       </td>
                     </tr>
                   </>
@@ -259,14 +258,14 @@ function TokenVerifyContent() {
                 {/* API 검증 결과 */}
                 {data.verification && (
                   <>
-                    <tr className="bg-green-50">
-                      <td colSpan={2} className="px-6 py-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-bold text-green-900">
+                    <tr className={styles.sectionHeaderGreen}>
+                      <td colSpan={2} className={styles.sectionHeader}>
+                        <div className={styles.sectionHeaderContent}>
+                          <span className={`${styles.sectionHeaderTitle} ${styles.sectionHeaderTitleGreen}`}>
                             {data.provider === "kakao" ? "카카오" : "네이버"} API 검증 결과
                           </span>
                           {data.apiEndpoint && (
-                            <span className="text-xs text-green-700 font-mono">
+                            <span className={styles.sectionHeaderEndpoint}>
                               {data.apiEndpoint}
                             </span>
                           )}
@@ -274,13 +273,13 @@ function TokenVerifyContent() {
                       </td>
                     </tr>
                     {Object.entries(data.verification).map(([key, value]) => (
-                      <tr key={key} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 capitalize">
+                      <tr key={key} className={styles.tableRow}>
+                        <td className={`${styles.tableCell} ${styles.tableCellLabel} ${styles.tableCellCapitalize}`}>
                           {key.replace(/_/g, " ")}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-700 break-all">
+                        <td className={`${styles.tableCell} ${styles.tableCellValue}`}>
                           {typeof value === "object" ? (
-                            <pre className="text-xs bg-gray-100 p-2 rounded overflow-x-auto">
+                            <pre className={styles.jsonPre}>
                               {JSON.stringify(value, null, 2)}
                             </pre>
                           ) : (
@@ -295,36 +294,36 @@ function TokenVerifyContent() {
                 {/* 에러 정보 */}
                 {data.error && (
                   <>
-                    <tr className="bg-red-50">
-                      <td colSpan={2} className="px-6 py-3 text-sm font-bold text-red-900">
+                    <tr className={styles.sectionHeaderRed}>
+                      <td colSpan={2} className={styles.sectionHeader}>
                         에러 정보
                       </td>
                     </tr>
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-900">
+                    <tr className={styles.tableRow}>
+                      <td className={`${styles.tableCell} ${styles.tableCellLabel} ${styles.errorLabel}`}>
                         에러 코드
                       </td>
-                      <td className="px-6 py-4 text-sm text-red-700 font-medium">
+                      <td className={`${styles.tableCell} ${styles.errorValueBold}`}>
                         {data.error}
                       </td>
                     </tr>
                     {data.message && (
-                      <tr className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-900">
+                      <tr className={styles.tableRow}>
+                        <td className={`${styles.tableCell} ${styles.tableCellLabel} ${styles.errorLabel}`}>
                           에러 메시지
                         </td>
-                        <td className="px-6 py-4 text-sm text-red-700">
+                        <td className={`${styles.tableCell} ${styles.errorValue}`}>
                           {data.message}
                         </td>
                       </tr>
                     )}
                     {data.errorData && (
-                      <tr className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-900">
+                      <tr className={styles.tableRow}>
+                        <td className={`${styles.tableCell} ${styles.tableCellLabel} ${styles.errorLabel}`}>
                           에러 상세
                         </td>
-                        <td className="px-6 py-4 text-sm text-red-700">
-                          <pre className="text-xs bg-red-50 p-3 rounded border border-red-200 overflow-x-auto max-h-64 overflow-y-auto">
+                        <td className={`${styles.tableCell} ${styles.errorValue}`}>
+                          <pre className={styles.jsonPreError}>
                             {JSON.stringify(data.errorData, null, 2)}
                           </pre>
                         </td>
@@ -338,18 +337,18 @@ function TokenVerifyContent() {
         </div>
 
         {/* 전체 응답 데이터 (접을 수 있게) */}
-        <div className="mt-6 bg-white rounded-lg shadow-md overflow-hidden">
+        <div className={styles.rawDataContainer}>
           <details className="group">
-            <summary className="px-6 py-4 cursor-pointer bg-gray-50 hover:bg-gray-100 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">
+            <summary className={styles.rawDataSummary}>
+              <h2 className={styles.rawDataTitle}>
                 전체 응답 데이터 (Raw JSON)
               </h2>
-              <span className="text-gray-500 group-open:rotate-180 transition-transform">
+              <span className={styles.rawDataArrow}>
                 ▼
               </span>
             </summary>
-            <div className="p-4 bg-gray-900">
-              <pre className="text-xs text-green-400 overflow-x-auto max-h-96 overflow-y-auto">
+            <div className={styles.rawDataContent}>
+              <pre className={styles.rawDataPre}>
                 {JSON.stringify(data, null, 2)}
               </pre>
             </div>
@@ -364,10 +363,10 @@ export default function TokenVerifyPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">로딩 중...</p>
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingContent}>
+            <div className={styles.spinner}></div>
+            <p className={styles.loadingText}>로딩 중...</p>
           </div>
         </div>
       }

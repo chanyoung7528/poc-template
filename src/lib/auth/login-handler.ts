@@ -42,6 +42,10 @@ export async function handleLoginFlow(
       email: userInfo.email || existingUser.email,
       nickname: userInfo.nickname || existingUser.nickname,
       profileImage: userInfo.profileImage || existingUser.profileImage,
+      accessToken: userInfo.accessToken,
+      refreshToken: userInfo.refreshToken,
+      tokenType: userInfo.tokenType,
+      expiresAt: userInfo.expiresAt,
     });
 
     // 마지막 로그인 시간 업데이트

@@ -20,7 +20,18 @@ import type { OAuthUserInfo } from "@/lib/auth/types";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, nickname, email, profileImage, cid, mode = "login" } = body; // ✅ mode 파라미터 추가 (기본값: login)
+    const { 
+      id, 
+      nickname, 
+      email, 
+      profileImage, 
+      cid, 
+      mode = "login",
+      accessToken,
+      refreshToken,
+      tokenType,
+      expiresIn
+    } = body; // ✅ token 파라미터 추가
 
     console.log("📱 네이티브 카카오 로그인 API 호출 - body:", body);
     console.log("🔐 모드:", mode);
@@ -33,6 +44,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // expiresAt 계산 (expiresIn이 있는 경우)
+    const expiresAt = expiresIn 
+      ? new Date(Date.now() + expiresIn * 1000) 
+      : undefined;
+
     // OAuthUserInfo 형태로 변환
     const userInfo: OAuthUserInfo = {
       providerId: id,
@@ -40,6 +56,10 @@ export async function POST(request: NextRequest) {
       nickname: nickname || undefined,
       profileImage: profileImage || undefined,
       provider: "kakao",
+      accessToken: accessToken || undefined,
+      refreshToken: refreshToken || undefined,
+      tokenType: tokenType || undefined,
+      expiresAt: expiresAt,
     };
 
     console.log("📱 네이티브 카카오 로그인 요청:", {

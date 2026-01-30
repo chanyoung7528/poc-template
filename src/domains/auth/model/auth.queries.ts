@@ -242,6 +242,10 @@ export function useKakaoNativeLogin() {
       profileImage?: string;
       cid?: string;
       mode?: "login" | "signup";
+      accessToken?: string;
+      refreshToken?: string;
+      tokenType?: string;
+      expiresIn?: number;
     }) => loginWithKakaoNative(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.me() });
@@ -264,6 +268,10 @@ export function useNaverNativeLogin() {
       profileImage?: string;
       cid?: string;
       mode?: "login" | "signup";
+      accessToken?: string;
+      refreshToken?: string;
+      tokenType?: string;
+      expiresIn?: number;
     }) => loginWithNaverNative(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.me() });

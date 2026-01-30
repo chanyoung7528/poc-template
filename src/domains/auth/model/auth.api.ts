@@ -245,6 +245,10 @@ export async function loginWithKakaoNative(data: {
   profileImage?: string;
   cid?: string;
   mode?: "login" | "signup";
+  accessToken?: string;
+  refreshToken?: string;
+  tokenType?: string;
+  expiresIn?: number;
 }): Promise<{ success: boolean; redirectUrl: string; isNewUser: boolean }> {
   const response = await apiClient.post<{
     success: boolean;
@@ -265,6 +269,10 @@ export async function loginWithNaverNative(data: {
   profileImage?: string;
   cid?: string;
   mode?: "login" | "signup";
+  accessToken?: string;
+  refreshToken?: string;
+  tokenType?: string;
+  expiresIn?: number;
 }): Promise<{ success: boolean; redirectUrl: string; isNewUser: boolean }> {
   const response = await apiClient.post<{
     success: boolean;

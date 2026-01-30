@@ -73,6 +73,11 @@ export async function handleSignupFlow(
     provider: userInfo.provider,
     isTemp: true,
     signupType: 'social', // 소셜 로그인 명시
+    // 토큰 정보 저장 (임시 세션에 포함)
+    accessToken: userInfo.accessToken,
+    refreshToken: userInfo.refreshToken,
+    tokenType: userInfo.tokenType,
+    expiresAt: userInfo.expiresAt,
   };
 
   console.log('🆕 신규 소셜 회원 - 약관 동의 페이지로 이동:', userInfo.providerId);

@@ -65,6 +65,10 @@ export async function createKakaoUser(data: {
   nickname: string | null;
   profileImage: string | null;
   marketingAgreed?: boolean;
+  accessToken?: string;
+  refreshToken?: string;
+  tokenType?: string;
+  expiresAt?: Date;
 }): Promise<User> {
   const user = await prisma.user.create({
     data: {
@@ -73,6 +77,10 @@ export async function createKakaoUser(data: {
       nickname: data.nickname,
       profileImage: data.profileImage,
       provider: 'kakao',
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      tokenType: data.tokenType,
+      expiresAt: data.expiresAt,
       // marketingAgreed는 필요시 스키마에 추가
     },
   });
@@ -91,6 +99,10 @@ export async function createNaverUser(data: {
   nickname: string | null;
   profileImage: string | null;
   marketingAgreed?: boolean;
+  accessToken?: string;
+  refreshToken?: string;
+  tokenType?: string;
+  expiresAt?: Date;
 }): Promise<User> {
   const user = await prisma.user.create({
     data: {
@@ -99,6 +111,10 @@ export async function createNaverUser(data: {
       nickname: data.nickname,
       profileImage: data.profileImage,
       provider: 'naver',
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      tokenType: data.tokenType,
+      expiresAt: data.expiresAt,
       // marketingAgreed는 필요시 스키마에 추가
     },
   });
@@ -118,6 +134,10 @@ export async function updateUser(
     nickname?: string | null;
     profileImage?: string | null;
     lastLoginAt?: Date;
+    accessToken?: string | null;
+    refreshToken?: string | null;
+    tokenType?: string | null;
+    expiresAt?: Date | null;
   }
 ): Promise<User | null> {
   const user = await prisma.user.update({

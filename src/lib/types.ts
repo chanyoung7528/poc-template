@@ -72,4 +72,9 @@ export interface SessionUser {
     birth: string;
     gender: 'M' | 'F';
   };
+  // 소셜 로그인 토큰 정보 (임시 세션용)
+  accessToken?: string;
+  refreshToken?: string;
+  tokenType?: string;
+  expiresAt?: Date;
 }

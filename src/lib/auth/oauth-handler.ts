@@ -110,6 +110,10 @@ export async function handleOAuthCallback(
             nickname: existingSession.nickname || null,
             profileImage: existingSession.profileImage || null,
             marketingAgreed: false,
+            accessToken: existingSession.accessToken,
+            refreshToken: existingSession.refreshToken,
+            tokenType: existingSession.tokenType,
+            expiresAt: existingSession.expiresAt,
           });
         } else if (
           existingSession.provider === 'naver' &&
@@ -121,6 +125,10 @@ export async function handleOAuthCallback(
             nickname: existingSession.nickname || null,
             profileImage: existingSession.profileImage || null,
             marketingAgreed: false,
+            accessToken: existingSession.accessToken,
+            refreshToken: existingSession.refreshToken,
+            tokenType: existingSession.tokenType,
+            expiresAt: existingSession.expiresAt,
           });
         } else {
           console.error('유효하지 않은 Provider:', existingSession.provider);
@@ -180,14 +188,27 @@ export async function handleOAuthCallback(
     }
 
     // Step 1: 액세스 토큰 획득
-    const accessToken = await provider.getAccessToken(code, state || undefined);
+    const tokenInfo = await provider.getAccessToken(code, state || undefined);
 
     // Step 2: 사용자 정보 조회
-    const userInfo = await provider.getUserInfo(accessToken);
+    const userInfo = await provider.getUserInfo(tokenInfo.accessToken);
+    
+    // Token 정보를 userInfo에 추가
+    const expiresAt = tokenInfo.expiresIn 
+      ? new Date(Date.now() + tokenInfo.expiresIn * 1000)
+      : undefined;
+      
+    userInfo.accessToken = tokenInfo.accessToken;
+    userInfo.refreshToken = tokenInfo.refreshToken;
+    userInfo.tokenType = tokenInfo.tokenType;
+    userInfo.expiresAt = expiresAt;
+    
     console.log(`${provider.name} 사용자 정보:`, {
       providerId: userInfo.providerId,
       email: userInfo.email,
       nickname: userInfo.nickname,
+      hasAccessToken: !!userInfo.accessToken,
+      hasRefreshToken: !!userInfo.refreshToken,
     });
 
     // Step 3: DB에서 사용자 조회

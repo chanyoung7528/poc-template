@@ -31,6 +31,11 @@ interface SocialLoginData {
   email?: string;
   profileImage?: string;
   cid?: string;
+  // 소셜 로그인 토큰 정보
+  accessToken?: string;
+  refreshToken?: string;
+  tokenType?: string;
+  expiresIn?: number; // 초 단위
 }
 
 interface SocialLoginError {
@@ -116,6 +121,11 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
             profileImage: data.profileImage,
             cid: data.cid || data.id,
             mode, // ✅ mode 전달
+            // ✅ 토큰 정보 전달
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
+            tokenType: data.tokenType,
+            expiresIn: data.expiresIn,
           });
 
           console.log(`✅ ${providerName} 로그인 API 응답:`, result);

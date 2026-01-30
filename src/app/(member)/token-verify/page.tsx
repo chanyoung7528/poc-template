@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 interface TokenVerificationData {
   success: boolean;
   provider?: string;
+  apiEndpoint?: string;
   verification?: any;
   storedToken?: {
     accessToken?: string;
@@ -77,187 +78,282 @@ function TokenVerifyContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">
-              소셜 로그인 토큰 검증 결과
-            </h1>
+    <div className="min-h-screen bg-gray-50 py-6 px-4 overflow-y-auto">
+      <div className="max-w-6xl mx-auto">
+        {/* 헤더 */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 sticky top-0 z-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-gray-900">
+                소셜 로그인 토큰 검증 결과
+              </h1>
+              <div
+                className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  data.success
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
+              >
+                {data.success ? "✅ 검증 성공" : "❌ 검증 실패"}
+              </div>
+            </div>
             <div className="flex gap-2">
               <button
                 onClick={() => window.location.href = '/api/auth/verify-token'}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition text-sm font-medium"
               >
                 다시 검증
               </button>
               <button
                 onClick={() => router.push("/")}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition text-sm font-medium"
               >
                 홈으로
               </button>
             </div>
           </div>
+        </div>
 
-          {/* 성공/실패 상태 */}
-          <div className="mb-6">
-            <div
-              className={`p-4 rounded-lg ${
-                data.success
-                  ? "bg-green-50 border border-green-200"
-                  : "bg-red-50 border border-red-200"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">
-                  {data.success ? "✅" : "❌"}
-                </span>
-                <span
-                  className={`font-semibold ${
-                    data.success ? "text-green-800" : "text-red-800"
-                  }`}
-                >
-                  {data.success ? "검증 성공" : "검증 실패"}
-                </span>
-              </div>
-            </div>
+        {/* 테이블 형태의 데이터 표시 */}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-1/4">
+                    항목
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    값
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {/* Provider 정보 */}
+                {data.provider && (
+                  <tr className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      Provider
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-700">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">
+                          {data.provider === "kakao" ? "🟡" : "🟢"}
+                        </span>
+                        <span className="font-medium">
+                          {data.provider === "kakao" ? "카카오" : "네이버"}
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+
+                {/* API 엔드포인트 정보 */}
+                {data.apiEndpoint && (
+                  <tr className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      API 엔드포인트
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-700">
+                      <div className="flex items-center gap-2">
+                        <span className="text-blue-600 font-mono break-all">
+                          {data.apiEndpoint}
+                        </span>
+                        <a
+                          href={data.apiEndpoint}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:text-blue-700 text-xs"
+                          title="API 문서 보기"
+                        >
+                          🔗
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+
+                {/* 사용자 정보 */}
+                {data.user && (
+                  <>
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        사용자 ID
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700 font-mono break-all">
+                        {data.user.id}
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        이메일
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {data.user.email || <span className="text-gray-400">없음</span>}
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        닉네임
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {data.user.nickname || <span className="text-gray-400">없음</span>}
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        가입일
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {new Date(data.user.createdAt).toLocaleString("ko-KR")}
+                      </td>
+                    </tr>
+                  </>
+                )}
+
+                {/* 저장된 토큰 정보 */}
+                {data.storedToken && (
+                  <>
+                    <tr className="bg-blue-50">
+                      <td colSpan={2} className="px-6 py-3 text-sm font-bold text-blue-900">
+                        DB에 저장된 토큰 정보
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        Access Token
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700 font-mono break-all">
+                        {data.storedToken.accessToken || <span className="text-gray-400">없음</span>}
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        Refresh Token
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700 font-mono break-all">
+                        {data.storedToken.refreshToken || <span className="text-gray-400">없음</span>}
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        Token Type
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {data.storedToken.tokenType || <span className="text-gray-400">없음</span>}
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        Expires At
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {data.storedToken.expiresAt
+                          ? new Date(data.storedToken.expiresAt).toLocaleString("ko-KR")
+                          : <span className="text-gray-400">없음</span>}
+                      </td>
+                    </tr>
+                  </>
+                )}
+
+                {/* API 검증 결과 */}
+                {data.verification && (
+                  <>
+                    <tr className="bg-green-50">
+                      <td colSpan={2} className="px-6 py-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-bold text-green-900">
+                            {data.provider === "kakao" ? "카카오" : "네이버"} API 검증 결과
+                          </span>
+                          {data.apiEndpoint && (
+                            <span className="text-xs text-green-700 font-mono">
+                              {data.apiEndpoint}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                    {Object.entries(data.verification).map(([key, value]) => (
+                      <tr key={key} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 capitalize">
+                          {key.replace(/_/g, " ")}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700 break-all">
+                          {typeof value === "object" ? (
+                            <pre className="text-xs bg-gray-100 p-2 rounded overflow-x-auto">
+                              {JSON.stringify(value, null, 2)}
+                            </pre>
+                          ) : (
+                            String(value)
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </>
+                )}
+
+                {/* 에러 정보 */}
+                {data.error && (
+                  <>
+                    <tr className="bg-red-50">
+                      <td colSpan={2} className="px-6 py-3 text-sm font-bold text-red-900">
+                        에러 정보
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-900">
+                        에러 코드
+                      </td>
+                      <td className="px-6 py-4 text-sm text-red-700 font-medium">
+                        {data.error}
+                      </td>
+                    </tr>
+                    {data.message && (
+                      <tr className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-900">
+                          에러 메시지
+                        </td>
+                        <td className="px-6 py-4 text-sm text-red-700">
+                          {data.message}
+                        </td>
+                      </tr>
+                    )}
+                    {data.errorData && (
+                      <tr className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-900">
+                          에러 상세
+                        </td>
+                        <td className="px-6 py-4 text-sm text-red-700">
+                          <pre className="text-xs bg-red-50 p-3 rounded border border-red-200 overflow-x-auto max-h-64 overflow-y-auto">
+                            {JSON.stringify(data.errorData, null, 2)}
+                          </pre>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                )}
+              </tbody>
+            </table>
           </div>
+        </div>
 
-          {/* Provider 정보 */}
-          {data.provider && (
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-3 text-gray-900">
-                Provider
+        {/* 전체 응답 데이터 (접을 수 있게) */}
+        <div className="mt-6 bg-white rounded-lg shadow-md overflow-hidden">
+          <details className="group">
+            <summary className="px-6 py-4 cursor-pointer bg-gray-50 hover:bg-gray-100 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">
+                전체 응답 데이터 (Raw JSON)
               </h2>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <span className="text-2xl">
-                  {data.provider === "kakao" ? "🟡" : "🟢"}
-                </span>
-                <span className="ml-2 font-medium">
-                  {data.provider === "kakao" ? "카카오" : "네이버"}
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* 저장된 토큰 정보 */}
-          {data.storedToken && (
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-3 text-gray-900">
-                DB에 저장된 토큰 정보
-              </h2>
-              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                <div className="grid grid-cols-1 gap-2 font-mono text-sm">
-                  <div>
-                    <span className="text-gray-600">Access Token:</span>
-                    <p className="text-gray-900 break-all">
-                      {data.storedToken.accessToken || "없음"}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">Refresh Token:</span>
-                    <p className="text-gray-900 break-all">
-                      {data.storedToken.refreshToken || "없음"}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">Token Type:</span>
-                    <p className="text-gray-900">
-                      {data.storedToken.tokenType || "없음"}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">Expires At:</span>
-                    <p className="text-gray-900">
-                      {data.storedToken.expiresAt
-                        ? new Date(data.storedToken.expiresAt).toLocaleString(
-                            "ko-KR"
-                          )
-                        : "없음"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 사용자 정보 */}
-          {data.user && (
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-3 text-gray-900">
-                사용자 정보
-              </h2>
-              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                <div>
-                  <span className="text-gray-600">ID:</span>
-                  <p className="text-gray-900 font-mono">{data.user.id}</p>
-                </div>
-                <div>
-                  <span className="text-gray-600">이메일:</span>
-                  <p className="text-gray-900">{data.user.email || "없음"}</p>
-                </div>
-                <div>
-                  <span className="text-gray-600">닉네임:</span>
-                  <p className="text-gray-900">
-                    {data.user.nickname || "없음"}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-gray-600">가입일:</span>
-                  <p className="text-gray-900">
-                    {new Date(data.user.createdAt).toLocaleString("ko-KR")}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* API 검증 결과 */}
-          {data.verification && (
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-3 text-gray-900">
-                {data.provider === "kakao" ? "카카오" : "네이버"} API 검증 결과
-              </h2>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <pre className="text-sm overflow-auto">
-                  {JSON.stringify(data.verification, null, 2)}
-                </pre>
-              </div>
-            </div>
-          )}
-
-          {/* 에러 정보 */}
-          {data.error && (
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-3 text-red-900">
-                에러 정보
-              </h2>
-              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                <p className="text-red-800 font-medium mb-2">{data.error}</p>
-                {data.message && (
-                  <p className="text-red-700 text-sm">{data.message}</p>
-                )}
-                {data.errorData && (
-                  <pre className="mt-3 text-sm text-red-900 overflow-auto">
-                    {JSON.stringify(data.errorData, null, 2)}
-                  </pre>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* 전체 응답 데이터 */}
-          <div>
-            <h2 className="text-lg font-semibold mb-3 text-gray-900">
-              전체 응답 데이터 (Raw)
-            </h2>
-            <div className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-auto">
-              <pre className="text-xs">
+              <span className="text-gray-500 group-open:rotate-180 transition-transform">
+                ▼
+              </span>
+            </summary>
+            <div className="p-4 bg-gray-900">
+              <pre className="text-xs text-green-400 overflow-x-auto max-h-96 overflow-y-auto">
                 {JSON.stringify(data, null, 2)}
               </pre>
             </div>
-          </div>
+          </details>
         </div>
       </div>
     </div>

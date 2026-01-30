@@ -76,6 +76,7 @@ export async function POST(request: NextRequest) {
               JSON.stringify({
                 success: false,
                 provider: "kakao",
+                apiEndpoint: "https://kapi.kakao.com/v1/user/access_token_info",
                 error: "토큰 검증 실패",
                 errorData,
                 storedToken: {
@@ -107,6 +108,7 @@ export async function POST(request: NextRequest) {
             JSON.stringify({
               success: false,
               provider: "kakao",
+              apiEndpoint: "https://kapi.kakao.com/v1/user/access_token_info",
               error: "토큰 검증 중 오류 발생",
               message:
                 verificationError instanceof Error
@@ -237,6 +239,7 @@ export async function POST(request: NextRequest) {
       const verificationData = {
         success: true,
         provider: "kakao",
+        apiEndpoint: tokenVerificationResult ? "https://kapi.kakao.com/v1/user/access_token_info" : undefined,
         verification: tokenVerificationResult,
         storedToken: {
           accessToken: accessToken ? accessToken.substring(0, 20) + "..." : undefined,

@@ -66,12 +66,6 @@ export async function POST(request: NextRequest) {
     const { verificationData } = body;
 
     console.log("✅ 본인인증 완료, 세션 업데이트");
-    console.log("📋 세션에 있는 토큰 정보:", {
-      hasAccessToken: !!sessionUser.accessToken,
-      hasRefreshToken: !!sessionUser.refreshToken,
-      tokenType: sessionUser.tokenType,
-      expiresAt: sessionUser.expiresAt,
-    });
 
     // 본인인증 완료 상태를 세션에 추가 (✅ 토큰 정보 유지)
     const updatedUser: SessionUser = {
@@ -139,12 +133,6 @@ export async function POST(request: NextRequest) {
 
     if (isSocialSignup) {
       console.log("📱 소셜 로그인 - DB 저장 및 회원가입 완료");
-      console.log("📋 DB에 저장할 토큰 정보:", {
-        hasAccessToken: !!updatedUser.accessToken,
-        hasRefreshToken: !!updatedUser.refreshToken,
-        tokenType: updatedUser.tokenType,
-        expiresAt: updatedUser.expiresAt,
-      });
 
       // DB에 사용자 저장
       let newUser;
@@ -184,12 +172,6 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
-
-      console.log("✅ DB에 사용자 저장 완료, 토큰 정보 확인:", {
-        userId: newUser.id,
-        hasAccessToken: !!newUser.accessToken,
-        hasRefreshToken: !!newUser.refreshToken,
-      });
 
       // 정식 세션 생성
       const finalSessionUser: SessionUser = {

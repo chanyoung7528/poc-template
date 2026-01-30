@@ -56,10 +56,11 @@ export async function POST(request: NextRequest) {
       try {
         console.log("🔐 카카오 토큰 검증 시작");
         const verificationResponse = await fetch(
-          "https://kapi.kakao.com/v1/user/access_token_info",
+          "https://kapi.kakao.com/v2/user/me",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
             },
           }
         );
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
               JSON.stringify({
                 success: false,
                 provider: "kakao",
-                apiEndpoint: "https://kapi.kakao.com/v1/user/access_token_info",
+                apiEndpoint: "https://kapi.kakao.com/v2/user/me",
                 error: "토큰 검증 실패",
                 errorData,
                 storedToken: {
@@ -239,7 +240,7 @@ export async function POST(request: NextRequest) {
       const verificationData = {
         success: true,
         provider: "kakao",
-        apiEndpoint: tokenVerificationResult ? "https://kapi.kakao.com/v1/user/access_token_info" : undefined,
+        apiEndpoint: tokenVerificationResult ? "https://kapi.kakao.com/v2/user/me" : undefined,
         verification: tokenVerificationResult,
         storedToken: {
           accessToken: accessToken ? accessToken.substring(0, 20) + "..." : undefined,

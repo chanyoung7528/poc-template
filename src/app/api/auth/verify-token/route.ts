@@ -79,10 +79,11 @@ export async function GET(request: NextRequest) {
     if (user.provider === "kakao") {
       // 카카오 토큰 검증
       const response = await fetch(
-        "https://kapi.kakao.com/v1/user/access_token_info",
+        "https://kapi.kakao.com/v2/user/me",
         {
           headers: {
             Authorization: `Bearer ${user.accessToken}`,
+            "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
           },
         }
       );
@@ -92,6 +93,7 @@ export async function GET(request: NextRequest) {
         result = {
           success: false,
           provider: "kakao",
+          apiEndpoint: "https://kapi.kakao.com/v2/user/me",
           error: "토큰 검증 실패",
           errorData,
           storedToken: {
@@ -108,6 +110,7 @@ export async function GET(request: NextRequest) {
         result = {
           success: true,
           provider: "kakao",
+          apiEndpoint: "https://kapi.kakao.com/v2/user/me",
           verification: verificationResult,
           storedToken: {
             accessToken: user.accessToken?.substring(0, 20) + "...",

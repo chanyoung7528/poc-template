@@ -68,9 +68,9 @@ export async function POST(request: NextRequest) {
           const errorData = await verificationResponse.json();
           console.error("❌ 카카오 토큰 검증 실패:", errorData);
           
-          // 검증 실패 시 에러 페이지로 리다이렉트
-          const url = new URL("/token-verify", request.url);
-          url.searchParams.set(
+          // 검증 실패 시 JSON 응답 반환
+          const verifyUrl = new URL("/token-verify", request.url);
+          verifyUrl.searchParams.set(
             "data",
             encodeURIComponent(
               JSON.stringify({
@@ -87,7 +87,13 @@ export async function POST(request: NextRequest) {
               })
             )
           );
-          return NextResponse.redirect(url);
+          
+          return NextResponse.json({
+            success: false,
+            redirectUrl: verifyUrl.toString(),
+            error: "토큰 검증 실패",
+            errorData,
+          });
         }
 
         tokenVerificationResult = await verificationResponse.json();
@@ -227,10 +233,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // ✅ DB 저장 후 검증 결과와 함께 /token-verify 페이지로 리다이렉트
-      const url = new URL("/token-verify", request.url);
-      
-      // 검증 결과 데이터 구성
+      // ✅ 검증 결과 데이터 구성
       const verificationData = {
         success: true,
         provider: "kakao",
@@ -259,14 +262,22 @@ export async function POST(request: NextRequest) {
         isNewUser: !existingUser,
       };
 
-      url.searchParams.set("data", encodeURIComponent(JSON.stringify(verificationData)));
+      // ✅ /token-verify 페이지 URL 생성
+      const verifyUrl = new URL("/token-verify", request.url);
+      verifyUrl.searchParams.set("data", encodeURIComponent(JSON.stringify(verificationData)));
 
-      const response = NextResponse.redirect(url);
+      // ✅ JSON 응답 반환 (프론트엔드에서 리다이렉트 처리)
+      const response = NextResponse.json({
+        success: true,
+        redirectUrl: verifyUrl.toString(),
+        isNewUser: !existingUser,
+        verificationData, // 검증 데이터도 함께 반환
+      });
       
       // 쿠키 설정
       setSessionCookieOnResponse(response, sessionToken);
 
-      console.log("✅ 카카오 네이티브 로그인 성공, 토큰 검증 페이지로 리다이렉트");
+      console.log("✅ 카카오 네이티브 로그인 성공, 토큰 검증 페이지로 리다이렉트 URL 반환");
       return response;
     } catch (tokenError) {
       console.error("❌ 세션 토큰 생성 실패:", tokenError);

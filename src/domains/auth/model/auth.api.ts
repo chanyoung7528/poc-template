@@ -249,11 +249,21 @@ export async function loginWithKakaoNative(data: {
   refreshToken?: string;
   tokenType?: string;
   expiresIn?: number;
-}): Promise<{ success: boolean; redirectUrl: string; isNewUser: boolean }> {
+}): Promise<{ 
+  success: boolean; 
+  redirectUrl?: string; 
+  isNewUser?: boolean;
+  verificationData?: any;
+  error?: string;
+  errorData?: any;
+}> {
   const response = await apiClient.post<{
     success: boolean;
-    redirectUrl: string;
-    isNewUser: boolean;
+    redirectUrl?: string;
+    isNewUser?: boolean;
+    verificationData?: any;
+    error?: string;
+    errorData?: any;
   }>("/api/auth/kakao/native", data);
   return response.data;
 }

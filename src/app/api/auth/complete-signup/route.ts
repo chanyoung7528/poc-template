@@ -81,6 +81,11 @@ export async function POST() {
         nickname: sessionUser.nickname || null,
         profileImage: sessionUser.profileImage || null,
         marketingAgreed: false, // 약관 동의 정보를 세션에서 가져올 수도 있음
+        // ✅ 토큰 정보 전달
+        accessToken: sessionUser.accessToken,
+        refreshToken: sessionUser.refreshToken,
+        tokenType: sessionUser.tokenType,
+        expiresAt: sessionUser.expiresAt,
       });
     } else if (sessionUser.provider === 'naver' && sessionUser.naverId) {
       newUser = await createNaverUser({
@@ -89,6 +94,11 @@ export async function POST() {
         nickname: sessionUser.nickname || null,
         profileImage: sessionUser.profileImage || null,
         marketingAgreed: false,
+        // ✅ 토큰 정보 전달
+        accessToken: sessionUser.accessToken,
+        refreshToken: sessionUser.refreshToken,
+        tokenType: sessionUser.tokenType,
+        expiresAt: sessionUser.expiresAt,
       });
     } else {
       console.error('지원하지 않는 Provider:', sessionUser.provider);

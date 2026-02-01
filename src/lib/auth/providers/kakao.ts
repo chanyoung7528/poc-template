@@ -13,7 +13,12 @@ export class KakaoProvider implements OAuthProvider {
   /**
    * 인가 코드로 액세스 토큰 획득
    */
-  async getAccessToken(code: string): Promise<string> {
+  async getAccessToken(code: string): Promise<{
+    accessToken: string;
+    refreshToken?: string;
+    tokenType?: string;
+    expiresIn?: number;
+  }> {
     const tokenParams = new URLSearchParams({
       grant_type: 'authorization_code',
       client_id: env.kakao.clientId,
@@ -37,7 +42,13 @@ export class KakaoProvider implements OAuthProvider {
     }
 
     const tokenData: KakaoTokenResponse = await response.json();
-    return tokenData.access_token;
+    
+    return {
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token,
+      tokenType: tokenData.token_type,
+      expiresIn: tokenData.expires_in,
+    };
   }
 
   /**

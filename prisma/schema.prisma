@@ -12,22 +12,29 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  kakaoId      String?  @unique @map("kakao_id")
-  naverId      String?  @unique @map("naver_id")
-  wellnessId   String?  @unique @map("wellness_id")
-  email        String?  @unique
+  id           String  @id @default(uuid())
+  kakaoId      String? @unique @map("kakao_id")
+  naverId      String? @unique @map("naver_id")
+  wellnessId   String? @unique @map("wellness_id")
+  email        String? @unique
   nickname     String?
-  profileImage String?  @map("profile_image")
-  provider     String   // 'kakao' | 'naver' | 'wellness'
-  passwordHash String?  @map("password_hash")
+  profileImage String? @map("profile_image")
+  provider     String // 'kakao' | 'naver' | 'wellness' | 'apple'
+  passwordHash String? @map("password_hash")
   name         String?
   phone        String?
   birth        String?
-  gender       String?  // 'M' | 'F'
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  lastLoginAt  DateTime @default(now()) @map("last_login_at")
+  gender       String? // 'M' | 'F'
+
+  // 소셜 로그인 토큰 (선택적 저장)
+  accessToken  String?   @map("access_token") @db.Text
+  refreshToken String?   @map("refresh_token") @db.Text
+  tokenType    String?   @map("token_type")
+  expiresAt    DateTime? @map("expires_at")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  lastLoginAt DateTime @default(now()) @map("last_login_at")
 
   @@index([kakaoId])
   @@index([naverId])

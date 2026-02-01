@@ -31,6 +31,11 @@ interface SocialLoginData {
   email?: string;
   profileImage?: string;
   cid?: string;
+  // 소셜 로그인 토큰 정보
+  accessToken?: string;
+  refreshToken?: string;
+  tokenType?: string;
+  expiresIn?: number; // 초 단위
 }
 
 interface SocialLoginError {
@@ -116,6 +121,11 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
             profileImage: data.profileImage,
             cid: data.cid || data.id,
             mode, // ✅ mode 전달
+            // ✅ 토큰 정보 전달
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
+            tokenType: data.tokenType,
+            expiresIn: data.expiresIn,
           });
 
           console.log(`✅ ${providerName} 로그인 API 응답:`, result);
@@ -123,19 +133,49 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
           // 쿠키 확인
           console.log("🍪 현재 브라우저 쿠키:", document.cookie);
 
-          // 서버에서 반환한 redirectUrl로 이동
-          const redirectPath = (result.redirectUrl || "/") as Route;
-          router.push(redirectPath);
+          // 서버에서 redirectUrl을 반환한 경우 (토큰 검증 페이지로 이동)
+          if (result.redirectUrl) {
+            const redirectPath = result.redirectUrl as Route;
+            console.log(`🔄 토큰 검증 페이지로 리다이렉트: ${redirectPath}`);
+            // 전체 URL이면 그대로 사용, 상대 경로면 router.push 사용
+            if (redirectPath.startsWith('http')) {
+              window.location.href = redirectPath;
+            } else {
+              router.push(redirectPath);
+            }
+          } else if (result.success) {
+            // 성공했지만 redirectUrl이 없는 경우 기본 경로로 이동
+            router.push("/");
+          }
         } catch (err: any) {
-          console.error(`❌ ${providerName} 로그인 처리 실패:`, {
-            error: err,
-            response: err?.response?.data,
-            status: err?.response?.status,
+          // 에러 응답에 redirectUrl이 있는 경우 (토큰 검증 실패 등)
+          if (err?.response?.data?.redirectUrl) {
+            const redirectUrl = err.response.data.redirectUrl;
+            console.log(`🔄 에러 응답에 리다이렉트 URL 포함: ${redirectUrl}`);
+            if (redirectUrl.startsWith('http')) {
+              window.location.href = redirectUrl;
+            } else {
+              router.push(redirectUrl as Route);
+            }
+            return;
+          }
+
+          // 에러 객체를 제대로 직렬화하여 로깅
+          const errorDetails = {
             message: err?.message,
-          });
+            response: err?.response ? {
+              status: err.response.status,
+              statusText: err.response.statusText,
+              data: err.response.data,
+            } : null,
+            stack: err?.stack,
+          };
+
+          console.error(`❌ ${providerName} 로그인 처리 실패:`, JSON.stringify(errorDetails, null, 2));
 
           const errorMessage =
             err?.response?.data?.message ||
+            err?.response?.data?.error ||
             err?.message ||
             `${providerName} 로그인에 실패했습니다`;
           setError(errorMessage);

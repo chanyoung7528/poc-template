@@ -245,11 +245,25 @@ export async function loginWithKakaoNative(data: {
   profileImage?: string;
   cid?: string;
   mode?: "login" | "signup";
-}): Promise<{ success: boolean; redirectUrl: string; isNewUser: boolean }> {
+  accessToken?: string;
+  refreshToken?: string;
+  tokenType?: string;
+  expiresIn?: number;
+}): Promise<{ 
+  success: boolean; 
+  redirectUrl?: string; 
+  isNewUser?: boolean;
+  verificationData?: any;
+  error?: string;
+  errorData?: any;
+}> {
   const response = await apiClient.post<{
     success: boolean;
-    redirectUrl: string;
-    isNewUser: boolean;
+    redirectUrl?: string;
+    isNewUser?: boolean;
+    verificationData?: any;
+    error?: string;
+    errorData?: any;
   }>("/api/auth/kakao/native", data);
   return response.data;
 }
@@ -265,6 +279,10 @@ export async function loginWithNaverNative(data: {
   profileImage?: string;
   cid?: string;
   mode?: "login" | "signup";
+  accessToken?: string;
+  refreshToken?: string;
+  tokenType?: string;
+  expiresIn?: number;
 }): Promise<{ success: boolean; redirectUrl: string; isNewUser: boolean }> {
   const response = await apiClient.post<{
     success: boolean;

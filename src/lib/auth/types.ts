@@ -8,9 +8,14 @@ export interface OAuthProvider {
   name: 'kakao' | 'naver';
 
   /**
-   * 인가 코드로 액세스 토큰 획득
+   * 인가 코드로 액세스 토큰 획득 (토큰 정보 포함)
    */
-  getAccessToken(code: string, state?: string): Promise<string>;
+  getAccessToken(code: string, state?: string): Promise<{
+    accessToken: string;
+    refreshToken?: string;
+    tokenType?: string;
+    expiresIn?: number;
+  }>;
 
   /**
    * 액세스 토큰으로 사용자 정보 조회
@@ -32,6 +37,11 @@ export interface OAuthUserInfo {
   nickname?: string;
   profileImage?: string;
   provider: 'kakao' | 'naver';
+  // 소셜 로그인 토큰 정보
+  accessToken?: string;
+  refreshToken?: string;
+  tokenType?: string;
+  expiresAt?: Date;
 }
 
 /**

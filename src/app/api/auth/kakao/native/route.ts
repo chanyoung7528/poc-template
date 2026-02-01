@@ -3,6 +3,7 @@ import { handleLoginFlow } from "@/lib/auth/login-handler";
 import { handleSignupFlow } from "@/lib/auth/signup-handler";
 import { findUserByKakaoId, findUserByEmail } from "@/lib/database";
 import { createSessionToken, setSessionCookieOnResponse } from "@/lib/session";
+import { prisma } from "@/lib/prisma";
 import type { OAuthUserInfo } from "@/lib/auth/types";
 
 /**
@@ -20,17 +21,105 @@ import type { OAuthUserInfo } from "@/lib/auth/types";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, nickname, email, profileImage, cid, mode = "login" } = body; // ✅ mode 파라미터 추가 (기본값: login)
+    const { 
+      id, 
+      nickname, 
+      email, 
+      profileImage, 
+      cid, 
+      mode = "login",
+      accessToken,
+      refreshToken,
+      tokenType,
+      expiresIn
+    } = body; // ✅ token 파라미터 추가
 
     console.log("📱 네이티브 카카오 로그인 API 호출 - body:", body);
     console.log("🔐 모드:", mode);
 
     if (!id) {
       console.error("❌ 카카오 사용자 ID가 없음");
-      return NextResponse.json(
-        { error: "invalid_request", message: "카카오 사용자 ID가 필요합니다." },
-        { status: 400 }
-      );
+      const url = new URL("/token-verify", request.url);
+      url.searchParams.set("error", "invalid_request");
+      url.searchParams.set("message", "카카오 사용자 ID가 필요합니다.");
+      return NextResponse.redirect(url);
+    }
+
+    // expiresAt 계산 (expiresIn이 있는 경우)
+    const expiresAt = expiresIn 
+      ? new Date(Date.now() + expiresIn * 1000) 
+      : undefined;
+
+    // ✅ accessToken이 있으면 먼저 카카오 API로 검증
+    let tokenVerificationResult: any = null;
+    if (accessToken) {
+      try {
+        console.log("🔐 카카오 토큰 검증 시작");
+        const verificationResponse = await fetch(
+          "https://kapi.kakao.com/v2/user/me",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+            },
+          }
+        );
+
+        if (!verificationResponse.ok) {
+          const errorData = await verificationResponse.json();
+          console.error("❌ 카카오 토큰 검증 실패:", errorData);
+          
+          // 검증 실패 시 JSON 응답 반환
+          const verifyUrl = new URL("/token-verify", request.url);
+          verifyUrl.searchParams.set(
+            "data",
+            encodeURIComponent(
+              JSON.stringify({
+                success: false,
+                provider: "kakao",
+                apiEndpoint: "https://kapi.kakao.com/v2/user/me",
+                error: "토큰 검증 실패",
+                errorData,
+                storedToken: {
+                  accessToken: accessToken.substring(0, 20) + "...",
+                  refreshToken: refreshToken ? refreshToken.substring(0, 20) + "..." : null,
+                  tokenType: tokenType,
+                  expiresAt: expiresAt,
+                },
+              })
+            )
+          );
+          
+          return NextResponse.json({
+            success: false,
+            redirectUrl: verifyUrl.toString(),
+            error: "토큰 검증 실패",
+            errorData,
+          });
+        }
+
+        tokenVerificationResult = await verificationResponse.json();
+        console.log("✅ 카카오 토큰 검증 성공:", tokenVerificationResult);
+      } catch (verificationError) {
+        console.error("❌ 카카오 토큰 검증 중 오류:", verificationError);
+        const url = new URL("/token-verify", request.url);
+        url.searchParams.set(
+          "data",
+          encodeURIComponent(
+            JSON.stringify({
+              success: false,
+              provider: "kakao",
+              apiEndpoint: "https://kapi.kakao.com/v1/user/access_token_info",
+              error: "토큰 검증 중 오류 발생",
+              message:
+                verificationError instanceof Error
+                  ? verificationError.message
+                  : "알 수 없는 오류",
+            })
+          )
+        );
+        return NextResponse.redirect(url);
+      }
     }
 
     // OAuthUserInfo 형태로 변환
@@ -40,12 +129,17 @@ export async function POST(request: NextRequest) {
       nickname: nickname || undefined,
       profileImage: profileImage || undefined,
       provider: "kakao",
+      accessToken: accessToken || undefined,
+      refreshToken: refreshToken || undefined,
+      tokenType: tokenType || undefined,
+      expiresAt: expiresAt,
     };
 
     console.log("📱 네이티브 카카오 로그인 요청:", {
       providerId: userInfo.providerId,
       email: userInfo.email,
       nickname: userInfo.nickname,
+      tokenVerified: !!tokenVerificationResult,
     });
 
     // DB에서 사용자 조회
@@ -58,10 +152,10 @@ export async function POST(request: NextRequest) {
       );
     } catch (dbError) {
       console.error("❌ 데이터베이스 조회 오류:", dbError);
-      return NextResponse.json(
-        { error: "db_error", message: "사용자 조회 중 오류가 발생했습니다." },
-        { status: 500 }
-      );
+      const url = new URL("/token-verify", request.url);
+      url.searchParams.set("error", "db_error");
+      url.searchParams.set("message", "사용자 조회 중 오류가 발생했습니다.");
+      return NextResponse.redirect(url);
     }
 
     // 이메일로 다른 플랫폼 가입 확인 (신규 사용자인 경우)
@@ -74,14 +168,11 @@ export async function POST(request: NextRequest) {
             userInfo.email,
             emailUser.provider
           );
-          return NextResponse.json(
-            {
-              error: "already_registered",
-              message: "이미 다른 방법으로 가입된 이메일입니다.",
-              provider: emailUser.provider,
-            },
-            { status: 400 }
-          );
+          const url = new URL("/token-verify", request.url);
+          url.searchParams.set("error", "already_registered");
+          url.searchParams.set("message", "이미 다른 방법으로 가입된 이메일입니다.");
+          url.searchParams.set("provider", emailUser.provider);
+          return NextResponse.redirect(url);
         }
       } catch (error) {
         console.error("이메일 조회 오류:", error);
@@ -107,26 +198,19 @@ export async function POST(request: NextRequest) {
 
     if (!result.success) {
       console.error("❌ 플로우 처리 실패:", result.error);
-      return NextResponse.json(
-        {
-          error: result.error || "unknown_error",
-          message: "로그인 처리 중 오류가 발생했습니다.",
-          redirectUrl: result.redirectUrl,
-        },
-        { status: 400 }
-      );
+      const url = new URL("/token-verify", request.url);
+      url.searchParams.set("error", result.error || "unknown_error");
+      url.searchParams.set("message", "로그인 처리 중 오류가 발생했습니다.");
+      return NextResponse.redirect(url);
     }
 
     // sessionUser가 없으면 에러
     if (!result.sessionUser) {
       console.error("❌ 세션 사용자 정보가 없음:", result);
-      return NextResponse.json(
-        {
-          error: "session_error",
-          message: "세션 사용자 정보를 생성할 수 없습니다.",
-        },
-        { status: 500 }
-      );
+      const url = new URL("/token-verify", request.url);
+      url.searchParams.set("error", "session_error");
+      url.searchParams.set("message", "세션 사용자 정보를 생성할 수 없습니다.");
+      return NextResponse.redirect(url);
     }
 
     // 세션 토큰 생성 및 쿠키 설정
@@ -140,22 +224,64 @@ export async function POST(request: NextRequest) {
 
       console.log("✅ 세션 토큰 생성 완료");
 
-      const response = NextResponse.json({
-        success: true,
-        redirectUrl: result.redirectUrl,
-        isNewUser: !existingUser,
+      // ✅ DB에서 최종 사용자 정보 조회 (createdAt 포함)
+      const finalUser = await prisma.user.findUnique({
+        where: { id: result.sessionUser.id },
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+          provider: true,
+          createdAt: true,
+        },
       });
 
+      // ✅ 검증 결과 데이터 구성
+      const verificationData = {
+        success: true,
+        provider: "kakao",
+        apiEndpoint: tokenVerificationResult ? "https://kapi.kakao.com/v2/user/me" : undefined,
+        verification: tokenVerificationResult,
+        storedToken: {
+          accessToken: accessToken ? accessToken.substring(0, 20) + "..." : undefined,
+          refreshToken: refreshToken ? refreshToken.substring(0, 20) + "..." : null,
+          tokenType: tokenType,
+          expiresAt: expiresAt,
+        },
+        user: finalUser
+          ? {
+              id: finalUser.id,
+              email: finalUser.email,
+              nickname: finalUser.nickname,
+              provider: finalUser.provider,
+              createdAt: finalUser.createdAt.toISOString(),
+            }
+          : {
+              id: result.sessionUser.id,
+              email: result.sessionUser.email,
+              nickname: result.sessionUser.nickname,
+              provider: result.sessionUser.provider,
+              createdAt: new Date().toISOString(),
+            },
+        isNewUser: !existingUser,
+      };
+
+      // ✅ /token-verify 페이지 URL 생성
+      const verifyUrl = new URL("/token-verify", request.url);
+      verifyUrl.searchParams.set("data", encodeURIComponent(JSON.stringify(verificationData)));
+
+      // ✅ JSON 응답 반환 (프론트엔드에서 리다이렉트 처리)
+      const response = NextResponse.json({
+        success: true,
+        redirectUrl: verifyUrl.toString(),
+        isNewUser: !existingUser,
+        verificationData, // 검증 데이터도 함께 반환
+      });
+      
       // 쿠키 설정
       setSessionCookieOnResponse(response, sessionToken);
 
-      // 응답 헤더 확인
-      console.log("📤 응답 헤더:", {
-        setCookie: response.headers.get("set-cookie"),
-        hasSetCookie: response.headers.has("set-cookie"),
-      });
-
-      console.log("✅ 카카오 네이티브 로그인 성공:", result.redirectUrl);
+      console.log("✅ 카카오 네이티브 로그인 성공, 토큰 검증 페이지로 리다이렉트 URL 반환");
       return response;
     } catch (tokenError) {
       console.error("❌ 세션 토큰 생성 실패:", tokenError);
@@ -165,13 +291,20 @@ export async function POST(request: NextRequest) {
         stack: tokenError instanceof Error ? tokenError.stack : undefined,
         sessionUser: result.sessionUser,
       });
-      return NextResponse.json(
-        {
-          error: "token_error",
-          message: "세션 토큰 생성 중 오류가 발생했습니다.",
-        },
-        { status: 500 }
+      
+      const url = new URL("/token-verify", request.url);
+      url.searchParams.set(
+        "data",
+        encodeURIComponent(
+          JSON.stringify({
+            success: false,
+            provider: "kakao",
+            error: "token_error",
+            message: "세션 토큰 생성 중 오류가 발생했습니다.",
+          })
+        )
       );
+      return NextResponse.redirect(url);
     }
   } catch (err) {
     console.error("❌ 카카오 네이티브 로그인 처리 중 오류:", err);
@@ -180,15 +313,14 @@ export async function POST(request: NextRequest) {
       stack: err instanceof Error ? err.stack : undefined,
       name: err instanceof Error ? err.name : undefined,
     });
-    return NextResponse.json(
-      {
-        error: "server_error",
-        message:
-          err instanceof Error
-            ? `서버 오류: ${err.message}`
-            : "서버 오류가 발생했습니다.",
-      },
-      { status: 500 }
+    const url = new URL("/token-verify", request.url);
+    url.searchParams.set("error", "server_error");
+    url.searchParams.set(
+      "message",
+      err instanceof Error
+        ? `서버 오류: ${err.message}`
+        : "서버 오류가 발생했습니다."
     );
+    return NextResponse.redirect(url);
   }
 }

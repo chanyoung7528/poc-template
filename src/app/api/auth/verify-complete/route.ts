@@ -67,11 +67,16 @@ export async function POST(request: NextRequest) {
 
     console.log("✅ 본인인증 완료, 세션 업데이트");
 
-    // 본인인증 완료 상태를 세션에 추가
+    // 본인인증 완료 상태를 세션에 추가 (✅ 토큰 정보 유지)
     const updatedUser: SessionUser = {
       ...sessionUser,
       verified: true,
       verificationData: verificationData || sessionUser.verificationData,
+      // ✅ 토큰 정보 명시적으로 유지
+      accessToken: sessionUser.accessToken,
+      refreshToken: sessionUser.refreshToken,
+      tokenType: sessionUser.tokenType,
+      expiresAt: sessionUser.expiresAt,
     };
 
     // 업데이트된 세션 토큰 생성
@@ -138,6 +143,11 @@ export async function POST(request: NextRequest) {
           nickname: sessionUser.nickname || null,
           profileImage: sessionUser.profileImage || null,
           marketingAgreed: false,
+          // ✅ 토큰 정보 전달
+          accessToken: sessionUser.accessToken,
+          refreshToken: sessionUser.refreshToken,
+          tokenType: sessionUser.tokenType,
+          expiresAt: sessionUser.expiresAt,
         });
       } else if (sessionUser.provider === "naver" && sessionUser.naverId) {
         newUser = await createNaverUser({
@@ -146,6 +156,11 @@ export async function POST(request: NextRequest) {
           nickname: sessionUser.nickname || null,
           profileImage: sessionUser.profileImage || null,
           marketingAgreed: false,
+          // ✅ 토큰 정보 전달
+          accessToken: sessionUser.accessToken,
+          refreshToken: sessionUser.refreshToken,
+          tokenType: sessionUser.tokenType,
+          expiresAt: sessionUser.expiresAt,
         });
       } else {
         console.error("유효하지 않은 Provider:", sessionUser.provider);

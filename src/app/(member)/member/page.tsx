@@ -2,6 +2,7 @@
  * Page: Member - 메인 인증 페이지 (auth 스타일 적용)
  *
  * 역할: 회원가입/로그인 선택 화면
+ * - 비즈니스 로직은 Feature hook에 위임
  */
 
 "use client";
@@ -12,13 +13,9 @@ import {
   AuthCurveMask,
 } from "@/domains/auth/ui";
 import styles from "./page.module.scss";
-import { useRouter } from "next/navigation";
-import { useAuthAnimation } from "@/shared/hooks/animations";
+import { useMemberMainPage } from "@/features/member/hooks/useMemberMainPage";
 
 export default function MemberMainPage() {
-  const router = useRouter();
-
-  // auth 페이지와 동일한 애니메이션
   const {
     splashTitleRef,
     sectionRef,
@@ -29,15 +26,9 @@ export default function MemberMainPage() {
     char2Ref,
     char3Ref,
     char4Ref,
-  } = useAuthAnimation();
-
-  const handleSignup = () => {
-    router.push("/member/signup");
-  };
-
-  const handleLogin = () => {
-    router.push("/member/login");
-  };
+    handleSignup,
+    handleLogin,
+  } = useMemberMainPage();
 
   return (
     <AuthContainer>

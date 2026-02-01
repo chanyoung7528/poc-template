@@ -2,52 +2,24 @@
  * Page: Member - 회원가입 방식 선택
  *
  * 역할: Wellness ID / SNS 회원가입 선택
+ * - 비즈니스 로직은 Feature hook에 위임
  */
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { SignupTitle } from "@/domains/member/ui/signup/SignupTitle";
 import { SocialLoginButtons } from "@/domains/auth/ui/signup/button/SocialLoginButtons";
-import { useSnsSignupFlow } from "@/features/member/hooks/useSnsSignupFlow";
+import { useMemberSignupPage } from "@/features/member/hooks/useMemberSignupPage";
 import styles from "./page.module.scss";
 
 export default function MemberSignupPage() {
-  const router = useRouter();
-  const snsFlow = useSnsSignupFlow();
-
-  // Wellness ID 회원가입 (일반 회원가입)
-  const handleWellnessIdSignup = () => {
-    router.push("/member/terms-agreement?type=general");
-  };
-
-  // SNS 로그인 (카카오, 네이버, 애플)
-  const handleKakaoLogin = async () => {
-    // TODO: 카카오 SDK 연동
-    console.log("카카오 로그인 시작");
-
-    // Mock: 카카오 로그인 성공 후
-    const mockAccessToken = "kakao_mock_token_12345";
-    await snsFlow.handleSnsLoginComplete("KAKAO", mockAccessToken);
-  };
-
-  const handleNaverLogin = async () => {
-    // TODO: 네이버 SDK 연동
-    console.log("네이버 로그인 시작");
-
-    // Mock: 네이버 로그인 성공 후
-    const mockAccessToken = "naver_mock_token_12345";
-    await snsFlow.handleSnsLoginComplete("NAVER", mockAccessToken);
-  };
-
-  const handleAppleLogin = async () => {
-    // TODO: 애플 SDK 연동
-    console.log("애플 로그인 시작");
-
-    // Mock: 애플 로그인 성공 후
-    const mockAccessToken = "apple_mock_token_12345";
-    await snsFlow.handleSnsLoginComplete("APPLE", mockAccessToken);
-  };
+  const {
+    handleWellnessIdSignup,
+    handleKakaoLogin,
+    handleNaverLogin,
+    handleAppleLogin,
+    isLoading,
+  } = useMemberSignupPage();
 
   return (
     <>
@@ -59,6 +31,7 @@ export default function MemberSignupPage() {
           onKakao={handleKakaoLogin}
           onNaver={handleNaverLogin}
           onApple={handleAppleLogin}
+          disabled={isLoading}
         />
       </div>
     </>

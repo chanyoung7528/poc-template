@@ -1,19 +1,16 @@
 /**
- * ⚠️ DEPRECATED: 이 훅은 너무 복잡하여 분리되었습니다.
+ * Feature: Auth - SNS 로그인 플로우
  * 
- * 대신 다음을 사용하세요:
- * - 로그인 페이지: useAuthLoginPage
- * - 일반 로그인: useGeneralLoginFlow
- * - SNS 로그인: useSnsLoginFlow
- * - 회원가입 페이지: useAuthSignupPage
- * - SNS 회원가입: useSnsSignupFlow
- * 
- * 기존 코드와의 호환성을 위해 유지되나, 새로운 코드에서는 사용하지 마세요.
+ * 역할: SNS 로그인 비즈니스 로직
+ * 1. SNS 로그인 (카카오/네이버/애플)
+ * 2. checkSnsUser API → 상태에 따라 분기
+ *    - 기존 회원: 자동 로그인
+ *    - 신규 회원: 회원가입 플로우로 전환
  */
 
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Route } from "next";
 import {
@@ -21,22 +18,7 @@ import {
   useNaverNativeLogin,
 } from "@/domains/auth/model/auth.queries";
 
-export type LoginStep = "login" | "find-id" | "reset-password";
-export type SocialProvider = "kakao" | "naver" | "apple";
-export type AuthMode = "login" | "signup";
-
-interface UseLoginFlowProps {
-  mode?: AuthMode; // 'login' 또는 'signup'
-}
-
-interface UseLoginFlowReturn {
-  currentStep: LoginStep;
-  isLoading: boolean;
-  error: string | null;
-  setStep: (step: LoginStep) => void;
-  handleLogin: (email: string, password: string) => Promise<void>;
-  handleSocialLogin: (provider: SocialProvider) => void;
-}
+export type SnsProvider = "kakao" | "naver" | "apple";
 
 interface SocialLoginData {
   id: string;
@@ -44,17 +26,35 @@ interface SocialLoginData {
   email?: string;
   profileImage?: string;
   cid?: string;
-  // 소셜 로그인 토큰 정보
   accessToken?: string;
   refreshToken?: string;
   tokenType?: string;
-  expiresIn?: number; // 초 단위
+  expiresIn?: number;
 }
 
 interface SocialLoginError {
   error: string;
   message?: string;
 }
+
+// Provider별 설정
+const PROVIDER_CONFIG = {
+  kakao: {
+    name: "카카오",
+    authUrl: "https://kauth.kakao.com/oauth/authorize",
+    clientIdKey: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || "",
+    redirectUri: process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || "",
+    requestFunction: "requestKakaoLogin" as const,
+    additionalParams: { prompt: "login" },
+  },
+  naver: {
+    name: "네이버",
+    authUrl: "https://nid.naver.com/oauth2.0/authorize",
+    clientIdKey: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || "",
+    redirectUri: process.env.NEXT_PUBLIC_NAVER_REDIRECT_URI || "",
+    requestFunction: "requestNaverLogin" as const,
+  },
+} as const;
 
 // 앱에서 주입하는 함수 타입 정의
 declare global {
@@ -68,55 +68,21 @@ declare global {
   }
 }
 
-// Provider별 설정
-const PROVIDER_CONFIG = {
-  kakao: {
-    name: "카카오",
-    authUrl: "https://kauth.kakao.com/oauth/authorize",
-    clientIdKey: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || "",
-    redirectUri: process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || "",
-    requestFunction: "requestKakaoLogin" as const,
-    additionalParams: { prompt: "login" }, // 자동 로그인 방지
-  },
-  naver: {
-    name: "네이버",
-    authUrl: "https://nid.naver.com/oauth2.0/authorize",
-    clientIdKey: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || "",
-    redirectUri: process.env.NEXT_PUBLIC_NAVER_REDIRECT_URI || "",
-    requestFunction: "requestNaverLogin" as const,
-  },
-} as const;
-
-export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
-  const mode = props?.mode || "login"; // 기본값은 'login'
+export function useSnsLoginFlow() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState<LoginStep>("login");
   const [error, setError] = useState<string | null>(null);
   const [isSocialLoading, setIsSocialLoading] = useState(false);
 
-  const loginMutation = { isPending: false }; // @deprecated
   const kakaoNativeLoginMutation = useKakaoNativeLogin();
   const naverNativeLoginMutation = useNaverNativeLogin();
 
-  // 일반 로그인 처리 (@deprecated - useGeneralLoginFlow 사용 권장)
-  const handleLogin = async (email: string, password: string) => {
-    try {
-      setError(null);
-      console.warn('useLoginFlow.handleLogin is deprecated. Use useGeneralLoginFlow instead.');
-      // 기존 로그인 로직은 useGeneralLoginFlow로 이동
-      router.push("/");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "로그인에 실패했습니다");
-    }
-  };
-
-  // 소셜 로그인 성공 공통 핸들러
+  /**
+   * SNS 로그인 성공 공통 핸들러
+   */
   const createSocialLoginSuccessHandler = useCallback(
     (
       provider: "kakao" | "naver",
-      mutation:
-        | typeof kakaoNativeLoginMutation
-        | typeof naverNativeLoginMutation
+      mutation: typeof kakaoNativeLoginMutation | typeof naverNativeLoginMutation
     ) => {
       return async (data: SocialLoginData) => {
         const providerName = PROVIDER_CONFIG[provider].name;
@@ -133,8 +99,7 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
             email: data.email,
             profileImage: data.profileImage,
             cid: data.cid || data.id,
-            mode, // ✅ mode 전달
-            // ✅ 토큰 정보 전달
+            mode: "login", // ✅ 로그인 모드
             accessToken: data.accessToken,
             refreshToken: data.refreshToken,
             tokenType: data.tokenType,
@@ -142,15 +107,13 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
           });
 
           console.log(`✅ ${providerName} 로그인 API 응답:`, result);
-
-          // 쿠키 확인
           console.log("🍪 현재 브라우저 쿠키:", document.cookie);
 
-          // 서버에서 redirectUrl을 반환한 경우 (토큰 검증 페이지로 이동)
+          // 서버에서 redirectUrl을 반환한 경우
           if (result.redirectUrl) {
             const redirectPath = result.redirectUrl as Route;
-            console.log(`🔄 토큰 검증 페이지로 리다이렉트: ${redirectPath}`);
-            // 전체 URL이면 그대로 사용, 상대 경로면 router.push 사용
+            console.log(`🔄 리다이렉트: ${redirectPath}`);
+            
             if (redirectPath.startsWith('http')) {
               window.location.href = redirectPath;
             } else {
@@ -161,10 +124,11 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
             router.push("/");
           }
         } catch (err: any) {
-          // 에러 응답에 redirectUrl이 있는 경우 (토큰 검증 실패 등)
+          // 에러 응답에 redirectUrl이 있는 경우
           if (err?.response?.data?.redirectUrl) {
             const redirectUrl = err.response.data.redirectUrl;
-            console.log(`🔄 에러 응답에 리다이렉트 URL 포함: ${redirectUrl}`);
+            console.log(`🔄 에러 응답 리다이렉트: ${redirectUrl}`);
+            
             if (redirectUrl.startsWith('http')) {
               window.location.href = redirectUrl;
             } else {
@@ -173,7 +137,6 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
             return;
           }
 
-          // 에러 객체를 제대로 직렬화하여 로깅
           const errorDetails = {
             message: err?.message,
             response: err?.response ? {
@@ -184,7 +147,7 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
             stack: err?.stack,
           };
 
-          console.error(`❌ ${providerName} 로그인 처리 실패:`, JSON.stringify(errorDetails, null, 2));
+          console.error(`❌ ${providerName} 로그인 실패:`, JSON.stringify(errorDetails, null, 2));
 
           const errorMessage =
             err?.response?.data?.message ||
@@ -197,10 +160,12 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
         }
       };
     },
-    [router, mode] // ✅ mode를 의존성 배열에 추가
+    [router]
   );
 
-  // 소셜 로그인 실패 공통 핸들러
+  /**
+   * SNS 로그인 실패 공통 핸들러
+   */
   const createSocialLoginErrorHandler = useCallback(
     (provider: "kakao" | "naver") => {
       return (error: SocialLoginError) => {
@@ -254,7 +219,9 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
     handleNaverLoginError,
   ]);
 
-  // 네이티브 앱 로그인 요청
+  /**
+   * 네이티브 앱 로그인 요청
+   */
   const requestNativeLogin = (provider: "kakao" | "naver"): boolean => {
     const config = PROVIDER_CONFIG[provider];
     const requestFn = window[config.requestFunction];
@@ -269,10 +236,12 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
     return false;
   };
 
-  // 웹 OAuth 로그인
+  /**
+   * 웹 OAuth 로그인
+   */
   const requestWebOAuthLogin = (provider: "kakao" | "naver") => {
     const config = PROVIDER_CONFIG[provider];
-    console.log(`🌐 ${config.name} 웹 OAuth 로그인 (웹 환경), mode: ${mode}`);
+    console.log(`🌐 ${config.name} 웹 OAuth 로그인 (웹 환경), mode: login`);
 
     const authUrl = new URL(config.authUrl);
     authUrl.searchParams.set("response_type", "code");
@@ -280,18 +249,16 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
     authUrl.searchParams.set("redirect_uri", config.redirectUri);
 
     // state에 mode 정보 포함
-    const stateData = { mode };
+    const stateData = { mode: "login" };
 
     // Provider별 추가 파라미터
     if (provider === "kakao") {
-      // 카카오: 자동 로그인 방지 + state 추가
       authUrl.searchParams.set("prompt", "login");
       authUrl.searchParams.set(
         "state",
         encodeURIComponent(JSON.stringify(stateData))
       );
     } else if (provider === "naver") {
-      // 네이버: state에 mode 정보 포함
       const randomState = Math.random().toString(36).substring(2, 15);
       const stateWithMode = { ...stateData, naver_state: randomState };
       sessionStorage.setItem("naver_state", randomState);
@@ -304,11 +271,13 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
     window.location.href = authUrl.toString();
   };
 
-  // 소셜 로그인 처리
-  const handleSocialLogin = (provider: SocialProvider) => {
+  /**
+   * SNS 로그인 시작
+   */
+  const handleSnsLogin = (provider: SnsProvider) => {
     setError(null);
 
-    console.log(`🔐 소셜 로그인 시작: ${provider}`);
+    console.log(`🔐 SNS 로그인 시작: ${provider}`);
     console.log(`📱 플러터 브리지 확인:`, {
       kakao: typeof window.requestKakaoLogin,
       naver: typeof window.requestNaverLogin,
@@ -326,11 +295,9 @@ export function useLoginFlow(props?: UseLoginFlowProps): UseLoginFlowReturn {
   };
 
   return {
-    currentStep,
-    isLoading: loginMutation.isPending || isSocialLoading,
+    handleSnsLogin,
+    isLoading: isSocialLoading,
     error,
-    setStep: setCurrentStep,
-    handleLogin,
-    handleSocialLogin,
+    clearError: () => setError(null),
   };
 }

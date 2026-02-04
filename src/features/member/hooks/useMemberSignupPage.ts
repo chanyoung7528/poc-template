@@ -4,6 +4,10 @@
  * 역할: 회원가입 페이지의 모든 비즈니스 로직
  * - Wellness ID 회원가입 시작
  * - SNS 로그인 시작 (카카오, 네이버, 애플)
+ * 
+ * 네이티브 앱 통신:
+ * - 플러터 앱과 웹뷰 간 브리지 통신 지원
+ * - 웹 환경에서는 OAuth로 자동 폴백
  */
 
 import { useRouter } from "next/navigation";
@@ -23,41 +27,29 @@ export function useMemberSignupPage() {
 
   /**
    * 카카오 로그인 시작
-   * - 카카오 SDK 연동 후 accessToken 받아서 처리
+   * - 네이티브 앱: 플러터 브리지로 요청
+   * - 웹: OAuth로 폴백
    */
-  const handleKakaoLogin = async () => {
-    // TODO: 카카오 SDK 연동
-    console.log("카카오 로그인 시작");
-
-    // Mock: 카카오 로그인 성공 후
-    const mockAccessToken = "kakao_mock_token_12345";
-    await snsFlow.handleSnsLoginComplete("KAKAO", mockAccessToken);
+  const handleKakaoLogin = () => {
+    snsFlow.handleSnsLogin("kakao");
   };
 
   /**
    * 네이버 로그인 시작
-   * - 네이버 SDK 연동 후 accessToken 받아서 처리
+   * - 네이티브 앱: 플러터 브리지로 요청
+   * - 웹: OAuth로 폴백
    */
-  const handleNaverLogin = async () => {
-    // TODO: 네이버 SDK 연동
-    console.log("네이버 로그인 시작");
-
-    // Mock: 네이버 로그인 성공 후
-    const mockAccessToken = "naver_mock_token_12345";
-    await snsFlow.handleSnsLoginComplete("NAVER", mockAccessToken);
+  const handleNaverLogin = () => {
+    snsFlow.handleSnsLogin("naver");
   };
 
   /**
    * 애플 로그인 시작
-   * - 애플 SDK 연동 후 accessToken 받아서 처리
+   * - 네이티브 앱: 플러터 브리지로 요청
+   * - 웹: OAuth로 폴백
    */
-  const handleAppleLogin = async () => {
-    // TODO: 애플 SDK 연동
-    console.log("애플 로그인 시작");
-
-    // Mock: 애플 로그인 성공 후
-    const mockAccessToken = "apple_mock_token_12345";
-    await snsFlow.handleSnsLoginComplete("APPLE", mockAccessToken);
+  const handleAppleLogin = () => {
+    snsFlow.handleSnsLogin("apple");
   };
 
   return {

@@ -2,16 +2,28 @@
 
 import { LoginForm } from '@/domains/auth/ui/login/LoginForm';
 import { SocialLoginSection } from '@/domains/auth/ui/social/SocialLoginSection';
-import { useLoginFlow } from '../hooks/useLoginFlow';
+import { useAuthLoginPage } from '../hooks/useAuthLoginPage';
 import styles from './LoginFlow.module.scss';
 
 interface LoginFlowProps {
   onNavigateToSignup?: () => void;
 }
 
+/**
+ * 로그인 플로우 UI
+ * 
+ * 역할: UI 렌더링만 담당
+ * - 모든 비즈니스 로직은 useAuthLoginPage 훅에 위임
+ */
 export function LoginFlow({ onNavigateToSignup }: LoginFlowProps) {
-  const { handleLogin, handleSocialLogin, isLoading, error, setStep } =
-    useLoginFlow({ mode: "login" }); // ✅ 로그인 모드
+  const {
+    handleLogin,
+    handleKakaoLogin,
+    handleNaverLogin,
+    isLoading,
+    error,
+    setStep,
+  } = useAuthLoginPage();
 
   return (
     <div className={styles.loginFlow}>
@@ -30,8 +42,8 @@ export function LoginFlow({ onNavigateToSignup }: LoginFlowProps) {
         />
 
         <SocialLoginSection
-          onKakaoLogin={() => handleSocialLogin('kakao')}
-          onNaverLogin={() => handleSocialLogin('naver')}
+          onKakaoLogin={handleKakaoLogin}
+          onNaverLogin={handleNaverLogin}
           isLoading={isLoading}
           showDivider
         />

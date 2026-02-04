@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import styles from './TermsAgreement.module.scss';
+import { useState } from "react";
+import styles from "./TermsAgreement.module.scss";
+import { usePopup } from "@/shared/hooks/usePopup";
 
 interface TermsAgreementProps {
   onAgree: (agreed: {
@@ -23,6 +24,8 @@ export function TermsAgreement({
     privacy: false,
     marketing: false,
   });
+
+  const { open } = usePopup();
 
   const handleToggle = (key: keyof typeof agreed) => {
     const newAgreed = { ...agreed, [key]: !agreed[key] };
@@ -58,7 +61,7 @@ export function TermsAgreement({
             type="checkbox"
             id="terms"
             checked={agreed.terms}
-            onChange={() => handleToggle('terms')}
+            onChange={() => handleToggle("terms")}
             className={styles.checkbox}
           />
           <label
@@ -69,7 +72,18 @@ export function TermsAgreement({
           </label>
           <button
             type="button"
-            onClick={() => window.open('/terms', '_blank')}
+            onClick={() => {
+              open({
+                title: "서비스 이용약관",
+                content: "서비스 이용약관 내용",
+                onBeforeClose: async () => {
+                  console.info("비동기 작업 시작...");
+                  await new Promise((resolve) => setTimeout(resolve, 500));
+                  console.info("비동기 작업 완료");
+                  return false;
+                },
+              });
+            }}
             className={styles.linkButton}
           >
             보기
@@ -81,7 +95,7 @@ export function TermsAgreement({
             type="checkbox"
             id="privacy"
             checked={agreed.privacy}
-            onChange={() => handleToggle('privacy')}
+            onChange={() => handleToggle("privacy")}
             className={styles.checkbox}
           />
           <label
@@ -92,7 +106,7 @@ export function TermsAgreement({
           </label>
           <button
             type="button"
-            onClick={() => window.open('/privacy', '_blank')}
+            onClick={() => window.open("/privacy", "_blank")}
             className={styles.linkButton}
           >
             보기
@@ -104,7 +118,7 @@ export function TermsAgreement({
             type="checkbox"
             id="marketing"
             checked={agreed.marketing}
-            onChange={() => handleToggle('marketing')}
+            onChange={() => handleToggle("marketing")}
             className={styles.checkbox}
           />
           <label htmlFor="marketing" className={styles.label}>

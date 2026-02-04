@@ -1,38 +1,78 @@
 :root {
-  --base-white: hsl(0, 0%, 100%);
-  --base-black: #000000;
-  --base-background: rgba(247, 245, 241, 1);
+  /* Green Colors */
+  --green-900: #003223;
+  --green-800: #2ab030;
+  --green-700: #66bb6a;
+  --green-600: #8cc74f;
+  --green-500: #00e266;
+  --green-400: #77f715;
+  --green-300: #b7c2a2;
+  --green-200: #dde2ce;
+  --green-100: #ebefe9;
 
-  /* Brand Colors */
-  --brand100: #003b41;
-  --brand90: #005961;
-  --brand80: #007782;
-  --brand70: #0c9dab;
-  --brand60: #2bb3bf;
-  --brand50: #5bc9d4;
-  --brand40: #83d7df;
-  --brand30: #abe6eb;
-  --brand20: #ceeef1;
-  --brand10: #e7f8fa;
+  /* Orange Colors */
+  --orange-900: #6e3218;
+  --orange-800: #ff660d;
+  --orange-700: #ff7043;
+  --orange-600: #fb9b35;
+  --orange-500: #f2bd1d;
+  --orange-400: #fee500;
+  --orange-300: #e1cbb1;
+  --orange-200: #f5ecde;
+  --orange-100: #f6f4ef;
 
-  /* Grayscale */
-  --gray100: #222222;
-  --gray90: #454444;
-  --gray80: #626261;
-  --gray70: #7e7e7d;
-  --gray60: #999898;
-  --gray50: #b1b1b0;
-  --gray40: #d3d3d3;
-  --gray30: #e5e5e5;
-  --gray20: #eeeeee;
-  --gray10: #f8f8f8;
+  /* Blue Colors */
+  --blue-900: #244bd7;
+  --blue-800: #1c6bff;
+  --blue-700: #e1ebff;
+  --blue-600: #ebf1fd;
+  --blue-500: #f2f7ff;
 
-  --orange800: #ff6400;
+  /* Red Colors */
+  --red-900: #df3042;
+  --red-800: #fb5768;
+  --red-700: #ffe1eb;
+  --red-600: #fdebf0;
+  --red-500: #fff6f8;
 
-  /* Semantic Colors */
-  --danger: #ff4d4f;
-  --success: #52c41a;
-  --warning: #faad14;
+  /* Gray Colors */
+  --gray-900: #222222;
+  --gray-800: #434855;
+  --gray-700: #5f646f;
+  --gray-600: #9397a1;
+  --gray-500: #abb0b9;
+  --gray-400: #c5c8ce;
+  --gray-300: #e2e5eb;
+  --gray-200: #ebeef1;
+  --gray-100: #f2f4f8;
+  --gray-050: #fbfbfd;
+  --gray-020: #fdfdfe;
+  --gray-000: #ffffff;
 
-  --info: var(--brand60);
+  --black: #000000;
+  --white: #ffffff;
+
+  /* Dim Colors */
+  --dim-bk-60: oklch(from var(--black) l c h / 60%);
+  --dim-bk-10: oklch(from var(--black) l c h / 10%);
+  --dim-wh-75: oklch(from var(--white) l c h / 75%);
+  --dim-wh-50: oklch(from var(--white) l c h / 50%);
+
+  /* Gradient Colors */
+  --gr001: linear-gradient(93.58deg, #ff9500 9.56%, #f64707 91.09%);
+  --gr002: linear-gradient(135deg, #f69204 0%, #f2c016 100%);
+  --gr003:
+    linear-gradient(0deg, var(--green-100), var(--green-100)),
+    linear-gradient(135deg, #e3c018 0%, #809504 100%);
+  --gr004: linear-gradient(90deg, var(--green-800) 0%, var(--green-600) 100%);
+  --gr005: linear-gradient(
+    270deg,
+    var(--white) 80.36%,
+    oklch(from var(--white) l c h / 0%) 98.21%
+  );
+
+  /* Box Shadow */
+  --shadow-01: 0px 0.8rem 0.8rem 0px oklch(from var(--black) l c h / 8%);
+  --shadow-02: 0px 0.8rem 0.8rem 0px oklch(from var(--black) l c h / 4%);
+  --shadow-03: 0px 0.4rem 0.4rem 0px oklch(from var(--black) l c h / 2%);
 }

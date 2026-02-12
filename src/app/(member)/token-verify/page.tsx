@@ -4,6 +4,9 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./page.module.scss";
 
+// Dynamic rendering 강제 (useSearchParams 사용으로 인해 필요)
+export const dynamic = "force-dynamic";
+
 interface TokenVerificationData {
   success: boolean;
   provider?: string;

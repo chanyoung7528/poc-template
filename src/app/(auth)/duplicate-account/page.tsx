@@ -6,6 +6,9 @@ import { Button } from "@/shared/ui/Button";
 import { LoadingOverlay } from "@/domains/auth/ui/common/LoadingOverlay";
 import styles from "./page.module.scss";
 
+// Dynamic rendering 강제 (useSearchParams 사용으로 인해 필요)
+export const dynamic = "force-dynamic";
+
 function DuplicateAccountContent() {
   const router = useRouter();
   const searchParams = useSearchParams();

@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { FormInput } from "@/domains/auth/ui/common/FormInput";
 import { WellnessIdInput } from "@/domains/auth/ui/input/WellnessIdInput";
+import { wellnessIdSchema } from "@/domains/auth/model/schemas";
 import styles from "./CredentialsForm.module.scss";
 
 interface AccountForm {
@@ -13,13 +14,7 @@ interface AccountForm {
 
 const accountSchema = z
   .object({
-    wellnessId: z
-      .string()
-      .min(10, "")
-      .max(15, "")
-      .regex(/^[a-z0-9]+$/, "")
-      .regex(/[a-z]/, "")
-      .regex(/\d/, ""),
+    wellnessId: wellnessIdSchema,
     password: z
       .string()
       .min(8, "비밀번호는 8자 이상이어야 합니다")

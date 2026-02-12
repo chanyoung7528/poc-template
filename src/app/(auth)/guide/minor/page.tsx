@@ -4,6 +4,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/shared/ui/Button";
 import styles from "./page.module.scss";
 
+// Dynamic rendering 강제
+export const dynamic = "force-dynamic";
+
 export default function MinorGuidePage() {
   const router = useRouter();
 

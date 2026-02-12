@@ -8,9 +8,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { agrmNo: string } }
+  { params }: { params: Promise<{ agrmNo: string }> }
 ) {
-  const { agrmNo } = params;
+  const { agrmNo } = await params;
 
   // Mock 약관 데이터
   const agreements: Record<string, any> = {

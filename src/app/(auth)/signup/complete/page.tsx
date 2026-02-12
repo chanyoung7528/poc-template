@@ -8,6 +8,9 @@ import { useSignupCompleteFlow } from "@/features/auth/hooks/useSignupCompleteFl
 import { useGroupMatching } from "@/features/auth/hooks/useGroupMatching";
 import { SignupCompleteView } from "@/features/auth/ui/SignupCompleteView";
 
+// Dynamic rendering 강제 (useSearchParams 사용으로 인해 필요)
+export const dynamic = "force-dynamic";
+
 function SignupCompleteContent() {
   const searchParams = useSearchParams();
   const wellnessId = searchParams.get("wellnessId") || "welless04";

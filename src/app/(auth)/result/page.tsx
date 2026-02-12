@@ -6,6 +6,9 @@ import { MaskedAccountView } from "@/domains/auth/ui/common/MaskedAccountView";
 import { Button } from "@/shared/ui/Button";
 import styles from "./page.module.scss";
 
+// Dynamic rendering 강제 (useSearchParams 사용으로 인해 필요)
+export const dynamic = "force-dynamic";
+
 function AuthResultContent() {
   const searchParams = useSearchParams();
   const router = useRouter();

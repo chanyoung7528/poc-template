@@ -5,12 +5,11 @@ import { useEffect, useState } from "react";
 import type { Control, FieldValues, Path } from "react-hook-form";
 import { useController } from "react-hook-form";
 import { useWellnessIdDuplicateCheck } from "@/features/member/hooks/useWellnessIdDuplicateCheck";
+import {
+  wellnessIdValidationRules,
+  type WellnessIdValidationRule,
+} from "@/domains/auth/model/schemas";
 import styles from "./WellnessIdInput.module.scss";
-
-interface ValidationRule {
-  label: string;
-  check: (value: string) => boolean;
-}
 
 interface WellnessIdInputProps<T extends FieldValues = FieldValues> {
   name: Path<T>;
@@ -20,21 +19,6 @@ interface WellnessIdInputProps<T extends FieldValues = FieldValues> {
   // onDuplicateCheck는 선택적 (없으면 내부 훅 사용)
   onDuplicateCheck?: (value: string) => Promise<boolean>; // true면 사용가능, false면 중복/오류
 }
-
-const VALIDATION_RULES: ValidationRule[] = [
-  {
-    label: "영문 소문자",
-    check: (value: string) => /[a-z]/.test(value) && /^[a-z0-9]*$/.test(value),
-  },
-  {
-    label: "숫자",
-    check: (value: string) => /\d/.test(value),
-  },
-  {
-    label: "10-15자",
-    check: (value: string) => value.length >= 10 && value.length <= 15,
-  },
-];
 
 export function WellnessIdInput<T extends FieldValues = FieldValues>({
   name,
@@ -59,20 +43,23 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
   const value = field.value ?? "";
   const hasValue = String(value).length > 0;
 
-  // 각 규칙의 통과 여부 계산
-  const ruleResults = VALIDATION_RULES.map((rule) => ({
+  // 각 규칙의 통과 여부 계산 (스키마에서 가져온 검증 규칙 사용)
+  const ruleResults = wellnessIdValidationRules.map((rule) => ({
     ...rule,
     passed: rule.check(value),
   }));
 
   // 아이디 중복확인 결과를 규칙 배열에 추가
-  const duplicateCheckResult = {
+  const duplicateCheckResult: WellnessIdValidationRule & { passed: boolean } = {
     label: "아이디 중복확인",
+    check: () => isDuplicate === false,
     passed: isDuplicate === false,
   };
 
   // 모든 검증 결과 통합 (기본 규칙 + 중복확인)
   const allValidationResults = [...ruleResults, duplicateCheckResult];
+
+  console.log("allValidationResults ", allValidationResults);
 
   // 모든 규칙 통과 여부
   const allRulesPassed = ruleResults.every((r) => r.passed) && hasValue;
@@ -108,7 +95,7 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
   const handleBlur = async () => {
     setIsFocused(false);
     field.onBlur();
-    
+
     // 블러 시 모든 벨리데이션이 통과되었으면 중복 체크 실행
     if (allRulesPassed) {
       await performDuplicateCheck();
@@ -241,9 +228,6 @@ export function WellnessIdInput<T extends FieldValues = FieldValues>({
             ))}
           </div>
         )}
-
-        {/* react-hook-form 에러 메시지 */}
-        {error && <p className={styles.helperTextError}>{error.message}</p>}
       </div>
     </div>
   );

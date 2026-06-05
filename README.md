@@ -272,3 +272,109 @@ JWT_SECRET=your_secret
 **Status:** ✅ Production Ready  
 **Architecture:** FSD + DDD + Widget Layer  
 **Last Updated:** 2026-01-27
+
+
+
+/* ==========================================
+   FOUNDATION COLORS
+========================================== */
+
+:root {
+  /* Neutral */
+  --neutral-140: #1f2329;
+  --neutral-100: #3d434c;
+  --neutral-80: #606874;
+  --neutral-60: #8d96a2;
+  --neutral-40: #c4c9d1;
+  --neutral-20: #e8ebef;
+  --neutral-10: #f5f7fa;
+
+  /* Basic Button */
+  --button-140: #20252b;
+  --button-100: #37404a;
+  --button-80: #55606e;
+  --button-60: #7f8997;
+  --button-40: #bcc2ca;
+  --button-20: #e4e7eb;
+  --button-10: #f7f8fa;
+
+  /* Primary */
+  --primary-140: #0b5b32;
+  --primary-120: #0d7741;
+  --primary-100: #12a053; /* base */
+  --primary-80: #35bc72;
+  --primary-60: #6ad49b;
+  --primary-40: #a9ebc7;
+  --primary-20: #ddf8e9;
+  --primary-10: #f2fcf6;
+
+  /* Success */
+  --success-140: #205ca8;
+  --success-120: #2c73d8;
+  --success-100: #4a90ff;
+  --success-80: #72acff;
+  --success-60: #a0c8ff;
+  --success-40: #cfe2ff;
+  --success-20: #eaf2ff;
+  --success-10: #f6f9ff;
+
+  /* Warning */
+  --warning-140: #b74b1d;
+  --warning-120: #d96126;
+  --warning-100: #ff813c;
+  --warning-80: #ff9c69;
+  --warning-60: #ffbe9e;
+  --warning-40: #ffdcca;
+  --warning-20: #fff0e7;
+  --warning-10: #fff8f4;
+
+  /* Error */
+  --error-140: #bf1c4a;
+  --error-120: #e12b5d;
+  --error-100: #ff4775;
+  --error-80: #ff6e92;
+  --error-60: #ff9eb4;
+  --error-40: #ffc9d5;
+  --error-20: #ffe8ee;
+  --error-10: #fff5f8;
+
+  /* Secondary */
+  --pink-100: #ff4e85;
+  --orange-100: #ff8d3f;
+  --yellow-100: #ffc93c;
+  --green-100: #1dcf71;
+  --skyblue-100: #4ab8ff;
+  --blue-100: #4f67ff;
+  --opium-100: #8a839d;
+  --black-100: #222222;
+}
+
+
+/* ==========================================
+   SEMANTIC TOKENS
+========================================== */
+
+:root {
+  /* Text */
+  --text-primary: var(--neutral-140);
+  --text-secondary: var(--neutral-80);
+  --text-disabled: var(--neutral-40);
+
+  /* Background */
+  --bg-primary: #fff;
+  --bg-secondary: var(--neutral-10);
+
+  /* Border */
+  --border-default: var(--neutral-20);
+  --border-focus: var(--primary-100);
+
+  /* Status */
+  --status-success: var(--success-100);
+  --status-warning: var(--warning-100);
+  --status-error: var(--error-100);
+
+  /* Button */
+  --button-primary-bg: var(--primary-100);
+  --button-primary-hover: var(--primary-120);
+  --button-disabled: var(--neutral-20);
+}
